@@ -1,7 +1,6 @@
 import express, { Request, Response, NextFunction } from 'express';
 import { expect } from 'chai';
 import request from 'supertest';
-import bcrypt from 'bcrypt';
 
 import RequestError from '../util/error';
 import isAuth from '../middleware/auth';

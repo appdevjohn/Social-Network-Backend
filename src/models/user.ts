@@ -39,7 +39,7 @@ class User {
      * Creates the user in the database.
      * @returns Whether or not the action was successful.
      */
-    create = (): Promise<boolean> => {
+    create(): Promise<boolean> {
         const newAccount: AccountType = {
             firstName: this.firstName,
             lastName: this.lastName,
@@ -66,7 +66,7 @@ class User {
      * Finds out if this user exists in the database.
      * @returns Whether or not the user has been created in the database.
      */
-    isCreated = (): Promise<boolean> => {
+    isCreated(): Promise<boolean> {
         if (this.id) {
             return getUser(this.id).then(result => {
                 return result.rowCount > 0;
@@ -83,7 +83,7 @@ class User {
      * @param token The token used to activate the account.
      * @returns Whether or not the token could successfully activate the account.
      */
-    activate = async (token: string): Promise<boolean> => {
+    async activate (token: string): Promise<boolean> {
         if (this.id && token === this.activateToken) {
             this.activated = true;
             this.activateToken = null;
@@ -98,7 +98,7 @@ class User {
      * Updates the user in the database.
      * @returns Whether or not the action was successful.
      */
-    update = (): Promise<boolean> => {
+    update(): Promise<boolean> {
         if (this.id) {
             const updatedAccount: AccountType = {
                 firstName: this.firstName,
@@ -128,7 +128,7 @@ class User {
      * Deletes the user from the database.
      * @returns Whether or not the action was successful.
      */
-    delete = (): Promise<boolean> => {
+    delete(): Promise<boolean> {
         if (this.id) {
             return deleteUser(this.id).then(result => {
                 if (result.rowCount > 0) {

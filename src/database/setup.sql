@@ -1,6 +1,7 @@
+CREATE TYPE content_type AS ENUM ('text', 'image');
+
 CREATE TABLE users (
     id BIGSERIAL PRIMARY KEY NOT NULL,
-    created_at 
     first_name VARCHAR(64) NOT NULL,
     last_name VARCHAR(64) NOT NULL,
     email VARCHAR(128) NOT NULL,
@@ -13,16 +14,18 @@ CREATE TABLE users (
 CREATE TABLE messages (
     id BIGSERIAL PRIMARY KEY NOT NULL,
     user_id BIGINT NOT NULL,
-    convo_id BIGINT NOT NULL,
+    convo_id BIGINT,
+    post_id BIGINT,
     content VARCHAR(1024) NOT NULL,
-    type VARCHAR(16) NOT NULL
+    type content_type NOT NULL
 );
 
 CREATE TABLE posts (
     id BIGSERIAL PRIMARY KEY NOT NULL,
     user_id BIGINT NOT NULL,
     group_id BIGINT NOT NULL,
-    text VARCHAR(1024) NOT NULL,
+    title VARCHAR(128) NOT NULL,
+    text VARCHAR(1024),
     media VARCHAR(128)
 );
 
