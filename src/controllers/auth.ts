@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import RequestError from '../util/error';
 import User, { AuthToken } from '../models/user';
 
 export const ping = async (req: Request, res: Response, next: NextFunction) => {
@@ -12,19 +13,13 @@ export const ping = async (req: Request, res: Response, next: NextFunction) => {
                     message: 'Authenticated'
                 });
             } else {
-                return res.status(401).json({
-                    message: 'Not Authenticated'
-                });
+                return next(RequestError.notAuthorized());
             }
         } catch (error) {
-            return res.status(401).json({
-                message: 'Not Authenticated'
-            });
+            return next(RequestError.notAuthorized());
         }
     } else {
-        return res.status(401).json({
-            message: 'Not Authenticated'
-        });
+        return next(RequestError.notAuthorized());
     }
 }
 
@@ -36,9 +31,7 @@ export const logIn = async (req: Request, res: Response, next: NextFunction) => 
     try {
         user = await User.findByEmail(email);
     } catch (error) {
-        return res.status(404).json({
-            message: 'This account does not exist.'
-        });
+        return next(RequestError.accountDoesNotExist());
     }
 
     if (user) {
@@ -54,15 +47,11 @@ export const logIn = async (req: Request, res: Response, next: NextFunction) => 
                 message: 'You are now logged in.'
             });
         } else {
-            return res.status(401).json({
-                message: 'Password is incorrect.'
-            });
+            return next(RequestError.passwordIncorrect());
         }
 
     } else {
-        return res.status(404).json({
-            message: 'This account does not exist.'
-        });
+        return next(RequestError.accountDoesNotExist());
     }
 }
 
@@ -75,14 +64,10 @@ export const signUp = async (req: Request, res: Response, next: NextFunction) =>
     try {
         const emailTaken = await User.accountWithEmailExists(email);
         if (emailTaken) {
-            return res.status(409).json({
-                message: 'This email account is taken.'
-            });
+            return next(RequestError.withMessageAndCode('This email account is taken.', 409));
         }
     } catch (error) {
-        return res.status(500).json({
-            message: 'Something went wrong creating your account.'
-        });
+        return next(RequestError.withMessageAndCode('Something went wrong creating your account.', 500));
     }
 
     const hashedPassword = await bcrypt.hash(password, 12);
@@ -104,9 +89,7 @@ export const signUp = async (req: Request, res: Response, next: NextFunction) =>
     try {
         accountCreated = await newUser.create();
     } catch (error) {
-        return res.status(500).json({
-            message: 'Something went wrong creating your account.'
-        });
+        return next(RequestError.withMessageAndCode('Something went wrong creating your account.', 500));
     }
 
     if (accountCreated) {
@@ -119,9 +102,7 @@ export const signUp = async (req: Request, res: Response, next: NextFunction) =>
             message: 'Find our activation email to activate your account.'
         });
     } else {
-        return res.status(500).json({
-            message: 'There was an error creating this account.'
-        });
+        return next(RequestError.withMessageAndCode('Something went wrong creating your account.', 500));
     }
 }
 
@@ -132,10 +113,7 @@ export const confirmEmail = async (req: Request, res: Response, next: NextFuncti
     try {
         user = await User.findById(req.userId || '');
     } catch (error) {
-        return res.status(500).json({
-            activated: false,
-            message: 'Account activation failed.'
-        });
+        return next(RequestError.withMessageAndCode('Account activation failed.', 500));
     }
     const successfulActivation = await user.activate(activateToken as string);
 
@@ -145,10 +123,7 @@ export const confirmEmail = async (req: Request, res: Response, next: NextFuncti
             message: 'You can now sign into the account.'
         });
     } else {
-        return res.status(406).json({
-            activated: user.activated,
-            message: 'The activation code was incorrect.'
-        });
+        return next(RequestError.withMessageAndCode('The activation code was incorrect.', 406));
     }
 }
 

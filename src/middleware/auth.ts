@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 
+import RequestError from '../util/error';
 import { AuthToken } from '../models/user';
 
 const isAuth = (req: Request, res: Response, next: NextFunction) => {
@@ -8,7 +9,7 @@ const isAuth = (req: Request, res: Response, next: NextFunction) => {
     
     if (!authHeader) {
         req.userId = null;
-        return next();
+        throw RequestError.notAuthorized();
     } else {
         const token = authHeader.split(' ')[1];
         let decodedToken: AuthToken;
@@ -16,11 +17,11 @@ const isAuth = (req: Request, res: Response, next: NextFunction) => {
             decodedToken = jwt.verify(token, 'secret') as AuthToken;
         } catch (error) {
             req.userId = null;
-            return next();
+            throw RequestError.notAuthorized();
         }
         if (!decodedToken) {
             req.userId = null;
-            return next();
+            throw RequestError.notAuthorized();
         }
 
         req.userId = decodedToken.userId;
