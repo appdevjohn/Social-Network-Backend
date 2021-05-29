@@ -14,8 +14,6 @@ router.post('/conversations/new', isAuth, messagesController.postNewConversation
 
 router.post('/conversations/edit', isAuth, messagesController.postEditConversation);
 
-router.post('/conversations/delete', isAuth, messagesController.postDeleteConversation);
-
 router.post('/conversations/leave', isAuth, messagesController.postLeaveConversation);
 
 router.post('/messages/new', isAuth, messagesController.postNewMessage);

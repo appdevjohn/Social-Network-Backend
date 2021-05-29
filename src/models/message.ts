@@ -112,14 +112,7 @@ class Message {
     static findByConvoId = (convoId: string): Promise<Message[]> => {
         return getMessagesFromConversation(convoId).then(result => {
             const messages = result.rows.map(row => {
-                return new Message({
-                    userId: row['user_id'],
-                    convoId: row['convo_id'],
-                    postId: row['post_id'],
-                    content: row['content'],
-                    type: row['type'],
-                    id: row['id']
-                });
+                return Message.parseRow(row);
             });
             return messages;
         }).catch(error => {
@@ -130,14 +123,7 @@ class Message {
     static findByPostId = (postId: string): Promise<Message[]> => {
         return getMessagesFromPost(postId).then(result => {
             const messages = result.rows.map(row => {
-                return new Message({
-                    userId: row['user_id'],
-                    convoId: row['convo_id'],
-                    postId: row['post_id'],
-                    content: row['content'],
-                    type: row['type'],
-                    id: row['id']
-                });
+                return Message.parseRow(row);
             });
             return messages;
         }).catch(error => {
