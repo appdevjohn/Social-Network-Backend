@@ -56,9 +56,10 @@ export const logIn = async (req: Request, res: Response, next: NextFunction) => 
 }
 
 export const signUp = async (req: Request, res: Response, next: NextFunction) => {
-    const firstName: string = req.body.firstName;
-    const lastName: string = req.body.lastName;
-    const email: string = req.body.email.toLowerCase();
+    const firstName: string = req.body.firstName.trim();
+    const lastName: string = req.body.lastName.trim();
+    const username: string = req.body.username.trim();
+    const email: string = req.body.email.trim().toLowerCase();
     const password: string = req.body.password;
 
     try {
@@ -79,6 +80,7 @@ export const signUp = async (req: Request, res: Response, next: NextFunction) =>
     const newUser = new User({
         firstName: firstName,
         lastName: lastName,
+        username: username,
         email: email,
         hashedPassword: hashedPassword,
         activated: false,

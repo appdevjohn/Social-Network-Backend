@@ -8,14 +8,21 @@ import User from '../models/user';
 import * as authController from '../controllers/auth';
 
 describe('Auth Tests', () => {
-    after(async function () {
-        try {
-            const user = await User.findByEmail('john@bison.software');
-            await user.delete();
+    const app = express();
 
-        } catch (error) {
-            throw new Error('Could not clean up after auth tests.');
-        }
+    before(function () {
+        app.use(express.json());
+
+        app.get('/ping', isAuth, authController.ping);
+        app.post('/signup', authController.signUp);
+        app.put('/login', authController.logIn);
+        app.put('/confirm-email', isAuth, authController.confirmEmail);
+
+        app.use((error: RequestError, req: Request, res: Response, next: NextFunction) => {
+            return res.status(error.code || 500).json({
+                message: error.message
+            });
+        });
     });
 
     it('should throw an error if no authorization header is present', function () {
@@ -30,178 +37,161 @@ describe('Auth Tests', () => {
         expect(isAuth.bind(this, req, {} as Response, nextFn)).to.throw('Not Authorized');
     });
 
-    it('should be able to sign a user up', function (done) {
-        const app = express();
-        app.use(express.json());
-
-        app.use(authController.signUp);
-        app.use((error: RequestError, req: Request, res: Response, next: NextFunction) => {
-            return res.status(error.code || 500).json({
-                message: error.message
-            });
-        });
-
-        request(app)
-            .post('/')
-            .send({ firstName: 'John', lastName: 'Champion', email: 'john@bison.software', password: 'asdf' })
-            .expect(201, done);
-    });
-
-    it('should fail to activate accounts with a wrong code', async function () {
-        const app = express();
-        app.use(express.json());
-
-        let user: User;
-        try {
-            user = await User.findByEmail('john@bison.software');
-        } catch (error) {
-            throw new Error('Could not find user.');
-        }
-
-        app.use((req: Request, res: Response, next: NextFunction) => {
-            req.userId = user.id;
-            next();
-        })
-        app.use(authController.confirmEmail);
-        app.use((error: RequestError, req: Request, res: Response, next: NextFunction) => {
-            return res.status(error.code || 500).json({
-                message: error.message
-            });
-        });
-
-        if (user) {
-            return request(app)
-                .post('/')
-                .send({ activateToken: '0' })
-                .then(res => {
-                    expect(res.statusCode).to.not.equal(200);
-                });
-        } else {
-            throw new Error('Could not find user.');
-        }
-    });
-
-    it('should activate account with correct activation code', async function () {
-        const app = express();
-        app.use(express.json());
-
-        let user: User;
-        try {
-            user = await User.findByEmail('john@bison.software');
-        } catch (error) {
-            throw new Error('Could not find user.');
-        }
-
-        app.use((req: Request, res: Response, next: NextFunction) => {
-            req.userId = user.id;
-            next();
-        })
-        app.use(authController.confirmEmail);
-        app.use((error: RequestError, req: Request, res: Response, next: NextFunction) => {
-            return res.status(error.code || 500).json({
-                message: error.message
-            });
-        });
-
-        if (user) {
-            return request(app)
-                .post('/')
-                .send({ activateToken: user.activateToken })
-                .expect(200);
-        } else {
-            throw new Error('Could not find user.');
-        }
-    });
-
-    it('should log in with working credentials', function (done) {
-        const app = express();
-        app.use(express.json());
-
-        app.use(authController.logIn);
-        app.use((error: RequestError, req: Request, res: Response, next: NextFunction) => {
-            return res.status(error.code || 500).json({
-                message: error.message
-            });
-        });
-
-        request(app)
-            .post('/')
-            .send({ email: 'john@bison.software', password: 'asdf' })
-            .then(res => {
-                expect(res.statusCode).to.equal(200);
-                done();
-            }).catch(error => {
-                console.log('ERROR');
-                console.log(error);
-                done(error)
-            });
-    });
-
-    it('should throw an error with an incorrect email or password', function (done) {
-        const app = express();
-        app.use(express.json());
-
-        app.use(authController.logIn);
-        app.use((error: RequestError, req: Request, res: Response, next: NextFunction) => {
-            return res.status(error.code || 500).json({
-                message: error.message
-            });
-        });
-
-        request(app)
-            .post('/')
-            .send({ email: 'john@bison.software', password: '' })
-            .expect(401, done);
-    });
-
-    it('should return authenticated on a authorized ping', async function () {
-        const app = express();
-        app.use(express.json());
-
-        let user: User;
-        try {
-            user = await User.findByEmail('john@bison.software');
-        } catch (error) {
-            throw new Error('Could not find user.');
-        }
-
-        app.use((req: Request, res: Response, next: NextFunction) => {
-            req.userId = user.id;
-            next();
-        });
-        app.use(authController.ping);
-        app.use((error: RequestError, req: Request, res: Response, next: NextFunction) => {
-            return res.status(error.code || 500).json({
-                message: error.message
-            });
-        });
-
+    it('should be able to sign a user up', function () {
         return request(app)
-            .post('/')
-            .send()
-            .expect(200);
+            .post('/signup')
+            .send({ firstName: 'John', lastName: 'Champion', username: 'appdevjohn', email: 'john@bison.software', password: 'asdf' })
+            .expect(201)
+            .then(res => {
+                return User.findByEmail('john@bison.software');
+            }).then(user => {
+                return user.delete();
+            });
+    });
+
+    it('should fail to activate accounts with a wrong code', function () {
+        return request(app)
+            .post('/signup')
+            .send({ firstName: 'John', lastName: 'Champion', username: 'appdevjohn', email: 'john@bison.software', password: 'asdf' })
+            .then(res => {
+                const token = res.body.token;
+                return request(app)
+                    .put('/confirm-email')
+                    .set('Authorization', 'Bearer ' + token)
+                    .send({ activateToken: '0' })
+                    .expect(406);
+            }).then(() => {
+                return User.findByEmail('john@bison.software');
+            }).then(user => {
+                return user.delete();
+            });
+    });
+
+    it('should activate account with correct activation code', function () {
+        return request(app)
+            .post('/signup')
+            .send({ firstName: 'John', lastName: 'Champion', username: 'appdevjohn', email: 'john@bison.software', password: 'asdf' })
+            .then(res => {
+                const token = res.body.token;
+
+                return User.findByEmail('john@bison.software').then(user => {
+                    return request(app)
+                        .put('/confirm-email')
+                        .set('Authorization', 'Bearer ' + token)
+                        .send({ activateToken: user.activateToken })
+                        .expect(200);
+                });
+            }).then(() => {
+                return User.findByEmail('john@bison.software');
+            }).then(user => {
+                return user.delete();
+            });
+    });
+
+    it('should log in with working credentials', function () {
+        return request(app)
+            .post('/signup')
+            .send({ firstName: 'John', lastName: 'Champion', username: 'appdevjohn', email: 'john@bison.software', password: 'asdf' })
+            .then(res => {
+                const token = res.body.token;
+
+                return User.findByEmail('john@bison.software').then(user => {
+                    return request(app)
+                        .put('/confirm-email')
+                        .set('Authorization', 'Bearer ' + token)
+                        .send({ activateToken: user.activateToken })
+                        .expect(200);
+                });
+            }).then(() => {
+                return request(app)
+                    .put('/login')
+                    .send({ email: 'john@bison.software', password: 'asdf' })
+                    .expect(200);
+            }).then(() => {
+                return User.findByEmail('john@bison.software');
+            }).then(user => {
+                return user.delete();
+            });
+    });
+
+    it('should throw an error with an incorrect email or password', function () {
+        return request(app)
+            .post('/signup')
+            .send({ firstName: 'John', lastName: 'Champion', username: 'appdevjohn', email: 'john@bison.software', password: 'asdf' })
+            .then(res => {
+                const token = res.body.token;
+
+                return User.findByEmail('john@bison.software').then(user => {
+                    return request(app)
+                        .put('/confirm-email')
+                        .set('Authorization', 'Bearer ' + token)
+                        .send({ activateToken: user.activateToken })
+                        .expect(200);
+                });
+            }).then(() => {
+                return request(app)
+                    .put('/login')
+                    .send({ email: 'john@bison.software', password: 'incorrect_password' })
+                    .expect(401);
+            }).then(() => {
+                return User.findByEmail('john@bison.software');
+            }).then(user => {
+                return user.delete();
+            });
+    });
+
+    it('should return authenticated on a authorized ping', function () {
+        let token: string;
+        return request(app)
+            .post('/signup')
+            .send({ firstName: 'John', lastName: 'Champion', username: 'appdevjohn', email: 'john@bison.software', password: 'asdf' })
+            .then(res => {
+                token = res.body.token;
+
+                return User.findByEmail('john@bison.software').then(user => {
+                    return request(app)
+                        .put('/confirm-email')
+                        .set('Authorization', 'Bearer ' + token)
+                        .send({ activateToken: user.activateToken })
+                });
+            }).then(() => {
+                return request(app)
+                    .get('/ping')
+                    .set('Authorization', 'Bearer ' + token)
+                    .send()
+                    .expect(200);
+            }).then(() => {
+                return User.findByEmail('john@bison.software');
+            }).then(user => {
+                return user.delete();
+            });
     });
 
     it('should throw an error on an unauthorized ping', async function () {
-        const app = express();
-        app.use(express.json());
-
-        app.use((req: Request, res: Response, next: NextFunction) => {
-            req.userId = 'inauthentic_id';
-            next();
-        });
-        app.use(authController.ping);
-        app.use((error: RequestError, req: Request, res: Response, next: NextFunction) => {
-            return res.status(error.code || 500).json({
-                message: error.message
-            });
-        });
-
         return request(app)
-            .post('/')
-            .send()
+            .post('/signup')
+            .send({ firstName: 'John', lastName: 'Champion', username: 'appdevjohn', email: 'john@bison.software', password: 'asdf' })
             .then(res => {
+                const token = res.body.token;
+
+                return User.findByEmail('john@bison.software').then(user => {
+                    return request(app)
+                        .put('/confirm-email')
+                        .set('Authorization', 'Bearer ' + token)
+                        .send({ activateToken: user.activateToken })
+                        .expect(200);
+                });
+            }).then(() => {
+                return request(app)
+                    .get('/ping')
+                    .set('Authorization', 'Bearer inauthentic_token')
+                    .send();
+            }).then(res => {
                 expect(res.statusCode).to.not.equal(200);
+            }).then(() => {
+                return User.findByEmail('john@bison.software');
+            }).then(user => {
+                return user.delete();
             });
     });
 });

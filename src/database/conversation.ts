@@ -14,7 +14,7 @@ export const getConversationsByUserId = (userId: string): Promise<QueryResult> =
 }
 
 export const createConversation = (newConversation: ConversationType): Promise<QueryResult> => {
-    return query('INSERT INTO conversation (name) VALUES ($1) RETURNING *', [newConversation.name]);
+    return query('INSERT INTO conversations (name) VALUES ($1) RETURNING *', [newConversation.name]);
 }
 
 export const updateConversation = (convoId: string, updatedConversation: ConversationType): Promise<QueryResult> => {

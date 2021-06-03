@@ -4,22 +4,22 @@ import isAuth from '../middleware/auth';
 
 const router = Router();
 
+router.get('/validate-recipient/:username', isAuth, messagesController.canMessageUser);
+
 router.get('/conversations', isAuth, messagesController.getConversations);
 
 router.get('/conversations/:convoId', isAuth, messagesController.getMessages);
 
 router.get('/messages/:messageId', isAuth, messagesController.getMessage);
 
-router.post('/conversations/new', isAuth, messagesController.postNewConversation);
+router.post('/conversations/new', isAuth, messagesController.newConversation);
 
-router.post('/conversations/edit', isAuth, messagesController.postEditConversation);
+router.put('/conversations/edit', isAuth, messagesController.editConversation);
 
-router.post('/conversations/leave', isAuth, messagesController.postLeaveConversation);
+router.put('/conversations/leave', isAuth, messagesController.leaveConversation);
 
-router.post('/messages/new', isAuth, messagesController.postNewMessage);
+router.post('/messages/new', isAuth, messagesController.newMessage);
 
-router.post('/messages/edit', isAuth, messagesController.postEditMessage);
-
-router.post('/messages/delete', isAuth, messagesController.postDeleteMessage);
+router.delete('/messages/delete', isAuth, messagesController.deleteMessage);
 
 export default router;

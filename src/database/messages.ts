@@ -68,3 +68,11 @@ export const updateMessage = (messageId: string, updatedMessage: MessageType): P
 export const deleteMessage = (messageId: string): Promise<QueryResult> => {
     return query('DELETE FROM messages WHERE id = $1 RETURNING *;', [messageId]);
 }
+
+export const deleteMessagesFromConversation = (convoId: string): Promise<QueryResult> => {
+    return query('DELETE FROM messages WHERE convo_id = $1 RETURNING *;', [convoId]);
+}
+
+export const deleteMessagesFromPost = (postId: string): Promise<QueryResult> => {
+    return query('DELETE FROM messages WHERE post_id = $1 RETURNING *;', [postId]);
+}

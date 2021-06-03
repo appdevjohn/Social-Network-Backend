@@ -4,6 +4,7 @@ import query from './index';
 export interface AccountType {
     firstName?: string,
     lastName?: string,
+    username?: string,
     email?: string,
     hashedPassword?: string,
     activated?: boolean,
@@ -18,8 +19,12 @@ export const getUserByEmail = (email: string): Promise<QueryResult> => {
     return query('SELECT * FROM users WHERE email = $1;', [email]);
 }
 
+export const getUserByUsername = (username: string): Promise<QueryResult> => {
+    return query('SELECT * FROM users WHERE username = $1;', [username]);
+}
+
 export const createUser = (newAccount: AccountType): Promise<QueryResult> => {
-    return query('INSERT INTO users (first_name, last_name, email, hashed_password, activated, activate_token) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *;', [newAccount.firstName, newAccount.lastName, newAccount.email, newAccount.hashedPassword, newAccount.activated, newAccount.activateToken]);
+    return query('INSERT INTO users (first_name, last_name, username, email, hashed_password, activated, activate_token) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *;', [newAccount.firstName, newAccount.lastName, newAccount.username, newAccount.email, newAccount.hashedPassword, newAccount.activated, newAccount.activateToken]);
 }
 
 export const updateUser = (userId: string, updatedAccount: AccountType): Promise<QueryResult> => {
@@ -35,6 +40,9 @@ export const updateUser = (userId: string, updatedAccount: AccountType): Promise
                 break;
             case 'lastName':
                 queryString = queryString + ' last_name = $' + (index + 1)
+                break;
+            case 'username':
+                queryString = queryString + ' username = $' + (index + 1)
                 break;
             case 'email':
                 queryString = queryString + ' email = $' + (index + 1)

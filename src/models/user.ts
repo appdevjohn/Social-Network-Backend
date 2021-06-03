@@ -1,9 +1,18 @@
-import { AccountType, getUser, createUser, updateUser, deleteUser, getUserByEmail } from '../database/auth';
+import {
+    AccountType,
+    getUser,
+    createUser,
+    updateUser,
+    deleteUser,
+    getUserByEmail,
+    getUserByUsername
+} from '../database/auth';
 import query from '../database/index';
 
 export interface UserConfigType {
     firstName: string,
     lastName: string,
+    username: string,
     email: string,
     hashedPassword: string,
     activated: boolean,
@@ -19,6 +28,7 @@ export interface AuthToken {
 class User {
     firstName: string;
     lastName: string;
+    username: string;
     email: string;
     hashedPassword: string;
     activated: boolean;
@@ -28,6 +38,7 @@ class User {
     constructor(config: UserConfigType) {
         this.firstName = config.firstName || '';
         this.lastName = config.lastName || '';
+        this.username = config.username || '';
         this.email = config.email || '';
         this.hashedPassword = config.hashedPassword || '';
         this.activated = config.activated;
@@ -43,6 +54,7 @@ class User {
         const newAccount: AccountType = {
             firstName: this.firstName,
             lastName: this.lastName,
+            username: this.username,
             email: this.email,
             hashedPassword: this.hashedPassword,
             activated: this.activated,
@@ -83,7 +95,7 @@ class User {
      * @param token The token used to activate the account.
      * @returns Whether or not the token could successfully activate the account.
      */
-    async activate (token: string): Promise<boolean> {
+    async activate(token: string): Promise<boolean> {
         if (this.id && token === this.activateToken) {
             this.activated = true;
             this.activateToken = null;
@@ -103,12 +115,13 @@ class User {
             const updatedAccount: AccountType = {
                 firstName: this.firstName,
                 lastName: this.lastName,
+                username: this.username,
                 email: this.email,
                 hashedPassword: this.hashedPassword,
                 activated: this.activated,
                 activateToken: this.activateToken
             }
-    
+
             return updateUser(this.id, updatedAccount).then(result => {
                 if (result.rowCount > 0) {
                     return true;
@@ -145,18 +158,15 @@ class User {
         }
     }
 
+    static accountWithEmailExists = async (email: string): Promise<boolean> => {
+        const result = await query('SELECT id FROM users WHERE email = $1;', [email]);
+        return result.rowCount > 0;
+    }
+
     static findById = (userId: string): Promise<User> => {
         return getUser(userId).then(result => {
             if (result.rowCount > 0) {
-                return new User({
-                    firstName: result.rows[0]['first_name'],
-                    lastName: result.rows[0]['last_name'],
-                    email: result.rows[0]['email'],
-                    hashedPassword: result.rows[0]['hashed_password'],
-                    activated: result.rows[0]['activated'],
-                    activateToken: result.rows[0]['activate_token'],
-                    id: result.rows[0]['id']
-                });
+                return User.parseRow(result.rows[0]);
             } else {
                 throw new Error('Could not find this account.');
             }
@@ -168,15 +178,7 @@ class User {
     static findByEmail = (email: string): Promise<User> => {
         return getUserByEmail(email).then(result => {
             if (result.rowCount > 0) {
-                return new User({
-                    firstName: result.rows[0]['first_name'],
-                    lastName: result.rows[0]['last_name'],
-                    email: result.rows[0]['email'],
-                    hashedPassword: result.rows[0]['hashed_password'],
-                    activated: result.rows[0]['activated'],
-                    activateToken: result.rows[0]['activate_token'],
-                    id: result.rows[0]['id']
-                });
+                return User.parseRow(result.rows[0]);
             } else {
                 throw new Error('Could not find this account.');
             }
@@ -185,9 +187,29 @@ class User {
         });
     }
 
-    static accountWithEmailExists = async (email: string): Promise<boolean> => {
-        const result = await query('SELECT id FROM users WHERE email = $1;', [email]);
-        return result.rowCount > 0;
+    static findByUsername = (username: string): Promise<User> => {
+        return getUserByUsername(username).then(result => {
+            if (result.rowCount > 0) {
+                return User.parseRow(result.rows[0]);
+            } else {
+                throw new Error('Could not find this account.');
+            }
+        }).catch(error => {
+            throw new Error(error);
+        });
+    }
+
+    private static parseRow = (row: any): User => {
+        return new User({
+            firstName: row['first_name'],
+            lastName: row['last_name'],
+            username: row['username'],
+            email: row['email'],
+            hashedPassword: row['hashed_password'],
+            activated: row['activated'],
+            activateToken: row['activate_token'],
+            id: row['id']
+        });
     }
 }
 

@@ -18,6 +18,7 @@ app.use('/posts', postRoutes);
 app.use(messageRoutes);
 
 app.use((error: RequestError, req: Request, res: Response, next: NextFunction) => {
+    console.error(error.message);
     return res.status(error.code || 500).json({
         message: error.message
     });

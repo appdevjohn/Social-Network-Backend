@@ -9,6 +9,7 @@ import {
     removeUserFromConversation,
     getUsersInConversation
 } from '../database/conversation';
+import { deleteMessagesFromConversation } from '../database/messages';
 
 export interface ConversationConfigType {
     name: string,
@@ -21,6 +22,7 @@ class Conversation {
 
     constructor(config: ConversationConfigType) {
         this.name = config.name;
+        this.id = config.id;
     }
 
     create(): Promise<boolean> {
@@ -64,14 +66,30 @@ class Conversation {
 
     delete(): Promise<boolean> {
         if (this.id) {
-            return deleteConversation(this.id).then(result => {
-                if (result.rowCount > 0) {
-                    return true;
-                } else {
-                    return false;
-                }
+            return deleteConversation(this.id).then(() => {
+                return deleteMessagesFromConversation(this.id!);
+
+            }).then(() => {
+                return true;
+
             }).catch(error => {
                 console.error(error);
+                return false;
+            });
+        } else {
+            return Promise.resolve(false);
+        }
+    }
+
+    /**
+     * Finds out if this conversation exists in the database.
+     * @returns Whether or not the conversation has been created in the database.
+     */
+     isCreated(): Promise<boolean> {
+        if (this.id) {
+            return getConversation(this.id).then(result => {
+                return result.rowCount > 0;
+            }).catch(() => {
                 return false;
             });
         } else {
@@ -130,7 +148,7 @@ class Conversation {
                     id: result.rows[0]['id']
                 });
             } else {
-                throw new Error('Could not find this post.');
+                throw new Error('Could not find this conversation.');
             }
         }).catch(error => {
             throw new Error(error);

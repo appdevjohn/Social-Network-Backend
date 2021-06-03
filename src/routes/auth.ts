@@ -6,14 +6,14 @@ const router = Router();
 
 router.get('/ping', isAuth, authController.ping);
 
-router.post('/login', authController.logIn);
+router.put('/login', authController.logIn);
 
 router.post('/signup', authController.signUp);
 
-router.post('/confirm-email', isAuth, authController.confirmEmail);
+router.put('/confirm-email', isAuth, authController.confirmEmail);
 
-router.post('/request-new-password', authController.requestPasswordReset);
+router.put('/request-new-password', authController.requestPasswordReset);
 
-router.post('/reset-password', authController.resetPassword);
+router.put('/reset-password', authController.resetPassword);
 
 export default router;
