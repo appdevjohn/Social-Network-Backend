@@ -57,13 +57,65 @@ export const getGroup = async (req: Request, res: Response, next: NextFunction) 
 }
 
 export const newGroup = (req: Request, res: Response, next: NextFunction) => {
+    const groupName: string = req.body.name.trim();
 
+    const group = new Group({
+        name: groupName
+    });
+
+    return group.create().then(() => {
+        return res.status(201).json({
+            group: group
+        });
+
+    }).catch(error => {
+        console.error(error);
+        return next(RequestError.withMessageAndCode('Could not create group', 500));
+    })
 }
 
 export const editGroup = (req: Request, res: Response, next: NextFunction) => {
+    const groupId: string = req.body.id;
+    const groupName: string = req.body.name.trim();
 
+    let updatedGroup: Group;
+    return Group.findById(groupId).then(group => {
+        updatedGroup = group;
+        updatedGroup.name = groupName;
+        return updatedGroup.update();
+
+    }).then(success => {
+        if (success) {
+            return res.status(200).json({
+                group: updatedGroup
+            });
+        } else {
+            return next(RequestError.withMessageAndCode('Could not update group.', 500));
+        }
+    }).catch(error => {
+        console.error(error);
+        return next(RequestError.withMessageAndCode('Could not update group.', 500));
+    });
 }
 
 export const deleteGroup = (req: Request, res: Response, next: NextFunction) => {
+    const groupId: string = req.body.id;
 
+    let deletedGroup: Group;
+    return Group.findById(groupId).then(group => {
+        deletedGroup = group;
+        return deletedGroup.delete();
+
+    }).then(success => {
+        if (success) {
+            return res.status(200).json({
+                group: deletedGroup
+            });
+        } else {
+            return next(RequestError.withMessageAndCode('Could not delete group.', 500));
+        }
+    }).catch(error => {
+        console.error(error);
+        return next(RequestError.withMessageAndCode('Could not delete group.', 500));
+    });
 }

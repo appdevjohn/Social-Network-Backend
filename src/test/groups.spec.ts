@@ -100,14 +100,65 @@ describe('Groups Tests', () => {
 
         return testGroup.create().then(() => {
             return request(app)
-            .get('/' + testGroup.id)
-            .expect(200);
+                .get('/' + testGroup.id)
+                .expect(200);
 
         }).then(res => {
             const groupName = res.body.group.name;
             expect(groupName).to.be.equal('test-group');
 
             return testGroup.delete();
+        });
+    });
+
+    it('should be able to create a new group', function () {
+        return request(app)
+            .post('/new')
+            .send({ name: 'Create Group' })
+            .expect(201)
+            .then(res => {
+                const groupId = res.body.group.id;
+                return Group.findById(groupId);
+            }).then(group => {
+                return group.delete();
+            });
+    });
+
+    it('should be able to edit an existing group', function () {
+        const testGroup = new Group({
+            name: 'To Be Updated'
+        });
+
+        return testGroup.create().then(() => {
+            return request(app)
+                .put('/edit')
+                .send({ id: testGroup.id, name: 'Updated Name' })
+                .expect(200);
+
+        }).then(res => {
+            const groupName = res.body.group.name;
+            expect(groupName).to.be.equal('Updated Name');
+
+            return testGroup.delete();
+        });
+    });
+
+    it('should be able to delete an existing group', function () {
+        const testGroup = new Group({
+            name: 'To Be Deleted'
+        });
+
+        return testGroup.create().then(() => {
+            return request(app)
+                .delete('/delete')
+                .send({ id: testGroup.id })
+                .expect(200);
+
+        }).then(() => {
+            return testGroup.isCreated();
+
+        }).then(isCreated => {
+            expect(isCreated).to.be.equal(false);
         });
     });
 });
