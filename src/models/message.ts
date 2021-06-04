@@ -90,6 +90,22 @@ class Message {
         }
     }
 
+    /**
+     * Finds out if this message exists in the database.
+     * @returns Whether or not the message has been created in the database.
+     */
+     isCreated(): Promise<boolean> {
+        if (this.id) {
+            return getMessage(this.id).then(result => {
+                return result.rowCount > 0;
+            }).catch(() => {
+                return false;
+            });
+        } else {
+            return Promise.resolve(false);
+        }
+    }
+
     static findById = (messageId: string): Promise<Message> => {
         return getMessage(messageId).then(result => {
             if (result.rowCount > 0) {

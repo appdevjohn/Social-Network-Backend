@@ -13,8 +13,12 @@ export const getPost = (postId: string): Promise<QueryResult> => {
     return query('SELECT * FROM posts WHERE id = $1;', [postId]);
 }
 
+export const getPostsFromGroup = (groupId: string): Promise<QueryResult> => {
+    return query('SELECT * FROM posts WHERE group_id = $1;', [groupId]);
+}
+
 export const createPost = (newPost: PostType): Promise<QueryResult> => {
-    return query('INSERT INTO posts (user_id, group_id, text, media) VALUES ($1, $2, $3, $4) RETURNING *', [newPost.userId, newPost.groupId, newPost.text, newPost.media]);
+    return query('INSERT INTO posts (user_id, group_id, title, text, media) VALUES ($1, $2, $3, $4, $5) RETURNING *', [newPost.userId, newPost.groupId, newPost.title, newPost.text, newPost.media]);
 }
 
 export const updatePost = (postId: string, updatedPost: PostType): Promise<QueryResult> => {
@@ -30,6 +34,9 @@ export const updatePost = (postId: string, updatedPost: PostType): Promise<Query
                 break;
             case 'groupId':
                 queryString = queryString + ' group_id = $' + (index + 1)
+                break;
+            case 'title':
+                queryString = queryString + ' title = $' + (index + 1)
                 break;
             case 'text':
                 queryString = queryString + ' text = $' + (index + 1)

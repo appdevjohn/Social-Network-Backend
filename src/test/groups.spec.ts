@@ -23,6 +23,10 @@ describe('Groups Tests', () => {
             activateToken: ''
         });
         await testUser.create();
+        app.use((req: Request, res: Response, next: NextFunction) => {
+            req.userId = testUser.id;
+            return next();
+        });
 
         app.get('/validate/:groupName', groupsController.validateGroupName);
         app.get('/', groupsController.getGroups);
@@ -30,10 +34,6 @@ describe('Groups Tests', () => {
         app.post('/new', groupsController.newGroup);
         app.put('/edit', groupsController.editGroup);
         app.delete('/delete', groupsController.deleteGroup);
-        app.use((req: Request, res: Response, next: NextFunction) => {
-            req.userId = testUser.id;
-            return next();
-        });
 
         app.use((error: RequestError, req: Request, res: Response, next: NextFunction) => {
             console.error(error.message);

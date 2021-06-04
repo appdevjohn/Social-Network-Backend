@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import * as postsController from '../controllers/posts';
+import * as messagesController from '../controllers/messages';
 import isAuth from '../middleware/auth';
 
 const router = Router();
@@ -10,12 +11,14 @@ router.get('/:postId', isAuth, postsController.getPost);
 
 router.post('/new', isAuth, postsController.newPost);
 
-router.post('/edit', isAuth, postsController.editPost);
+router.put('/edit', isAuth, postsController.editPost);
 
-router.post('/delete', isAuth, postsController.deletePost);
+router.delete('/delete', isAuth, postsController.deletePost);
 
-router.post('/messages/new', isAuth, postsController.newMessage);
+router.get('/:postId/messages', isAuth, postsController.getMessages);
 
-router.post('/messages/delete', isAuth, postsController.deleteMessage);
+router.post('/add-message', isAuth, messagesController.newMessage);
+
+router.get('/delete-message', isAuth, messagesController.deleteMessage);
 
 export default router;

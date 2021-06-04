@@ -3,7 +3,8 @@ import {
     getPost, 
     createPost, 
     updatePost, 
-    deletePost 
+    deletePost, 
+    getPostsFromGroup
 } from '../database/posts';
 import { deleteMessagesFromPost } from '../database/messages';
 
@@ -97,6 +98,22 @@ class Post {
         }
     }
 
+    /**
+     * Finds out if this post exists in the database.
+     * @returns Whether or not the post has been created in the database.
+     */
+     isCreated(): Promise<boolean> {
+        if (this.id) {
+            return getPost(this.id).then(result => {
+                return result.rowCount > 0;
+            }).catch(() => {
+                return false;
+            });
+        } else {
+            return Promise.resolve(false);
+        }
+    }
+
     static findById = (postId: string): Promise<Post> => {
         return getPost(postId).then(result => {
             if (result.rowCount > 0) {
@@ -111,6 +128,24 @@ class Post {
             } else {
                 throw new Error('Could not find this post.');
             }
+        }).catch(error => {
+            throw new Error(error);
+        });
+    }
+
+    static findByGroupId = (groupId: string): Promise<Post[]> => {
+        return getPostsFromGroup(groupId).then(result => {
+            const posts = result.rows.map(row => {
+                return new Post({
+                    userId: result.rows[0]['user_id'],
+                    groupId: result.rows[0]['group_id'],
+                    title: result.rows[0]['title'],
+                    text: result.rows[0]['text'],
+                    media: result.rows[0]['media'],
+                    id: result.rows[0]['id']
+                });
+            });
+            return posts;
         }).catch(error => {
             throw new Error(error);
         });
