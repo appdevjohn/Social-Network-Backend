@@ -8,16 +8,14 @@ router.get('/', isAuth, postsController.getPosts);
 
 router.get('/:postId', isAuth, postsController.getPost);
 
-router.post('/new', isAuth, postsController.postNewPost);
+router.post('/new', isAuth, postsController.newPost);
 
-router.post('/edit', isAuth, postsController.postEditPost);
+router.post('/edit', isAuth, postsController.editPost);
 
-router.post('/delete', isAuth, postsController.postEditPost);
+router.post('/delete', isAuth, postsController.deletePost);
 
-router.post('/messages/new', isAuth, postsController.postNewMessage);
+router.post('/messages/new', isAuth, postsController.newMessage);
 
-router.post('/messages/edit', isAuth, postsController.postEditMessage);
-
-router.post('/messages/delete', isAuth, postsController.postDeleteMessage);
+router.post('/messages/delete', isAuth, postsController.deleteMessage);
 
 export default router;

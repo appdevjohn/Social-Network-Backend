@@ -36,8 +36,20 @@ CREATE TABLE conversations (
     name VARCHAR(128) NOT NULL
 );
 
+CREATE TABLE groups (
+    id BIGSERIAL PRIMARY KEY NOT NULL,
+    name VARCHAR(128) NOT NULL,
+    UNIQUE(name)
+);
+
 CREATE TABLE users_conversations (
     id BIGSERIAL PRIMARY KEY NOT NULL,
     user_id BIGINT NOT NULL,
     convo_id BIGINT NOT NULL
+);
+
+CREATE TABLE users_groups (
+    id BIGSERIAL PRIMARY KEY NOT NULL,
+    user_id BIGINT NOT NULL,
+    group_id BIGINT NOT NULL
 );

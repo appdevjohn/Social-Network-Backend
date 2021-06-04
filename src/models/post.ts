@@ -1,4 +1,11 @@
-import { PostType, getPost, createPost, updatePost, deletePost } from '../database/posts';
+import { 
+    PostType, 
+    getPost, 
+    createPost, 
+    updatePost, 
+    deletePost 
+} from '../database/posts';
+import { deleteMessagesFromPost } from '../database/messages';
 
 export interface PostConfigType {
     userId: string,
@@ -75,12 +82,12 @@ class Post {
 
     delete(): Promise<boolean> {
         if (this.id) {
-            return deletePost(this.id).then(result => {
-                if (result.rowCount > 0) {
-                    return true;
-                } else {
-                    return false;
-                }
+            return deletePost(this.id).then(() => {
+                return deleteMessagesFromPost(this.id!);
+
+            }).then(() => {
+                return true;
+
             }).catch(error => {
                 console.error(error);
                 return false;

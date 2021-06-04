@@ -52,3 +52,7 @@ export const updatePost = (postId: string, updatedPost: PostType): Promise<Query
 export const deletePost = (postId: string): Promise<QueryResult> => {
     return query('DELETE FROM posts WHERE id = $1 RETURNING *;', [postId]);
 }
+
+export const deletePostsFromGroup = (groupId: string): Promise<QueryResult> => {
+    return query('DELETE FROM posts WHERE group_id = $1 RETURNING *;', [groupId]);
+}

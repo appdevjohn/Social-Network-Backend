@@ -8,26 +8,22 @@ export const getPost = (req: Request, res: Response, next: NextFunction) => {
     
 }
 
-export const postNewPost = (req: Request, res: Response, next: NextFunction) => {
+export const newPost = (req: Request, res: Response, next: NextFunction) => {
     
 }
 
-export const postEditPost = (req: Request, res: Response, next: NextFunction) => {
+export const editPost = (req: Request, res: Response, next: NextFunction) => {
     
 }
 
-export const postDeletePost = (req: Request, res: Response, next: NextFunction) => {
+export const deletePost = (req: Request, res: Response, next: NextFunction) => {
     
 }
 
-export const postNewMessage = (req: Request, res: Response, next: NextFunction) => {
+export const newMessage = (req: Request, res: Response, next: NextFunction) => {
     
 }
 
-export const postEditMessage = (req: Request, res: Response, next: NextFunction) => {
-    
-}
-
-export const postDeleteMessage = (req: Request, res: Response, next: NextFunction) => {
+export const deleteMessage = (req: Request, res: Response, next: NextFunction) => {
     
 }
