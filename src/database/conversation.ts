@@ -53,5 +53,5 @@ export const removeUserFromConversation = (userId: string, convoId: string): Pro
 }
 
 export const getUsersInConversation = (convoId: string): Promise<QueryResult> => {
-    return query('SELECT user_id FROM users_conversations WHERE convo_id = $1', [convoId]);
+    return query('SELECT * FROM users_conversations RIGHT JOIN users USING (user_id) WHERE convo_id = $1', [convoId]);
 }

@@ -1,11 +1,19 @@
 import { ContentType, MessageType, getMessage, getMessagesFromConversation, getMessagesFromPost, createMessage, updateMessage, deleteMessage } from '../database/messages';
 
+export interface MessageUserData {
+    firstName: string;
+    lastName: string;
+    email: string;
+    username: string;
+}
+
 export interface MessageConfigType {
-    userId: string,
-    convoId?: string,
-    postId?: string,
-    content: string,
-    type: ContentType
+    userId: string;
+    convoId?: string;
+    postId?: string;
+    content: string;
+    type: ContentType;
+    userData?: MessageUserData;
     id?: string;
 }
 
@@ -15,6 +23,7 @@ class Message {
     postId?: string;
     content: string;
     type: ContentType;
+    userData?: MessageUserData;
     id?: string;
 
     constructor(config: MessageConfigType) {
@@ -23,6 +32,7 @@ class Message {
         this.postId = config.postId;
         this.content = config.content;
         this.type = config.type;
+        this.userData = config.userData;
         this.id = config.id;
     }
 
@@ -38,6 +48,12 @@ class Message {
         return createMessage(newMessage).then(result => {
             if (result.rowCount > 0) {
                 this.id = result.rows[0]['message_id'];
+                this.userData = {
+                    firstName: result.rows[0]['first_name'],
+                    lastName: result.rows[0]['last_name'],
+                    email: result.rows[0]['email'],
+                    username: result.rows[0]['username']
+                }
                 return true;
             } else {
                 return false;
@@ -60,6 +76,12 @@ class Message {
 
             return updateMessage(this.id, updatedMessage).then(result => {
                 if (result.rowCount > 0) {
+                    this.userData = {
+                        firstName: result.rows[0]['first_name'],
+                        lastName: result.rows[0]['last_name'],
+                        email: result.rows[0]['email'],
+                        username: result.rows[0]['username']
+                    }
                     return true;
                 } else {
                     return false;
@@ -77,6 +99,12 @@ class Message {
         if (this.id) {
             return deleteMessage(this.id).then(result => {
                 if (result.rowCount > 0) {
+                    this.userData = {
+                        firstName: result.rows[0]['first_name'],
+                        lastName: result.rows[0]['last_name'],
+                        email: result.rows[0]['email'],
+                        username: result.rows[0]['username']
+                    }
                     return true;
                 } else {
                     return false;
@@ -94,7 +122,7 @@ class Message {
      * Finds out if this message exists in the database.
      * @returns Whether or not the message has been created in the database.
      */
-     isCreated(): Promise<boolean> {
+    isCreated(): Promise<boolean> {
         if (this.id) {
             return getMessage(this.id).then(result => {
                 return result.rowCount > 0;
@@ -147,6 +175,12 @@ class Message {
             postId: row['post_id'],
             content: row['content'],
             type: row['type'],
+            userData: {
+                firstName: row['first_name'],
+                lastName: row['last_name'],
+                email: row['email'],
+                username: row['username']
+            },
             id: row['message_id']
         });
     }

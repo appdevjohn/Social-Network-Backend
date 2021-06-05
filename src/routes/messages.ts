@@ -8,7 +8,9 @@ router.get('/validate-recipient/:username', isAuth, messagesController.canMessag
 
 router.get('/conversations', isAuth, messagesController.getConversations);
 
-router.get('/conversations/:convoId', isAuth, messagesController.getMessages);
+router.get('/conversations/:convoId', isAuth, messagesController.getConversation);
+
+router.get('/conversations/:convoId/messages', isAuth, messagesController.getMessages);
 
 router.get('/messages/:messageId', isAuth, messagesController.getMessage);
 

@@ -11,6 +11,7 @@ import {
     getUsersInGroup,
 } from '../database/group';
 import { deletePostsFromGroup } from '../database/posts';
+import User from './user';
 
 export interface GroupConfigType {
     name: string,
@@ -117,13 +118,13 @@ class Group {
 
     removeUser(userId: string): Promise<boolean> {
         if (!this.id) { 
-            throw new Error('This conversation must be created in the database before users can be removed.'); 
+            throw new Error('This group must be created in the database before users can be removed.'); 
         }
 
         return removeUserFromGroup(userId, this.id).then(result => {
             if (result.rowCount > 0) {
-                return getUsersInGroup(this.id!).then(usersInConversationResult => {
-                    if (usersInConversationResult.rowCount === 0) {
+                return getUsersInGroup(this.id!).then(usersInGroupResult => {
+                    if (usersInGroupResult.rowCount === 0) {
                         return this.delete();
                     } else {
                         return Promise.resolve(true);
@@ -139,6 +140,22 @@ class Group {
             console.error(error);
             return false;
         });
+    }
+
+    members(): Promise<User[]> {
+        if(this.id) {
+            return getUsersInGroup(this.id).then(usersInGroupResult => {
+                const users = usersInGroupResult.rows.map(row => {
+                    return User.parseRow(row);
+                });
+                return users;
+            }).catch(error => {
+                console.error(error);
+                return [];
+            });
+        } else {
+            return Promise.resolve([]);
+        }
     }
 
     static findById = (groupId: string): Promise<Group> => {

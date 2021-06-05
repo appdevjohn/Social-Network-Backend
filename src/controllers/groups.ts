@@ -38,19 +38,24 @@ export const getGroup = async (req: Request, res: Response, next: NextFunction) 
     const groupName: string | null = req.params.groupName || null;
 
     try {
+        let group: Group;
         if (groupId) {
-            const group = await Group.findById(groupId);
-            return res.status(200).json({
-                group: group
-            });
+            group = await Group.findById(groupId);
+            
         } else if (groupName) {
-            const group = await Group.findByName(groupName);
-            return res.status(200).json({
-                group: group
-            });
+            group = await Group.findByName(groupName);
+
         } else {
             return next(RequestError.withMessageAndCode('A group id or group name is required to get a group.', 406));
         }
+
+        const members = await group.members();
+
+        return res.status(200).json({
+            group: group,
+            members: members
+        });
+
     } catch (error) {
         return next(RequestError.withMessageAndCode('Could not get this group.', 500));
     }
@@ -64,8 +69,15 @@ export const newGroup = (req: Request, res: Response, next: NextFunction) => {
     });
 
     return group.create().then(() => {
+        return group.addUser(req.userId!);
+
+    }).then(() => {
+        return group.members();
+
+    }).then(members => {
         return res.status(201).json({
-            group: group
+            group: group,
+            members: members
         });
 
     }).catch(error => {
@@ -86,8 +98,14 @@ export const editGroup = (req: Request, res: Response, next: NextFunction) => {
 
     }).then(success => {
         if (success) {
-            return res.status(200).json({
-                group: updatedGroup
+            return updatedGroup.members().then(members => {
+                return res.status(200).json({
+                    group: updatedGroup,
+                    members: members
+                });
+            }).catch(error => {
+                console.error(error);
+                return next(RequestError.withMessageAndCode('Could not update group.', 500));
             });
         } else {
             return next(RequestError.withMessageAndCode('Could not update group.', 500));

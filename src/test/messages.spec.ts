@@ -39,7 +39,8 @@ describe('Messages Tests', () => {
         app.put('/conversations/leave', messagesController.leaveConversation);
         app.post('/messages/new', messagesController.newMessage);
         app.delete('/messages/delete', messagesController.deleteMessage);
-        app.get('/conversations/:convoId', messagesController.getMessages);
+        app.get('/conversations/:convoId', messagesController.getConversation);
+        app.get('/conversations/:convoId/messages', messagesController.getMessages);
         app.get('/messages/:messageId', messagesController.getMessage);
         app.use((error: RequestError, req: Request, res: Response, next: NextFunction) => {
             console.error(error.message);
@@ -87,7 +88,7 @@ describe('Messages Tests', () => {
             return request(app)
                 .put('/conversations/edit')
                 .send({ convoId: existingConversation.id, newConvoName: 'Updated Conversation Name' })
-                .expect(201)
+                .expect(200)
                 .then(req => {
                     return existingConversation.delete();
                 });
@@ -187,12 +188,50 @@ describe('Messages Tests', () => {
 
         }).then(() => {
             return request(app)
-                .get('/conversations/' + testConversation.id)
+                .get('/conversations/' + testConversation.id + '/messages')
                 .expect(200);
 
         }).then(res => {
             const messages = res.body.messages;
             expect(messages).to.have.lengthOf(2);
+
+            return testConversation.delete();
+        });
+    });
+
+    it('should be able to get a conversation\'s data', function () {
+        const testConversation = new Conversation({
+            name: 'Test Conversation'
+        });
+        return testConversation.create().then(() => {
+            return User.findByEmail('john@bison.software');
+
+        }).then(user => {
+            const message1 = new Message({
+                userId: user.id!,
+                convoId: testConversation.id,
+                content: 'Message 1',
+                type: 'text' as ContentType
+            });
+            const message2 = new Message({
+                userId: user.id!,
+                convoId: testConversation.id,
+                content: 'Message 2',
+                type: 'text' as ContentType
+            });
+
+            const addMessagePromises = [message1.create(), message2.create()];
+            return Promise.all(addMessagePromises);
+
+        }).then(() => {
+            return request(app)
+                .get('/conversations/' + testConversation.id)
+                .expect(200);
+
+        }).then(res => {
+            expect(res.body).to.have.property('conversation');
+            expect(res.body).to.have.property('members');
+            expect(res.body).to.have.property('messages');
 
             return testConversation.delete();
         });

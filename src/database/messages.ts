@@ -15,11 +15,11 @@ export interface MessageType {
 }
 
 export const getMessage = (messageId: string): Promise<QueryResult> => {
-    return query('SELECT * FROM messages WHERE message_id = $1;', [messageId]);
+    return query('SELECT * FROM messages FULL JOIN users USING (user_id) WHERE messages.message_id = $1;', [messageId]);
 }
 
 export const getMessagesFromConversation = (convoId: string): Promise<QueryResult> => {
-    return query('SELECT * FROM messages WHERE convo_id = $1;', [convoId]); 
+    return query('SELECT * FROM messages FULL JOIN users USING (user_id) WHERE messages.convo_id = $1;', [convoId]); 
 }
 
 export const getMessagesFromPost = (postId: string): Promise<QueryResult> => {

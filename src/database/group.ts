@@ -57,5 +57,5 @@ export const removeUserFromGroup = (userId: string, groupId: string): Promise<Qu
 }
 
 export const getUsersInGroup = (groupId: string): Promise<QueryResult> => {
-    return query('SELECT user_id FROM users_groups WHERE group_id = $1', [groupId]);
+    return query('SELECT * FROM users_groups RIGHT JOIN users USING (user_id) WHERE group_id = $1', [groupId]);
 }

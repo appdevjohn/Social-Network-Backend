@@ -1,12 +1,19 @@
-import { 
-    PostType, 
-    getPost, 
-    createPost, 
-    updatePost, 
-    deletePost, 
+import {
+    PostType,
+    getPost,
+    createPost,
+    updatePost,
+    deletePost,
     getPostsFromGroup
 } from '../database/posts';
 import { deleteMessagesFromPost } from '../database/messages';
+
+export interface PostUserData {
+    firstName: string,
+    lastName: string,
+    email: string;
+    username: string;
+}
 
 export interface PostConfigType {
     userId: string,
@@ -14,6 +21,7 @@ export interface PostConfigType {
     title: string,
     text?: string,
     media?: string,
+    userData?: PostUserData,
     id?: string
 }
 
@@ -23,6 +31,7 @@ class Post {
     title: string;
     text?: string;
     media?: string;
+    userData?: PostUserData;
     id?: string;
 
     constructor(config: PostConfigType) {
@@ -31,6 +40,7 @@ class Post {
         this.title = config.title;
         this.text = config.text;
         this.media = config.media;
+        this.userData = config.userData;
         this.id = config.id;
     }
 
@@ -46,6 +56,12 @@ class Post {
         return createPost(newPost).then(result => {
             if (result.rowCount > 0) {
                 this.id = result.rows[0]['post_id'];
+                this.userData = {
+                    firstName: result.rows[0]['first_name'],
+                    lastName: result.rows[0]['last_name'],
+                    email: result.rows[0]['email'],
+                    username: result.rows[0]['username']
+                }
                 return true;
             } else {
                 return false;
@@ -68,6 +84,12 @@ class Post {
 
             return updatePost(this.id, updatedPost).then(result => {
                 if (result.rowCount > 0) {
+                    this.userData = {
+                        firstName: result.rows[0]['first_name'],
+                        lastName: result.rows[0]['last_name'],
+                        email: result.rows[0]['email'],
+                        username: result.rows[0]['username']
+                    }
                     return true;
                 } else {
                     return false;
@@ -83,7 +105,15 @@ class Post {
 
     delete(): Promise<boolean> {
         if (this.id) {
-            return deletePost(this.id).then(() => {
+            return deletePost(this.id).then(result => {
+                if (result.rowCount > 0) {
+                    this.userData = {
+                        firstName: result.rows[0]['first_name'],
+                        lastName: result.rows[0]['last_name'],
+                        email: result.rows[0]['email'],
+                        username: result.rows[0]['username']
+                    }
+                }
                 return deleteMessagesFromPost(this.id!);
 
             }).then(() => {
@@ -102,7 +132,7 @@ class Post {
      * Finds out if this post exists in the database.
      * @returns Whether or not the post has been created in the database.
      */
-     isCreated(): Promise<boolean> {
+    isCreated(): Promise<boolean> {
         if (this.id) {
             return getPost(this.id).then(result => {
                 return result.rowCount > 0;
@@ -117,14 +147,7 @@ class Post {
     static findById = (postId: string): Promise<Post> => {
         return getPost(postId).then(result => {
             if (result.rowCount > 0) {
-                return new Post({
-                    userId: result.rows[0]['user_id'],
-                    groupId: result.rows[0]['group_id'],
-                    title: result.rows[0]['title'],
-                    text: result.rows[0]['text'],
-                    media: result.rows[0]['media'],
-                    id: result.rows[0]['post_id']
-                });
+                return Post.parseRow(result.rows[0]);
             } else {
                 throw new Error('Could not find this post.');
             }
@@ -136,18 +159,28 @@ class Post {
     static findByGroupId = (groupId: string): Promise<Post[]> => {
         return getPostsFromGroup(groupId).then(result => {
             const posts = result.rows.map(row => {
-                return new Post({
-                    userId: result.rows[0]['user_id'],
-                    groupId: result.rows[0]['group_id'],
-                    title: result.rows[0]['title'],
-                    text: result.rows[0]['text'],
-                    media: result.rows[0]['media'],
-                    id: result.rows[0]['post_id']
-                });
+                return Post.parseRow(row);
             });
             return posts;
         }).catch(error => {
             throw new Error(error);
+        });
+    }
+
+    private static parseRow = (row: any): Post => {
+        return new Post({
+            userId: row['user_id'],
+            groupId: row['group_id'],
+            title: row['title'],
+            text: row['text'],
+            media: row['media'],
+            userData: {
+                firstName: row['first_name'],
+                lastName: row['last_name'],
+                email: row['email'],
+                username: row['username']
+            },
+            id: row['post_id']
         });
     }
 }

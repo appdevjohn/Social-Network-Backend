@@ -10,6 +10,7 @@ import {
     getUsersInConversation
 } from '../database/conversation';
 import { deleteMessagesFromConversation } from '../database/messages';
+import User from './user';
 
 export interface ConversationConfigType {
     name: string,
@@ -138,6 +139,22 @@ class Conversation {
             console.error(error);
             return false;
         });
+    }
+
+    members(): Promise<User[]> {
+        if(this.id) {
+            return getUsersInConversation(this.id).then(usersInGroupResult => {
+                const users = usersInGroupResult.rows.map(row => {
+                    return User.parseRow(row);
+                });
+                return users;
+            }).catch(error => {
+                console.error(error);
+                return [];
+            });
+        } else {
+            return Promise.resolve([]);
+        }
     }
 
     static findById = (convoId: string): Promise<Conversation> => {

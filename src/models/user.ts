@@ -199,7 +199,7 @@ class User {
         });
     }
 
-    private static parseRow = (row: any): User => {
+    static parseRow = (row: any): User => {
         return new User({
             firstName: row['first_name'],
             lastName: row['last_name'],

@@ -37,10 +37,36 @@ export const getConversations = async (req: Request, res: Response, next: NextFu
     });
 }
 
+export const getConversation = (req: Request, res: Response, next: NextFunction) => {
+    const convoId = req.params.convoId;
+
+    let conversation: Conversation;
+    let members: User[];
+    return Conversation.findById(convoId).then(convo => {
+        conversation = convo;
+        return conversation.members();
+
+    }).then(users => {
+        members = users;
+        return Message.findByConvoId(conversation.id!);
+
+    }).then(messages => {
+        return res.status(200).json({
+            conversation: conversation,
+            members: members,
+            messages: messages
+        });
+
+    }).catch(error => {
+        console.error(error);
+        return next(RequestError.withMessageAndCode('Could not get conversation', 500));
+    })
+}
+
 export const getMessages = async (req: Request, res: Response, next: NextFunction) => {
     const convoId = req.params.convoId;
 
-    let messages: Message[] = [];
+    let messages: Message[];
 
     try {
         messages = await Message.findByConvoId(convoId);
@@ -100,9 +126,14 @@ export const newConversation = (req: Request, res: Response, next: NextFunction)
             console.error('One or more members were not successfully added to the conversation.');
         }
 
+        return newConversation.members();
+
+    }).then(members => {
         return res.status(201).json({
-            conversation: newConversation
+            conversation: newConversation,
+            members: members
         });
+
     }).catch(error => {
         return next(RequestError.withMessageAndCode('Could not successfully create conversation.', 500));
     })
@@ -120,9 +151,16 @@ export const editConversation = (req: Request, res: Response, next: NextFunction
 
     }).then(success => {
         if (success) {
-            return res.status(201).json({
-                conversation: conversation
+            return conversation.members().then(members => {
+                return res.status(200).json({
+                    conversation: conversation,
+                    members: members
+                });
+            }).catch(error => {
+                console.error(error);
+                return next(RequestError.withMessageAndCode('There was an error retrieving this conversation\'s data.', 500));
             });
+            
         } else {
             return next(RequestError.withMessageAndCode('Could not update conversation.', 500));
         }
