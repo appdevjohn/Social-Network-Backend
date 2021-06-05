@@ -15,7 +15,7 @@ export interface MessageType {
 }
 
 export const getMessage = (messageId: string): Promise<QueryResult> => {
-    return query('SELECT * FROM messages WHERE id = $1;', [messageId]);
+    return query('SELECT * FROM messages WHERE message_id = $1;', [messageId]);
 }
 
 export const getMessagesFromConversation = (convoId: string): Promise<QueryResult> => {
@@ -60,13 +60,13 @@ export const updateMessage = (messageId: string, updatedMessage: MessageType): P
     });
     paramKeys.push(messageId);
 
-    queryString = queryString + ' WHERE id = $' + paramKeys.length + ' RETURNING *;';
+    queryString = queryString + ' WHERE message_id = $' + paramKeys.length + ' RETURNING *;';
     
     return query(queryString, paramKeys);
 }
 
 export const deleteMessage = (messageId: string): Promise<QueryResult> => {
-    return query('DELETE FROM messages WHERE id = $1 RETURNING *;', [messageId]);
+    return query('DELETE FROM messages WHERE message_id = $1 RETURNING *;', [messageId]);
 }
 
 export const deleteMessagesFromConversation = (convoId: string): Promise<QueryResult> => {

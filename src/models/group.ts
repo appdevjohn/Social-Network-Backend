@@ -33,7 +33,7 @@ class Group {
 
         return createGroup(newGroup).then(result => {
             if (result.rowCount > 0) {
-                this.id = result.rows[0].id;
+                this.id = result.rows[0]['group_id'];
                 return true;
             } else {
                 return false;
@@ -146,7 +146,7 @@ class Group {
             if (result.rowCount > 0) {
                 return new Group({
                     name: result.rows[0]['name'],
-                    id: result.rows[0]['id']
+                    id: result.rows[0]['group_id']
                 });
             } else {
                 throw new Error('Could not find this conversation.');
@@ -161,7 +161,7 @@ class Group {
             if (result.rowCount > 0) {
                 return new Group({
                     name: result.rows[0]['name'],
-                    id: result.rows[0]['id']
+                    id: result.rows[0]['group_id']
                 });
             } else {
                 throw new Error('Could not find this grouop.');
@@ -173,11 +173,11 @@ class Group {
 
     static findByUserId = (userId: string): Promise<Group[]> => {
         return getGroupsByUserId(userId).then(result => {
-            const rows = result.rows.filter(row => row['id'] !== null);
+            const rows = result.rows.filter(row => row['group_id'] !== null);
             const groups = rows.map(row => {
                 return new Group({
                     name: row['name'],
-                    id: row['id']
+                    id: row['group_id']
                 });
             });
             return groups;

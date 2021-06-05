@@ -1,7 +1,7 @@
 CREATE TYPE content_type AS ENUM ('text', 'image');
 
 CREATE TABLE users (
-    id BIGSERIAL PRIMARY KEY NOT NULL,
+    user_id BIGSERIAL PRIMARY KEY NOT NULL,
     first_name VARCHAR(64) NOT NULL,
     last_name VARCHAR(64) NOT NULL,
     username VARCHAR(64) NOT NULL,
@@ -14,7 +14,7 @@ CREATE TABLE users (
 );
 
 CREATE TABLE messages (
-    id BIGSERIAL PRIMARY KEY NOT NULL,
+    message_id BIGSERIAL PRIMARY KEY NOT NULL,
     user_id BIGINT NOT NULL,
     convo_id BIGINT,
     post_id BIGINT,
@@ -23,7 +23,7 @@ CREATE TABLE messages (
 );
 
 CREATE TABLE posts (
-    id BIGSERIAL PRIMARY KEY NOT NULL,
+    post_id BIGSERIAL PRIMARY KEY NOT NULL,
     user_id BIGINT NOT NULL,
     group_id BIGINT NOT NULL,
     title VARCHAR(128) NOT NULL,
@@ -32,24 +32,24 @@ CREATE TABLE posts (
 );
 
 CREATE TABLE conversations (
-    id BIGSERIAL PRIMARY KEY NOT NULL,
+    convo_id BIGSERIAL PRIMARY KEY NOT NULL,
     name VARCHAR(128) NOT NULL
 );
 
 CREATE TABLE groups (
-    id BIGSERIAL PRIMARY KEY NOT NULL,
+    group_id BIGSERIAL PRIMARY KEY NOT NULL,
     name VARCHAR(128) NOT NULL,
     UNIQUE(name)
 );
 
 CREATE TABLE users_conversations (
-    id BIGSERIAL PRIMARY KEY NOT NULL,
+    users_conversations_id BIGSERIAL PRIMARY KEY NOT NULL,
     user_id BIGINT NOT NULL,
     convo_id BIGINT NOT NULL
 );
 
 CREATE TABLE users_groups (
-    id BIGSERIAL PRIMARY KEY NOT NULL,
+    iusers_groups_id BIGSERIAL PRIMARY KEY NOT NULL,
     user_id BIGINT NOT NULL,
     group_id BIGINT NOT NULL
 );

@@ -10,7 +10,7 @@ export interface PostType {
 }
 
 export const getPost = (postId: string): Promise<QueryResult> => {
-    return query('SELECT * FROM posts WHERE id = $1;', [postId]);
+    return query('SELECT * FROM posts WHERE post_id = $1;', [postId]);
 }
 
 export const getPostsFromGroup = (groupId: string): Promise<QueryResult> => {
@@ -51,13 +51,13 @@ export const updatePost = (postId: string, updatedPost: PostType): Promise<Query
     });
     paramKeys.push(postId);
 
-    queryString = queryString + ' WHERE id = $' + paramKeys.length + ' RETURNING *;';
+    queryString = queryString + ' WHERE post_id = $' + paramKeys.length + ' RETURNING *;';
     
     return query(queryString, paramKeys);
 }
 
 export const deletePost = (postId: string): Promise<QueryResult> => {
-    return query('DELETE FROM posts WHERE id = $1 RETURNING *;', [postId]);
+    return query('DELETE FROM posts WHERE post_id = $1 RETURNING *;', [postId]);
 }
 
 export const deletePostsFromGroup = (groupId: string): Promise<QueryResult> => {

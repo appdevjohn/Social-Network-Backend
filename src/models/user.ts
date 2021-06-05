@@ -63,7 +63,7 @@ class User {
 
         return createUser(newAccount).then(result => {
             if (result.rowCount > 0) {
-                this.id = result.rows[0].id;
+                this.id = result.rows[0]['user_id'];
                 return true;
             } else {
                 return false;
@@ -159,7 +159,7 @@ class User {
     }
 
     static accountWithEmailExists = async (email: string): Promise<boolean> => {
-        const result = await query('SELECT id FROM users WHERE email = $1;', [email]);
+        const result = await query('SELECT user_id FROM users WHERE email = $1;', [email]);
         return result.rowCount > 0;
     }
 
@@ -208,7 +208,7 @@ class User {
             hashedPassword: row['hashed_password'],
             activated: row['activated'],
             activateToken: row['activate_token'],
-            id: row['id']
+            id: row['user_id']
         });
     }
 }

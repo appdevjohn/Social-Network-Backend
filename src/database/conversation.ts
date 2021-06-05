@@ -6,11 +6,11 @@ export interface ConversationType {
 }
 
 export const getConversation = (convoId: string): Promise<QueryResult> => {
-    return query('SELECT * FROM conversations WHERE id = $1;', [convoId]);
+    return query('SELECT * FROM conversations WHERE convo_id = $1;', [convoId]);
 }
 
 export const getConversationsByUserId = (userId: string): Promise<QueryResult> => {
-    return query('SELECT DISTINCT conversations.* FROM users FULL JOIN users_conversations ON users.id = users_conversations.user_id FULL JOIN conversations ON users_conversations.convo_id = conversations.id WHERE users.id = $1;', [userId]);
+    return query('SELECT DISTINCT conversations.* FROM users FULL JOIN users_conversations USING (user_id) FULL JOIN conversations USING (convo_id) WHERE users.user_id = $1;', [userId]);
 }
 
 export const createConversation = (newConversation: ConversationType): Promise<QueryResult> => {
@@ -35,13 +35,13 @@ export const updateConversation = (convoId: string, updatedConversation: Convers
     });
     paramKeys.push(convoId);
 
-    queryString = queryString + ' WHERE id = $' + paramKeys.length + ' RETURNING *;';
+    queryString = queryString + ' WHERE convo_id = $' + paramKeys.length + ' RETURNING *;';
     
     return query(queryString, paramKeys);
 }
 
 export const deleteConversation = (convoId: string): Promise<QueryResult> => {
-    return query('DELETE FROM conversations WHERE id = $1 RETURNING *;', [convoId]);
+    return query('DELETE FROM conversations WHERE convo_id = $1 RETURNING *;', [convoId]);
 }
 
 export const addUserToConversation = (userId: string, convoId: string): Promise<QueryResult> => {
@@ -53,5 +53,5 @@ export const removeUserFromConversation = (userId: string, convoId: string): Pro
 }
 
 export const getUsersInConversation = (convoId: string): Promise<QueryResult> => {
-    return query('SELECT id FROM users_conversations WHERE convo_id = $1', [convoId]);
+    return query('SELECT user_id FROM users_conversations WHERE convo_id = $1', [convoId]);
 }

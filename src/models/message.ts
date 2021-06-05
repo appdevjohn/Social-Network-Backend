@@ -37,7 +37,7 @@ class Message {
 
         return createMessage(newMessage).then(result => {
             if (result.rowCount > 0) {
-                this.id = result.rows[0].id;
+                this.id = result.rows[0]['message_id'];
                 return true;
             } else {
                 return false;
@@ -109,14 +109,7 @@ class Message {
     static findById = (messageId: string): Promise<Message> => {
         return getMessage(messageId).then(result => {
             if (result.rowCount > 0) {
-                return new Message({
-                    userId: result.rows[0]['user_id'],
-                    convoId: result.rows[0]['convo_id'],
-                    postId: result.rows[0]['post_id'],
-                    content: result.rows[0]['content'],
-                    type: result.rows[0]['type'],
-                    id: result.rows[0]['id']
-                });
+                return Message.parseRow(result.rows[0]);
             } else {
                 throw new Error('Could not find this message.');
             }
@@ -154,7 +147,7 @@ class Message {
             postId: row['post_id'],
             content: row['content'],
             type: row['type'],
-            id: row['id']
+            id: row['message_id']
         });
     }
 }

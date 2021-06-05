@@ -45,7 +45,7 @@ class Post {
 
         return createPost(newPost).then(result => {
             if (result.rowCount > 0) {
-                this.id = result.rows[0].id;
+                this.id = result.rows[0]['post_id'];
                 return true;
             } else {
                 return false;
@@ -123,7 +123,7 @@ class Post {
                     title: result.rows[0]['title'],
                     text: result.rows[0]['text'],
                     media: result.rows[0]['media'],
-                    id: result.rows[0]['id']
+                    id: result.rows[0]['post_id']
                 });
             } else {
                 throw new Error('Could not find this post.');
@@ -142,7 +142,7 @@ class Post {
                     title: result.rows[0]['title'],
                     text: result.rows[0]['text'],
                     media: result.rows[0]['media'],
-                    id: result.rows[0]['id']
+                    id: result.rows[0]['post_id']
                 });
             });
             return posts;

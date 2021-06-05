@@ -32,7 +32,7 @@ class Conversation {
 
         return createConversation(newConversation).then(result => {
             if (result.rowCount > 0) {
-                this.id = result.rows[0].id;
+                this.id = result.rows[0]['convo_id'];
                 return true;
             } else {
                 return false;
@@ -145,7 +145,7 @@ class Conversation {
             if (result.rowCount > 0) {
                 return new Conversation({
                     name: result.rows[0]['name'],
-                    id: result.rows[0]['id']
+                    id: result.rows[0]['convo_id']
                 });
             } else {
                 throw new Error('Could not find this conversation.');
@@ -157,11 +157,11 @@ class Conversation {
 
     static findByUserId = (userId: string): Promise<Conversation[]> => {
         return getConversationsByUserId(userId).then(result => {
-            const rows = result.rows.filter(row => row['id'] !== null);
+            const rows = result.rows.filter(row => row['convo_id'] !== null);
             const conversations = rows.map(row => {
                 return new Conversation({
                     name: row['name'],
-                    id: row['id']
+                    id: row['convo_id']
                 });
             });
             return conversations;

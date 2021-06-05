@@ -12,7 +12,7 @@ export interface AccountType {
 }
 
 export const getUser = (userId: string): Promise<QueryResult> => {
-    return query('SELECT * FROM users WHERE id = $1;', [userId]);
+    return query('SELECT * FROM users WHERE user_id = $1;', [userId]);
 }
 
 export const getUserByEmail = (email: string): Promise<QueryResult> => {
@@ -63,11 +63,11 @@ export const updateUser = (userId: string, updatedAccount: AccountType): Promise
     });
     paramKeys.push(userId);
 
-    queryString = queryString + ' WHERE id = $' + paramKeys.length + ' RETURNING *;';
+    queryString = queryString + ' WHERE user_id = $' + paramKeys.length + ' RETURNING *;';
     
     return query(queryString, paramKeys);
 }
 
 export const deleteUser = (userId: string): Promise<QueryResult> => {
-    return query('DELETE FROM users WHERE id = $1 RETURNING *;', [userId]);
+    return query('DELETE FROM users WHERE user_id = $1 RETURNING *;', [userId]);
 }

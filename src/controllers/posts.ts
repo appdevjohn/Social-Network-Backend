@@ -22,8 +22,11 @@ export const getPost = (req: Request, res: Response, next: NextFunction) => {
     const postId: string = req.params.postId;
 
     return Post.findById(postId).then(post => {
-        return res.status(200).json({
-            post: post
+        return Message.findByPostId(post.id!).then(messages => {
+            return res.status(200).json({
+                post: post,
+                messages: messages
+            });
         });
     }).catch(error => {
         console.error(error);
