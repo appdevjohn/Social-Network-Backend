@@ -4,6 +4,7 @@ import request from 'supertest';
 
 import RequestError from '../util/error';
 import isAuth from '../middleware/auth';
+import isActivated from '../middleware/activated';
 import User from '../models/user';
 import * as authController from '../controllers/auth';
 
@@ -39,6 +40,16 @@ describe('Auth Tests', () => {
 
         expect(isAuth.bind(this, req, {} as Response, nextFn)).to.throw('Not Authorized');
     });
+
+    it('should throw an error if the account is not activated', function () {
+        const req = {
+            activated: false
+        } as Request;
+
+        const nextFn: NextFunction = () => { };
+
+        expect(isActivated.bind(this, req, {} as Response, nextFn)).to.throw('Not Authorized');
+    })
 
     it('should be able to sign a user up', function () {
         return request(app)
