@@ -6,7 +6,11 @@ import isAuth from '../middleware/auth';
 
 const router = Router();
 
-router.get('/ping', isAuth, authController.ping);
+router.get(
+    '/ping',
+    isAuth,
+    authController.ping
+);
 
 router.put(
     '/login',
@@ -36,8 +40,14 @@ router.put(
     authController.confirmEmail
 );
 
-router.put('/request-new-password', authController.requestPasswordReset);
+router.put(
+    '/request-new-password',
+    authController.requestPasswordReset
+);
 
-router.put('/reset-password', authController.resetPassword);
+router.put(
+    '/reset-password',
+    authController.resetPassword
+);
 
 export default router;
