@@ -3,12 +3,14 @@ import { body } from 'express-validator';
 
 import * as authController from '../controllers/auth';
 import isAuth from '../middleware/auth';
+import isActivated from '../middleware/activated';
 
 const router = Router();
 
 router.get(
     '/ping',
     isAuth,
+    isActivated,
     authController.ping
 );
 
