@@ -10,14 +10,16 @@ import Group from '../models/group';
 describe('Groups Tests', () => {
     const app = express();
 
+    const testEmail = 'test_email@test.com';
+
     before(async function () {
         app.use(express.json());
 
         const testUser = new User({
-            firstName: 'John',
-            lastName: 'Champion',
-            username: 'appdevjohn',
-            email: 'john@bison.software',
+            firstName: 'test_first',
+            lastName: 'test_last',
+            username: 'test_username',
+            email: testEmail,
             hashedPassword: 'hashed_password',
             activated: true,
             activateToken: ''
@@ -46,7 +48,7 @@ describe('Groups Tests', () => {
     });
 
     after(function () {
-        return User.findByEmail('john@bison.software').then(user => {
+        return User.findByEmail(testEmail).then(user => {
             return user.delete();
         });
     });

@@ -10,6 +10,9 @@ import * as authController from '../controllers/auth';
 describe('Auth Tests', () => {
     const app = express();
 
+    const testUsername = 'test_username';
+    const testEmail = 'test_email@test.com'
+
     before(function () {
         app.use(express.json());
 
@@ -40,10 +43,10 @@ describe('Auth Tests', () => {
     it('should be able to sign a user up', function () {
         return request(app)
             .post('/signup')
-            .send({ firstName: 'John', lastName: 'Champion', username: 'appdevjohn', email: 'john@bison.software', password: 'asdf' })
+            .send({ firstName: 'test_first', lastName: 'test_last', username: testUsername, email: testEmail, password: 'asdf' })
             .expect(201)
             .then(res => {
-                return User.findByEmail('john@bison.software');
+                return User.findByEmail(testEmail);
             }).then(user => {
                 return user.delete();
             });
@@ -52,7 +55,7 @@ describe('Auth Tests', () => {
     it('should fail to activate accounts with a wrong code', function () {
         return request(app)
             .post('/signup')
-            .send({ firstName: 'John', lastName: 'Champion', username: 'appdevjohn', email: 'john@bison.software', password: 'asdf' })
+            .send({ firstName: 'test_first', lastName: 'test_last', username: testUsername, email: testEmail, password: 'asdf' })
             .then(res => {
                 const token = res.body.token;
                 return request(app)
@@ -61,7 +64,7 @@ describe('Auth Tests', () => {
                     .send({ activateToken: '0' })
                     .expect(406);
             }).then(() => {
-                return User.findByEmail('john@bison.software');
+                return User.findByEmail(testEmail);
             }).then(user => {
                 return user.delete();
             });
@@ -70,11 +73,11 @@ describe('Auth Tests', () => {
     it('should activate account with correct activation code', function () {
         return request(app)
             .post('/signup')
-            .send({ firstName: 'John', lastName: 'Champion', username: 'appdevjohn', email: 'john@bison.software', password: 'asdf' })
+            .send({ firstName: 'test_first', lastName: 'test_last', username: testUsername, email: testEmail, password: 'asdf' })
             .then(res => {
                 const token = res.body.token;
 
-                return User.findByEmail('john@bison.software').then(user => {
+                return User.findByEmail(testEmail).then(user => {
                     return request(app)
                         .put('/confirm-email')
                         .set('Authorization', 'Bearer ' + token)
@@ -82,7 +85,7 @@ describe('Auth Tests', () => {
                         .expect(200);
                 });
             }).then(() => {
-                return User.findByEmail('john@bison.software');
+                return User.findByEmail(testEmail);
             }).then(user => {
                 return user.delete();
             });
@@ -91,11 +94,11 @@ describe('Auth Tests', () => {
     it('should log in with working credentials', function () {
         return request(app)
             .post('/signup')
-            .send({ firstName: 'John', lastName: 'Champion', username: 'appdevjohn', email: 'john@bison.software', password: 'asdf' })
+            .send({ firstName: 'test_first', lastName: 'test_last', username: testUsername, email: testEmail, password: 'asdf' })
             .then(res => {
                 const token = res.body.token;
 
-                return User.findByEmail('john@bison.software').then(user => {
+                return User.findByEmail(testEmail).then(user => {
                     return request(app)
                         .put('/confirm-email')
                         .set('Authorization', 'Bearer ' + token)
@@ -105,10 +108,10 @@ describe('Auth Tests', () => {
             }).then(() => {
                 return request(app)
                     .put('/login')
-                    .send({ email: 'john@bison.software', password: 'asdf' })
+                    .send({ email: testEmail, password: 'asdf' })
                     .expect(200);
             }).then(() => {
-                return User.findByEmail('john@bison.software');
+                return User.findByEmail(testEmail);
             }).then(user => {
                 return user.delete();
             });
@@ -117,11 +120,11 @@ describe('Auth Tests', () => {
     it('should throw an error with an incorrect email or password', function () {
         return request(app)
             .post('/signup')
-            .send({ firstName: 'John', lastName: 'Champion', username: 'appdevjohn', email: 'john@bison.software', password: 'asdf' })
+            .send({ firstName: 'test_first', lastName: 'test_last', username: testUsername, email: testEmail, password: 'asdf' })
             .then(res => {
                 const token = res.body.token;
 
-                return User.findByEmail('john@bison.software').then(user => {
+                return User.findByEmail(testEmail).then(user => {
                     return request(app)
                         .put('/confirm-email')
                         .set('Authorization', 'Bearer ' + token)
@@ -131,10 +134,10 @@ describe('Auth Tests', () => {
             }).then(() => {
                 return request(app)
                     .put('/login')
-                    .send({ email: 'john@bison.software', password: 'incorrect_password' })
+                    .send({ email: testEmail, password: 'incorrect_password' })
                     .expect(401);
             }).then(() => {
-                return User.findByEmail('john@bison.software');
+                return User.findByEmail(testEmail);
             }).then(user => {
                 return user.delete();
             });
@@ -144,11 +147,11 @@ describe('Auth Tests', () => {
         let token: string;
         return request(app)
             .post('/signup')
-            .send({ firstName: 'John', lastName: 'Champion', username: 'appdevjohn', email: 'john@bison.software', password: 'asdf' })
+            .send({ firstName: 'test_first', lastName: 'test_last', username: testUsername, email: testEmail, password: 'asdf' })
             .then(res => {
                 token = res.body.token;
 
-                return User.findByEmail('john@bison.software').then(user => {
+                return User.findByEmail(testEmail).then(user => {
                     return request(app)
                         .put('/confirm-email')
                         .set('Authorization', 'Bearer ' + token)
@@ -161,7 +164,7 @@ describe('Auth Tests', () => {
                     .send()
                     .expect(200);
             }).then(() => {
-                return User.findByEmail('john@bison.software');
+                return User.findByEmail(testEmail);
             }).then(user => {
                 return user.delete();
             });
@@ -170,11 +173,11 @@ describe('Auth Tests', () => {
     it('should throw an error on an unauthorized ping', async function () {
         return request(app)
             .post('/signup')
-            .send({ firstName: 'John', lastName: 'Champion', username: 'appdevjohn', email: 'john@bison.software', password: 'asdf' })
+            .send({ firstName: 'test_first', lastName: 'test_last', username: testUsername, email: testEmail, password: 'asdf' })
             .then(res => {
                 const token = res.body.token;
 
-                return User.findByEmail('john@bison.software').then(user => {
+                return User.findByEmail(testEmail).then(user => {
                     return request(app)
                         .put('/confirm-email')
                         .set('Authorization', 'Bearer ' + token)
@@ -189,7 +192,7 @@ describe('Auth Tests', () => {
             }).then(res => {
                 expect(res.statusCode).to.not.equal(200);
             }).then(() => {
-                return User.findByEmail('john@bison.software');
+                return User.findByEmail(testEmail);
             }).then(user => {
                 return user.delete();
             });

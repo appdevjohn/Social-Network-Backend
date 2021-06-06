@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { validationResult } from 'express-validator';
+
 import RequestError from '../util/error';
 import User, { AuthToken } from '../models/user';
 
@@ -24,6 +26,14 @@ export const ping = async (req: Request, res: Response, next: NextFunction) => {
 }
 
 export const logIn = async (req: Request, res: Response, next: NextFunction) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ 
+            message: errors.array()[0].msg,
+            errors: errors.array() 
+        });
+    }
+
     const email = req.body.email;
     const password = req.body.password;
 
@@ -56,6 +66,14 @@ export const logIn = async (req: Request, res: Response, next: NextFunction) => 
 }
 
 export const signUp = async (req: Request, res: Response, next: NextFunction) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ 
+            message: errors.array()[0].msg,
+            errors: errors.array() 
+        });
+    }
+
     const firstName: string = req.body.firstName.trim();
     const lastName: string = req.body.lastName.trim();
     const username: string = req.body.username.trim();
@@ -109,6 +127,14 @@ export const signUp = async (req: Request, res: Response, next: NextFunction) =>
 }
 
 export const confirmEmail = async (req: Request, res: Response, next: NextFunction) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ 
+            message: errors.array()[0].msg,
+            errors: errors.array() 
+        });
+    }
+
     const activateToken = req.body.activateToken;
 
     let user: User;

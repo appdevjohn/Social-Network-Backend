@@ -1,9 +1,18 @@
 import { Request, Response, NextFunction } from 'express';
+import { validationResult } from 'express-validator';
 
 import Group from '../models/group';
 import RequestError from '../util/error';
 
 export const validateGroupName = (req: Request, res: Response, next: NextFunction) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ 
+            message: errors.array()[0].msg,
+            errors: errors.array() 
+        });
+    }
+
     const groupName = req.params.groupName;
 
     return Group.findByName(groupName).then(() => {
@@ -20,7 +29,7 @@ export const validateGroupName = (req: Request, res: Response, next: NextFunctio
 }
 
 export const getGroups = async (req: Request, res: Response, next: NextFunction) => {
-    let groups: Group[] = [];
+    let groups: Group[];
 
     try {
         groups = await Group.findByUserId(req.userId!);
@@ -34,6 +43,14 @@ export const getGroups = async (req: Request, res: Response, next: NextFunction)
 }
 
 export const getGroup = async (req: Request, res: Response, next: NextFunction) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ 
+            message: errors.array()[0].msg,
+            errors: errors.array() 
+        });
+    }
+
     const groupId: string | null = req.params.groupId || null;
     const groupName: string | null = req.params.groupName || null;
 
@@ -62,6 +79,14 @@ export const getGroup = async (req: Request, res: Response, next: NextFunction) 
 }
 
 export const newGroup = (req: Request, res: Response, next: NextFunction) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ 
+            message: errors.array()[0].msg,
+            errors: errors.array() 
+        });
+    }
+
     const groupName: string = req.body.name.trim();
 
     const group = new Group({
@@ -87,6 +112,14 @@ export const newGroup = (req: Request, res: Response, next: NextFunction) => {
 }
 
 export const editGroup = (req: Request, res: Response, next: NextFunction) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ 
+            message: errors.array()[0].msg,
+            errors: errors.array() 
+        });
+    }
+
     const groupId: string = req.body.id;
     const groupName: string = req.body.name.trim();
 
@@ -117,6 +150,14 @@ export const editGroup = (req: Request, res: Response, next: NextFunction) => {
 }
 
 export const deleteGroup = (req: Request, res: Response, next: NextFunction) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ 
+            message: errors.array()[0].msg,
+            errors: errors.array() 
+        });
+    }
+
     const groupId: string = req.body.id;
 
     let deletedGroup: Group;

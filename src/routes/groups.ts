@@ -1,19 +1,51 @@
 import { Router } from 'express';
+import { body, param } from 'express-validator';
+
 import * as groupsController from '../controllers/groups';
 import isAuth from '../middleware/auth';
 
 const router = Router();
 
-router.get('/validate/:groupName', isAuth, groupsController.validateGroupName);
+router.get(
+    '/validate/:groupName',
+    isAuth,
+    param('groupName').isLength({ min: 1 }).withMessage('A group name is required to validate it.'),
+    groupsController.validateGroupName
+);
 
-router.get('/', isAuth, groupsController.getGroups);
+router.get(
+    '/',
+    isAuth,
+    groupsController.getGroups
+);
 
-router.get('/:groupId', isAuth, groupsController.getGroup);
+router.get(
+    '/:groupId',
+    isAuth,
+    param('groupId').isLength({ min: 1 }).withMessage('A group ID is required.'),
+    groupsController.getGroup
+);
 
-router.post('/new', isAuth, groupsController.newGroup);
+router.post(
+    '/new',
+    isAuth,
+    body('name').isLength({ min: 1 }).withMessage('A group name is required.'),
+    groupsController.newGroup
+);
 
-router.put('/edit', isAuth, groupsController.editGroup);
+router.put(
+    '/edit',
+    isAuth,
+    body('id').isLength({ min: 1 }).withMessage('A group ID is required.'),
+    body('name').isLength({ min: 1 }).withMessage('A group name is required.'),
+    groupsController.editGroup
+);
 
-router.delete('/delete', isAuth, groupsController.deleteGroup);
+router.delete(
+    '/delete',
+    isAuth,
+    body('id').isLength({ min: 1 }).withMessage('A group ID is required.'),
+    groupsController.deleteGroup
+);
 
 export default router;

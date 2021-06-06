@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import { validationResult } from 'express-validator';
 
 import RequestError from '../util/error';
 import Conversation from '../models/conversation';
@@ -7,6 +8,14 @@ import User from '../models/user';
 import { ContentType } from '../database/messages';
 
 export const canMessageUser = (req: Request, res: Response, next: NextFunction) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ 
+            message: errors.array()[0].msg,
+            errors: errors.array() 
+        });
+    }
+
     const username = req.params.username;
 
     return User.findByUsername(username).then(() => {
@@ -38,6 +47,14 @@ export const getConversations = async (req: Request, res: Response, next: NextFu
 }
 
 export const getConversation = (req: Request, res: Response, next: NextFunction) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ 
+            message: errors.array()[0].msg,
+            errors: errors.array() 
+        });
+    }
+
     const convoId = req.params.convoId;
 
     let conversation: Conversation;
@@ -64,6 +81,14 @@ export const getConversation = (req: Request, res: Response, next: NextFunction)
 }
 
 export const getMessages = async (req: Request, res: Response, next: NextFunction) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ 
+            message: errors.array()[0].msg,
+            errors: errors.array() 
+        });
+    }
+
     const convoId = req.params.convoId;
 
     let messages: Message[];
@@ -80,6 +105,14 @@ export const getMessages = async (req: Request, res: Response, next: NextFunctio
 }
 
 export const getMessage = async (req: Request, res: Response, next: NextFunction) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ 
+            message: errors.array()[0].msg,
+            errors: errors.array() 
+        });
+    }
+
     const messageId = req.params.messageId;
 
     try {
@@ -94,7 +127,15 @@ export const getMessage = async (req: Request, res: Response, next: NextFunction
 }
 
 export const newConversation = (req: Request, res: Response, next: NextFunction) => {
-    const convoName = req.body.convoName;
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ 
+            message: errors.array()[0].msg,
+            errors: errors.array() 
+        });
+    }
+
+    const convoName = req.body.name;
     const members: string[] = JSON.parse(req.body.members);
 
     const newConversation = new Conversation({
@@ -140,8 +181,16 @@ export const newConversation = (req: Request, res: Response, next: NextFunction)
 }
 
 export const editConversation = (req: Request, res: Response, next: NextFunction) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ 
+            message: errors.array()[0].msg,
+            errors: errors.array() 
+        });
+    }
+
     const convoId = req.body.convoId;
-    const newConvoName = req.body.newConvoName;
+    const newConvoName = req.body.newName;
 
     let conversation: Conversation;
     return Conversation.findById(convoId).then(convo => {
@@ -171,6 +220,14 @@ export const editConversation = (req: Request, res: Response, next: NextFunction
 }
 
 export const leaveConversation = (req: Request, res: Response, next: NextFunction) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ 
+            message: errors.array()[0].msg,
+            errors: errors.array() 
+        });
+    }
+
     const convoId = req.body.convoId;
 
     let conversation: Conversation;
@@ -192,6 +249,14 @@ export const leaveConversation = (req: Request, res: Response, next: NextFunctio
 }
 
 export const newMessage = (req: Request, res: Response, next: NextFunction) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ 
+            message: errors.array()[0].msg,
+            errors: errors.array() 
+        });
+    }
+
     const convoId: string | null = req.body.convoId || null;
     const postId: string | null = req.body.postId || null;
     const messageContent: string = req.body.content || '';
@@ -227,6 +292,14 @@ export const newMessage = (req: Request, res: Response, next: NextFunction) => {
 }
 
 export const deleteMessage = (req: Request, res: Response, next: NextFunction) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ 
+            message: errors.array()[0].msg,
+            errors: errors.array() 
+        });
+    }
+
     const messageId = req.body.messageId;
 
     let message: Message;

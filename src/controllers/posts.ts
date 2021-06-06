@@ -1,11 +1,19 @@
 import { Request, Response, NextFunction } from 'express';
+import { validationResult } from 'express-validator';
 
 import Post from '../models/post';
 import Message from '../models/message';
 import RequestError from '../util/error';
-import { ContentType } from '../database/messages';
 
 export const getPosts = (req: Request, res: Response, next: NextFunction) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ 
+            message: errors.array()[0].msg,
+            errors: errors.array() 
+        });
+    }
+
     const groupId: string = req.query.groupId as string;
 
     return Post.findByGroupId(groupId).then(posts => {
@@ -19,6 +27,14 @@ export const getPosts = (req: Request, res: Response, next: NextFunction) => {
 }
 
 export const getPost = (req: Request, res: Response, next: NextFunction) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ 
+            message: errors.array()[0].msg,
+            errors: errors.array() 
+        });
+    }
+
     const postId: string = req.params.postId;
 
     return Post.findById(postId).then(post => {
@@ -35,6 +51,14 @@ export const getPost = (req: Request, res: Response, next: NextFunction) => {
 }
 
 export const newPost = (req: Request, res: Response, next: NextFunction) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ 
+            message: errors.array()[0].msg,
+            errors: errors.array() 
+        });
+    }
+
     const groupId: string = req.body.groupId;
     const title: string = req.body.title;
     const text: string = req.body.text;
@@ -61,6 +85,14 @@ export const newPost = (req: Request, res: Response, next: NextFunction) => {
 }
 
 export const editPost = (req: Request, res: Response, next: NextFunction) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ 
+            message: errors.array()[0].msg,
+            errors: errors.array() 
+        });
+    }
+
     const postId: string = req.body.postId;
     const newTitle: string = req.body.title;
     const newText: string = req.body.text;
@@ -87,6 +119,14 @@ export const editPost = (req: Request, res: Response, next: NextFunction) => {
 }
 
 export const deletePost = (req: Request, res: Response, next: NextFunction) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ 
+            message: errors.array()[0].msg,
+            errors: errors.array() 
+        });
+    }
+
     const postId: string = req.body.postId;
 
     let deletedPost: Post;
@@ -108,6 +148,14 @@ export const deletePost = (req: Request, res: Response, next: NextFunction) => {
 }
 
 export const getMessages = (req: Request, res: Response, next: NextFunction) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ 
+            message: errors.array()[0].msg,
+            errors: errors.array() 
+        });
+    }
+
     const postId: string = req.params.postId;
 
     return Message.findByPostId(postId).then(messages => {

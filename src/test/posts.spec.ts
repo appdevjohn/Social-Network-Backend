@@ -14,14 +14,16 @@ import { ContentType } from '../database/messages';
 describe('Posts Tests', () => {
     const app = express();
 
+    const testEmail = 'test_email@test.com';
+
     before(async function () {
         app.use(express.json());
 
         const testUser = new User({
-            firstName: 'John',
-            lastName: 'Champion',
-            username: 'appdevjohn',
-            email: 'john@bison.software',
+            firstName: 'test_first',
+            lastName: 'test_last',
+            username: 'test_username',
+            email: testEmail,
             hashedPassword: 'hashed_password',
             activated: true,
             activateToken: ''
@@ -52,7 +54,7 @@ describe('Posts Tests', () => {
     });
 
     after(function () {
-        return User.findByEmail('john@bison.software').then(user => {
+        return User.findByEmail(testEmail).then(user => {
             return user.delete();
         });
     });
@@ -63,7 +65,7 @@ describe('Posts Tests', () => {
         });
 
         return testGroup.create().then(() => {
-            return User.findByEmail('john@bison.software')
+            return User.findByEmail(testEmail)
 
         }).then(user => {
             const testPost1 = new Post({
@@ -112,7 +114,7 @@ describe('Posts Tests', () => {
 
         let testPost: Post;
         return testGroup.create().then(() => {
-            return User.findByEmail('john@bison.software')
+            return User.findByEmail(testEmail)
 
         }).then(user => {
             testPost = new Post({
@@ -170,7 +172,7 @@ describe('Posts Tests', () => {
 
         let testPost: Post;
         return testGroup.create().then(() => {
-            return User.findByEmail('john@bison.software');
+            return User.findByEmail(testEmail);
 
         }).then(user => {
             testPost = new Post({
@@ -207,7 +209,7 @@ describe('Posts Tests', () => {
 
         let testPost: Post;
         return testGroup.create().then(() => {
-            return User.findByEmail('john@bison.software');
+            return User.findByEmail(testEmail);
 
         }).then(user => {
             testPost = new Post({
@@ -241,7 +243,7 @@ describe('Posts Tests', () => {
         let currentUser: User;
         let testPost: Post;
         return testGroup.create().then(() => {
-            return User.findByEmail('john@bison.software');
+            return User.findByEmail(testEmail);
 
         }).then(user => {
             currentUser = user;
@@ -292,7 +294,7 @@ describe('Posts Tests', () => {
         let currentUser: User;
         let testPost: Post;
         return testGroup.create().then(() => {
-            return User.findByEmail('john@bison.software');
+            return User.findByEmail(testEmail);
 
         }).then(user => {
             currentUser = user;
@@ -330,7 +332,7 @@ describe('Posts Tests', () => {
         let testPost: Post;
         let testComment: Message;
         return testGroup.create().then(() => {
-            return User.findByEmail('john@bison.software');
+            return User.findByEmail(testEmail);
 
         }).then(user => {
             currentUser = user;

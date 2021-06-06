@@ -12,14 +12,17 @@ import { ContentType } from '../database/messages';
 describe('Messages Tests', () => {
     const app = express();
 
+    const testUsername = 'test_username';
+    const testEmail = 'test_email@test.com';
+
     before(async function () {
         app.use(express.json());
 
         const testUser = new User({
-            firstName: 'John',
-            lastName: 'Champion',
-            username: 'appdevjohn',
-            email: 'john@bison.software',
+            firstName: 'test_first',
+            lastName: 'test_last',
+            username: 'test_username',
+            email: testEmail,
             hashedPassword: 'hashed_password',
             activated: true,
             activateToken: ''
@@ -53,7 +56,7 @@ describe('Messages Tests', () => {
     });
 
     after(function () {
-        return User.findByEmail('john@bison.software').then(user => {
+        return User.findByEmail(testEmail).then(user => {
             return user.delete();
         });
     });
@@ -61,13 +64,13 @@ describe('Messages Tests', () => {
     it('should be able to create a new conversation', function () {
         return request(app)
             .post('/conversations/new')
-            .send({ convoName: 'Test Conversation', members: JSON.stringify(['Lemonayyyd']) })
+            .send({ name: 'Test Conversation', members: JSON.stringify(['Lemonayyyd']) })
             .expect(201)
             .then(res => {
                 const convoId = res.body.conversation.id;
                 return Conversation.findById(convoId);
             }).then(conversation => {
-                return User.findByEmail('john@bison.software').then(user => {
+                return User.findByEmail(testEmail).then(user => {
                     conversation.removeUser(user.id!);
                 });
             });
@@ -87,7 +90,7 @@ describe('Messages Tests', () => {
 
             return request(app)
                 .put('/conversations/edit')
-                .send({ convoId: existingConversation.id, newConvoName: 'Updated Conversation Name' })
+                .send({ convoId: existingConversation.id, newName: 'Updated Conversation Name' })
                 .expect(200)
                 .then(req => {
                     return existingConversation.delete();
@@ -100,7 +103,7 @@ describe('Messages Tests', () => {
             name: 'Test Leave Conversation'
         });
         return conversationToLeave.create().then(() => {
-            return User.findByEmail('john@bison.software');
+            return User.findByEmail(testEmail);
 
         }).then(user => {
             return conversationToLeave.addUser(user.id!);
@@ -124,7 +127,7 @@ describe('Messages Tests', () => {
             name: 'Test Conversation'
         });
         return testConversation.create().then(() => {
-            return User.findByEmail('john@bison.software');
+            return User.findByEmail(testEmail);
 
         }).then(() => {
             return request(app)
@@ -142,7 +145,7 @@ describe('Messages Tests', () => {
             name: 'Test Conversation'
         });
         return testConversation.create().then(() => {
-            return User.findByEmail('john@bison.software');
+            return User.findByEmail(testEmail);
 
         }).then(() => {
             return request(app)
@@ -167,7 +170,7 @@ describe('Messages Tests', () => {
             name: 'Test Conversation'
         });
         return testConversation.create().then(() => {
-            return User.findByEmail('john@bison.software');
+            return User.findByEmail(testEmail);
 
         }).then(user => {
             const message1 = new Message({
@@ -204,7 +207,7 @@ describe('Messages Tests', () => {
             name: 'Test Conversation'
         });
         return testConversation.create().then(() => {
-            return User.findByEmail('john@bison.software');
+            return User.findByEmail(testEmail);
 
         }).then(user => {
             const message1 = new Message({
@@ -244,7 +247,7 @@ describe('Messages Tests', () => {
 
         let message: Message;
         return testConversation.create().then(() => {
-            return User.findByEmail('john@bison.software');
+            return User.findByEmail(testEmail);
 
         }).then(user => {
             message = new Message({
@@ -270,7 +273,7 @@ describe('Messages Tests', () => {
 
     it('should be able to validate a valid recipient', function () {
         return request(app)
-            .get('/validate-recipient/appdevjohn')
+            .get('/validate-recipient/' + testUsername)
             .send()
             .expect(200)
             .then(res => {
