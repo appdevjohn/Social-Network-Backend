@@ -38,6 +38,8 @@ router.put(
     isAuth,
     isActivated,
     body('postId').isLength({ min: 1 }).withMessage('A post ID is required to edit a post.'),
+    body('title').isLength({ min: 1 }).withMessage('The title of the post.'),
+    body('text').isLength({ min: 1 }).withMessage('The text content of the post.'),
     postsController.editPost
 );
 
@@ -73,7 +75,7 @@ router.post(
     messagesController.newMessage
 );
 
-router.get(
+router.delete(
     '/delete-message',
     isAuth,
     isActivated,
