@@ -10,7 +10,7 @@ PGDATABASE=social_network
 PGPASSWORD=password1
 PGPORT=5432
 ```
-Once the database and environment variables are set up, the app can be run with `npm run dev`. A production build can be generated with `npm build`, then it can be run with `npm start`. After setting everything up, it is recommended to run `npm test` to ensure everything is working.
+Once the database and environment variables are set up, the app can be run with `npm run dev`. A production build can be generated with `npm run build`, then it can be run with `npm start`. After setting everything up, it is recommended to run `npm test` to ensure everything is working.
 
 ## Endpoints
 
