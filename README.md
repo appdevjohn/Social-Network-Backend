@@ -30,7 +30,8 @@ Gets an Authorization token for the client.<br>
 |password|body|true|The password the account.|
 ```
 {
-    token: eyJhbGciOiJIUzI1NiI...,
+    userId: '1234'
+    token: 'eyJhbGciOiJIUzI1NiI...',
     activated: true,
     message: 'You are now logged in.'
 }
@@ -48,7 +49,8 @@ Creates a new account.<br>
 |password|body|true|The password for the account. Must be at least four characters.|
 ```
 {
-    token: eyJhbGciOiJIUzI1NiI...,
+    userId: '1234'
+    token: 'eyJhbGciOiJIUzI1NiI...',
     activated: false,
     message: 'Find our activation email to activate your account.'
 }

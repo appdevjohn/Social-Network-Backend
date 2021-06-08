@@ -76,7 +76,7 @@ export const getConversation = (req: Request, res: Response, next: NextFunction)
 
     }).catch(error => {
         console.error(error);
-        return next(RequestError.withMessageAndCode('Could not get conversation', 500));
+        return next(RequestError.withMessageAndCode('Could not find conversation.', 404));
     })
 }
 

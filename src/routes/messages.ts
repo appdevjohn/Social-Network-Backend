@@ -11,7 +11,9 @@ router.get(
     '/validate-recipient/:username',
     isAuth,
     isActivated,
-    param('username').isLength({ min: 1 }).withMessage('A username to validate is required.'),
+    param('username')
+        .isAlphanumeric().withMessage('Username must be alphanumeric')
+        .isLength({ min: 1 }).withMessage('A username to validate is required.'),
     messagesController.canMessageUser
 );
 

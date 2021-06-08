@@ -52,6 +52,7 @@ export const logIn = async (req: Request, res: Response, next: NextFunction) => 
             const token = jwt.sign(tokenPayload, 'secret', { expiresIn: '1h' });
 
             return res.status(200).json({
+                userId: user.id,
                 token: token,
                 activated: user.activated,
                 message: 'You are now logged in.'
@@ -117,6 +118,7 @@ export const signUp = async (req: Request, res: Response, next: NextFunction) =>
         const token = jwt.sign(tokenPayload, 'secret', { expiresIn: '1h' });
 
         return res.status(201).json({
+            userId: newUser.id,
             token: token,
             activated: newUser.activated,
             message: 'Find our activation email to activate your account.'
