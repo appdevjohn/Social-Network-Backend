@@ -94,7 +94,9 @@ Returns all of the groups the user is currently involved in.<br>
     groups: [
         {
             id: '1234',
-            name: 'Nintendo Gamers'
+            name: 'Nintendo Gamers',
+            createdAt: '2021-06-10T18:16:50.085Z',
+            updatedAt: '2021-06-10T18:16:50.085Z'
         }
     ]
 }
@@ -110,7 +112,9 @@ Returns details about the group and the members in the group.<br>
 {
     group: {
         id: '1234',
-        name: 'Nintendo Gamers'
+        name: 'Nintendo Gamers',
+        createdAt: '2021-06-10T18:16:50.085Z',
+        updatedAt: '2021-06-10T18:16:50.085Z'
     },
     members: [
         {
@@ -121,7 +125,9 @@ Returns details about the group and the members in the group.<br>
             hashedPassword: '$2b$12$24.gTVOvhU9vNYlCWtxQ5u9UlinOjZ8.gSyIevxbmCM2oH4Ik9/K2',
             activated: true,
             activateToken: '',
-            id: '1234'
+            id: '1234',
+            createdAt: '2021-06-10T18:16:50.085Z',
+            updatedAt: '2021-06-10T18:16:50.085Z'
         }
     ]
 }
@@ -137,7 +143,9 @@ Creates a new group.<br>
 {
     group: {
         id: '1234',
-        name: 'Nintendo Gamers'
+        name: 'Nintendo Gamers',
+        createdAt: '2021-06-10T18:16:50.085Z',
+        updatedAt: '2021-06-10T18:16:50.085Z'
     },
     members: [
         {
@@ -148,7 +156,9 @@ Creates a new group.<br>
             hashedPassword: '$2b$12$24.gTVOvhU9vNYlCWtxQ5u9UlinOjZ8.gSyIevxbmCM2oH4Ik9/K2',
             activated: true,
             activateToken: '',
-            id: '1234'
+            id: '1234',
+            createdAt: '2021-06-10T18:16:50.085Z',
+            updatedAt: '2021-06-10T18:16:50.085Z'
         }
     ]
 }
@@ -165,7 +175,9 @@ Edits the details of a group.<br>
 {
     group: {
         id: '1234',
-        name: 'Nintendo Gamers'
+        name: 'Nintendo Gamers',
+        createdAt: '2021-06-10T18:16:50.085Z',
+        updatedAt: '2021-06-10T18:16:50.085Z'
     },
     members: [
         {
@@ -176,7 +188,9 @@ Edits the details of a group.<br>
             hashedPassword: '$2b$12$24.gTVOvhU9vNYlCWtxQ5u9UlinOjZ8.gSyIevxbmCM2oH4Ik9/K2',
             activated: true,
             activateToken: '',
-            id: '1234'
+            id: '1234',
+            createdAt: '2021-06-10T18:16:50.085Z',
+            updatedAt: '2021-06-10T18:16:50.085Z'
         }
     ]
 }
@@ -192,8 +206,10 @@ Deletes a group and all of the posts in that group.<br>
 {
     group: {
         id: '1234',
-        name: 'Nintendo Gamers'
-  }
+        name: 'Nintendo Gamers',
+        createdAt: '2021-06-10T18:16:50.085Z',
+        updatedAt: '2021-06-10T18:16:50.085Z'
+    }
 }
 ```
 <br>
@@ -222,7 +238,9 @@ Returns all posts from a group.<br>
                 email: 'john@bison.software',
                 username: 'appdevjohn'
             },
-            id: '7654'
+            id: '7654',
+            createdAt: '2021-06-10T18:16:50.085Z',
+            updatedAt: '2021-06-10T18:16:50.085Z'
         }
     ]
 }
@@ -248,7 +266,9 @@ Returns data for a specific post.<br>
             email: 'john@bison.software',
             username: 'appdevjohn'
         },
-        id: '7654'
+        id: '7654',
+        createdAt: '2021-06-10T18:16:50.085Z',
+        updatedAt: '2021-06-10T18:16:50.085Z'
     },
     messages: [
         {
@@ -263,7 +283,9 @@ Returns data for a specific post.<br>
                 email: 'john@bison.software',
                 username: 'appdevjohn'
             },
-            id: '2345'
+            id: '2345',
+            createdAt: '2021-06-10T18:16:50.085Z',
+            updatedAt: '2021-06-10T18:16:50.085Z'
         }
     ]
 }
@@ -291,7 +313,9 @@ Creates a new post.<br>
             email: 'john@bison.software',
             username: 'appdevjohn'
         },
-        id: '7654'
+        id: '7654',
+        createdAt: '2021-06-10T18:16:50.085Z',
+        updatedAt: '2021-06-10T18:16:50.085Z'
     }
 }
 ```
@@ -318,7 +342,9 @@ Edits an existing post.<br>
             email: 'john@bison.software',
             username: 'appdevjohn'
         },
-        id: '7654'
+        id: '7654',
+        createdAt: '2021-06-10T18:16:50.085Z',
+        updatedAt: '2021-06-10T18:16:50.085Z'
     }
 }
 ```
@@ -343,7 +369,9 @@ Edits an existing post.<br>
             email: 'john@bison.software',
             username: 'appdevjohn'
         },
-        id: '7654'
+        id: '7654',
+        createdAt: '2021-06-10T18:16:50.085Z',
+        updatedAt: '2021-06-10T18:16:50.085Z'
     }
 }
 ```
@@ -369,7 +397,9 @@ Gets the current list of messages sent in a post.<br>
                 email: 'john@bison.software',
                 username: 'appdevjohn'
             },
-            id: '2345'
+            id: '2345',
+            createdAt: '2021-06-10T18:16:50.085Z',
+            updatedAt: '2021-06-10T18:16:50.085Z'
         }
     ]
 }
@@ -397,7 +427,9 @@ Sends a message from within a post.<br>
             email: 'john@bison.software',
             username: 'appdevjohn'
         },
-        id: '2345'
+        id: '2345',
+        createdAt: '2021-06-10T18:16:50.085Z',
+        updatedAt: '2021-06-10T18:16:50.085Z'
     }
 }
 ```
@@ -422,7 +454,9 @@ Deletes a message from a post.<br>
             email: 'john@bison.software',
             username: 'appdevjohn'
         },
-        id: '2345'
+        id: '2345',
+        createdAt: '2021-06-10T18:16:50.085Z',
+        updatedAt: '2021-06-10T18:16:50.085Z'
     }
 }
 ```
@@ -452,7 +486,9 @@ Returns the conversations which the user is involved in.<br>
     conversations: [
         {
             name: 'Pokemangos',
-            id: '1234'
+            id: '1234',
+            createdAt: '2021-06-10T18:16:50.085Z',
+            updatedAt: '2021-06-10T18:16:50.085Z'
         }
     ]
 }
@@ -468,7 +504,9 @@ Returns data for a conversation.<br>
 {
     conversation: {
         name: 'Pokemangos',
-        id: '1234'
+        id: '1234',
+        createdAt: '2021-06-10T18:16:50.085Z',
+        updatedAt: '2021-06-10T18:16:50.085Z'
     },
     members: [
         {
@@ -479,7 +517,9 @@ Returns data for a conversation.<br>
             hashedPassword: '$2b$12$24.gTVOvhU9vNYlCWtxQ5u9UlinOjZ8.gSyIevxbmCM2oH4Ik9/K2',
             activated: true,
             activateToken: '',
-            id: '1234'
+            id: '1234',
+            createdAt: '2021-06-10T18:16:50.085Z',
+            updatedAt: '2021-06-10T18:16:50.085Z'
         }
     ],
     messages [
@@ -495,7 +535,9 @@ Returns data for a conversation.<br>
                 email: 'john@bison.software',
                 username: 'appdevjohn'
             },
-            id: '5678'
+            id: '5678',
+            createdAt: '2021-06-10T18:16:50.085Z',
+            updatedAt: '2021-06-10T18:16:50.085Z'
         }
     ]
 }
@@ -522,7 +564,9 @@ Returns only message data for a conversation.<br>
                 email: 'john@bison.software',
                 username: 'appdevjohn'
             },
-            id: '5678'
+            id: '5678',
+            createdAt: '2021-06-10T18:16:50.085Z',
+            updatedAt: '2021-06-10T18:16:50.085Z'
         }
     ]
 }
@@ -548,7 +592,9 @@ Returns a single message.<br>
             email: 'john@bison.software',
             username: 'appdevjohn'
         },
-        id: '5678'
+        id: '5678',
+        createdAt: '2021-06-10T18:16:50.085Z',
+        updatedAt: '2021-06-10T18:16:50.085Z'
     }
 }
 ```
@@ -564,7 +610,9 @@ Creates a new conversation.<br>
 {
     conversation: {
         name: 'Pokemangos',
-        id: '1234'
+        id: '1234',
+        createdAt: '2021-06-10T18:16:50.085Z',
+        updatedAt: '2021-06-10T18:16:50.085Z'
     },
     members: [
         {
@@ -575,7 +623,9 @@ Creates a new conversation.<br>
             hashedPassword: '$2b$12$24.gTVOvhU9vNYlCWtxQ5u9UlinOjZ8.gSyIevxbmCM2oH4Ik9/K2',
             activated: true,
             activateToken: '',
-            id: '1234'
+            id: '1234',
+            createdAt: '2021-06-10T18:16:50.085Z',
+            updatedAt: '2021-06-10T18:16:50.085Z'
         }
     ]
 }
@@ -592,7 +642,9 @@ Creates a new conversation.<br>
 {
     conversation: {
         name: 'Pokemangos',
-        id: '1234'
+        id: '1234',
+        createdAt: '2021-06-10T18:16:50.085Z',
+        updatedAt: '2021-06-10T18:16:50.085Z'
     },
     members: [
         {
@@ -603,7 +655,9 @@ Creates a new conversation.<br>
             hashedPassword: '$2b$12$24.gTVOvhU9vNYlCWtxQ5u9UlinOjZ8.gSyIevxbmCM2oH4Ik9/K2',
             activated: true,
             activateToken: '',
-            id: '1234'
+            id: '1234',
+            createdAt: '2021-06-10T18:16:50.085Z',
+            updatedAt: '2021-06-10T18:16:50.085Z'
         }
     ]
 }
@@ -619,7 +673,9 @@ Removes this user from the conversation. Even if this user created the conversat
 {
     conversation: {
         name: 'Pokemangos',
-        id: '1234'
+        id: '1234',
+        createdAt: '2021-06-10T18:16:50.085Z',
+        updatedAt: '2021-06-10T18:16:50.085Z'
     }
 }
 ```
@@ -646,7 +702,9 @@ Sends a message in a conversation.<br>
             email: 'john@bison.software',
             username: 'appdevjohn'
         },
-        id: '5678'
+        id: '5678',
+        createdAt: '2021-06-10T18:16:50.085Z',
+        updatedAt: '2021-06-10T18:16:50.085Z'
     }
 }
 ```
@@ -671,7 +729,9 @@ Deletes a message from a conversation.<br>
             email: 'john@bison.software',
             username: 'appdevjohn'
         },
-        id: '5678'
+        id: '5678',
+        createdAt: '2021-06-10T18:16:50.085Z',
+        updatedAt: '2021-06-10T18:16:50.085Z'
     }
 }
 ```

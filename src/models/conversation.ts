@@ -13,15 +13,21 @@ import { deleteMessagesFromConversation } from '../database/messages';
 import User from './user';
 
 export interface ConversationConfigType {
+    createdAt?: Date,
+    updatedAt?: Date,
     name: string,
     id?: string
 }
 
 class Conversation {
+    createdAt?: Date;
+    updatedAt?: Date;
     name: string;
     id?: string;
 
     constructor(config: ConversationConfigType) {
+        this.createdAt = config.createdAt;
+        this.updatedAt = config.updatedAt;
         this.name = config.name;
         this.id = config.id;
     }
@@ -33,6 +39,8 @@ class Conversation {
 
         return createConversation(newConversation).then(result => {
             if (result.rowCount > 0) {
+                this.createdAt = result.rows[0]['created_at'];
+                this.updatedAt = result.rows[0]['updated_at'];
                 this.id = result.rows[0]['convo_id'];
                 return true;
             } else {
@@ -52,6 +60,7 @@ class Conversation {
 
             return updateConversation(this.id, updatedConversation).then(result => {
                 if (result.rowCount > 0) {
+                    this.updatedAt = result.rows[0]['updated_at'];
                     return true;
                 } else {
                     return false;
@@ -161,6 +170,8 @@ class Conversation {
         return getConversation(convoId).then(result => {
             if (result.rowCount > 0) {
                 return new Conversation({
+                    createdAt: result.rows[0]['created_at'],
+                    updatedAt: result.rows[0]['updated_at'],
                     name: result.rows[0]['name'],
                     id: result.rows[0]['convo_id']
                 });
@@ -177,6 +188,8 @@ class Conversation {
             const rows = result.rows.filter(row => row['convo_id'] !== null);
             const conversations = rows.map(row => {
                 return new Conversation({
+                    createdAt: row['created_at'],
+                    updatedAt: row['updated_at'],
                     name: row['name'],
                     id: row['convo_id']
                 });

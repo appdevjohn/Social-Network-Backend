@@ -1,4 +1,5 @@
 import { ContentType, MessageType, getMessage, getMessagesFromConversation, getMessagesFromPost, createMessage, updateMessage, deleteMessage } from '../database/messages';
+import { getUser } from '../database/auth';
 
 export interface MessageUserData {
     firstName: string;
@@ -8,6 +9,8 @@ export interface MessageUserData {
 }
 
 export interface MessageConfigType {
+    createdAt?: Date,
+    updatedAt?: Date,
     userId: string;
     convoId?: string;
     postId?: string;
@@ -18,6 +21,8 @@ export interface MessageConfigType {
 }
 
 class Message {
+    createdAt?: Date;
+    updatedAt?: Date;
     userId: string;
     convoId?: string;
     postId?: string;
@@ -27,6 +32,8 @@ class Message {
     id?: string;
 
     constructor(config: MessageConfigType) {
+        this.createdAt = config.createdAt;
+        this.updatedAt = config.updatedAt;
         this.userId = config.userId;
         this.convoId = config.convoId;
         this.postId = config.postId;
@@ -47,17 +54,21 @@ class Message {
 
         return createMessage(newMessage).then(result => {
             if (result.rowCount > 0) {
+                this.createdAt = result.rows[0]['created_at'];
+                this.updatedAt = result.rows[0]['updated_at'];
                 this.id = result.rows[0]['message_id'];
-                this.userData = {
-                    firstName: result.rows[0]['first_name'],
-                    lastName: result.rows[0]['last_name'],
-                    email: result.rows[0]['email'],
-                    username: result.rows[0]['username']
-                }
-                return true;
+                return getUser(this.userId!);
             } else {
-                return false;
+                throw new Error('Could not update message.');
             }
+        }).then(result => {
+            this.userData = {
+                firstName: result.rows[0]['first_name'],
+                lastName: result.rows[0]['last_name'],
+                email: result.rows[0]['email'],
+                username: result.rows[0]['username']
+            }
+            return true;
         }).catch(error => {
             console.error(error);
             return false;
@@ -76,16 +87,19 @@ class Message {
 
             return updateMessage(this.id, updatedMessage).then(result => {
                 if (result.rowCount > 0) {
-                    this.userData = {
-                        firstName: result.rows[0]['first_name'],
-                        lastName: result.rows[0]['last_name'],
-                        email: result.rows[0]['email'],
-                        username: result.rows[0]['username']
-                    }
-                    return true;
+                    this.updatedAt = result.rows[0]['updated_at'];
+                    return getUser(this.userId!);
                 } else {
-                    return false;
+                    throw new Error('Could not update message.');
                 }
+            }).then(result => {
+                this.userData = {
+                    firstName: result.rows[0]['first_name'],
+                    lastName: result.rows[0]['last_name'],
+                    email: result.rows[0]['email'],
+                    username: result.rows[0]['username']
+                }
+                return true;
             }).catch(error => {
                 console.error(error);
                 return false;
@@ -99,16 +113,18 @@ class Message {
         if (this.id) {
             return deleteMessage(this.id).then(result => {
                 if (result.rowCount > 0) {
-                    this.userData = {
-                        firstName: result.rows[0]['first_name'],
-                        lastName: result.rows[0]['last_name'],
-                        email: result.rows[0]['email'],
-                        username: result.rows[0]['username']
-                    }
-                    return true;
+                    return getUser(this.userId);
                 } else {
-                    return false;
+                    throw new Error('Could not update message.');
                 }
+            }).then(result => {
+                this.userData = {
+                    firstName: result.rows[0]['first_name'],
+                    lastName: result.rows[0]['last_name'],
+                    email: result.rows[0]['email'],
+                    username: result.rows[0]['username']
+                }
+                return true;
             }).catch(error => {
                 console.error(error);
                 return false;
@@ -170,6 +186,8 @@ class Message {
 
     private static parseRow = (row: any): Message => {
         return new Message({
+            createdAt: row['created_at'],
+            updatedAt: row['updated_at'],
             userId: row['user_id'],
             convoId: row['convo_id'],
             postId: row['post_id'],

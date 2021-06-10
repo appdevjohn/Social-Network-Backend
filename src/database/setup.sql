@@ -1,6 +1,8 @@
 CREATE TYPE content_type AS ENUM ('text', 'image');
 
 CREATE TABLE users (
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
     user_id BIGSERIAL PRIMARY KEY NOT NULL,
     first_name VARCHAR(64) NOT NULL,
     last_name VARCHAR(64) NOT NULL,
@@ -14,6 +16,8 @@ CREATE TABLE users (
 );
 
 CREATE TABLE messages (
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
     message_id BIGSERIAL PRIMARY KEY NOT NULL,
     user_id BIGINT NOT NULL,
     convo_id BIGINT,
@@ -23,6 +27,8 @@ CREATE TABLE messages (
 );
 
 CREATE TABLE posts (
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
     post_id BIGSERIAL PRIMARY KEY NOT NULL,
     user_id BIGINT NOT NULL,
     group_id BIGINT NOT NULL,
@@ -32,24 +38,65 @@ CREATE TABLE posts (
 );
 
 CREATE TABLE conversations (
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
     convo_id BIGSERIAL PRIMARY KEY NOT NULL,
     name VARCHAR(128) NOT NULL
 );
 
 CREATE TABLE groups (
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
     group_id BIGSERIAL PRIMARY KEY NOT NULL,
     name VARCHAR(128) NOT NULL,
     UNIQUE(name)
 );
 
 CREATE TABLE users_conversations (
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
     users_conversations_id BIGSERIAL PRIMARY KEY NOT NULL,
     user_id BIGINT NOT NULL,
     convo_id BIGINT NOT NULL
 );
 
 CREATE TABLE users_groups (
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
     iusers_groups_id BIGSERIAL PRIMARY KEY NOT NULL,
     user_id BIGINT NOT NULL,
     group_id BIGINT NOT NULL
 );
+
+CREATE OR REPLACE FUNCTION update_timestamp()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.* IS DISTINCT FROM OLD.* THEN
+      NEW.updated_at = NOW(); 
+      RETURN NEW;
+   ELSE
+      RETURN OLD;
+   END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER update_timestamp BEFORE UPDATE ON users
+FOR EACH ROW EXECUTE PROCEDURE update_timestamp();
+
+CREATE TRIGGER update_timestamp BEFORE UPDATE ON messages
+FOR EACH ROW EXECUTE PROCEDURE update_timestamp();
+
+CREATE TRIGGER update_timestamp BEFORE UPDATE ON posts
+FOR EACH ROW EXECUTE PROCEDURE update_timestamp();
+
+CREATE TRIGGER update_timestamp BEFORE UPDATE ON conversations
+FOR EACH ROW EXECUTE PROCEDURE update_timestamp();
+
+CREATE TRIGGER update_timestamp BEFORE UPDATE ON groups
+FOR EACH ROW EXECUTE PROCEDURE update_timestamp();
+
+CREATE TRIGGER update_timestamp BEFORE UPDATE ON users_conversations
+FOR EACH ROW EXECUTE PROCEDURE update_timestamp();
+
+CREATE TRIGGER update_timestamp BEFORE UPDATE ON users_groups
+FOR EACH ROW EXECUTE PROCEDURE update_timestamp();

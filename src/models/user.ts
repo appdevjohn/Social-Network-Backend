@@ -10,6 +10,8 @@ import {
 import query from '../database/index';
 
 export interface UserConfigType {
+    createdAt?: Date,
+    updatedAt?: Date,
     firstName: string,
     lastName: string,
     username: string,
@@ -26,6 +28,8 @@ export interface AuthToken {
 }
 
 class User {
+    createdAt?: Date;
+    updatedAt?: Date;
     firstName: string;
     lastName: string;
     username: string;
@@ -36,6 +40,8 @@ class User {
     id?: string;
 
     constructor(config: UserConfigType) {
+        this.createdAt = config.createdAt;
+        this.updatedAt = config.updatedAt;
         this.firstName = config.firstName || '';
         this.lastName = config.lastName || '';
         this.username = config.username || '';
@@ -63,6 +69,8 @@ class User {
 
         return createUser(newAccount).then(result => {
             if (result.rowCount > 0) {
+                this.createdAt = result.rows[0]['created_at'];
+                this.updatedAt = result.rows[0]['updated_at'];
                 this.id = result.rows[0]['user_id'];
                 return true;
             } else {
@@ -124,6 +132,7 @@ class User {
 
             return updateUser(this.id, updatedAccount).then(result => {
                 if (result.rowCount > 0) {
+                    this.updatedAt = result.rows[0]['updated_at'];
                     return true;
                 } else {
                     return false;
@@ -201,6 +210,8 @@ class User {
 
     static parseRow = (row: any): User => {
         return new User({
+            createdAt: row['created_at'],
+            updatedAt: row['updated_at'],
             firstName: row['first_name'],
             lastName: row['last_name'],
             username: row['username'],

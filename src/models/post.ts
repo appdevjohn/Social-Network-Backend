@@ -7,6 +7,7 @@ import {
     getPostsFromGroup
 } from '../database/posts';
 import { deleteMessagesFromPost } from '../database/messages';
+import { getUser } from '../database/auth';
 
 export interface PostUserData {
     firstName: string,
@@ -16,6 +17,8 @@ export interface PostUserData {
 }
 
 export interface PostConfigType {
+    createdAt?: Date,
+    updatedAt?: Date,
     userId: string,
     groupId: string,
     title: string,
@@ -26,6 +29,8 @@ export interface PostConfigType {
 }
 
 class Post {
+    createdAt?: Date;
+    updatedAt?: Date;
     userId: string;
     groupId: string;
     title: string;
@@ -35,6 +40,8 @@ class Post {
     id?: string;
 
     constructor(config: PostConfigType) {
+        this.createdAt = config.createdAt;
+        this.updatedAt = config.updatedAt;
         this.userId = config.userId;
         this.groupId = config.groupId;
         this.title = config.title;
@@ -55,17 +62,21 @@ class Post {
 
         return createPost(newPost).then(result => {
             if (result.rowCount > 0) {
+                this.createdAt = result.rows[0]['created_at'];
+                this.updatedAt = result.rows[0]['updated_at'];
                 this.id = result.rows[0]['post_id'];
-                this.userData = {
-                    firstName: result.rows[0]['first_name'],
-                    lastName: result.rows[0]['last_name'],
-                    email: result.rows[0]['email'],
-                    username: result.rows[0]['username']
-                }
-                return true;
+                return getUser(this.userId!);
             } else {
-                return false;
+                throw new Error('Could not update message.');
             }
+        }).then(result => {
+            this.userData = {
+                firstName: result.rows[0]['first_name'],
+                lastName: result.rows[0]['last_name'],
+                email: result.rows[0]['email'],
+                username: result.rows[0]['username']
+            }
+            return true;
         }).catch(error => {
             console.error(error);
             return false;
@@ -84,16 +95,19 @@ class Post {
 
             return updatePost(this.id, updatedPost).then(result => {
                 if (result.rowCount > 0) {
-                    this.userData = {
-                        firstName: result.rows[0]['first_name'],
-                        lastName: result.rows[0]['last_name'],
-                        email: result.rows[0]['email'],
-                        username: result.rows[0]['username']
-                    }
-                    return true;
+                    this.updatedAt = result.rows[0]['updated_at'];
+                    return getUser(this.userId!);
                 } else {
-                    return false;
+                    throw new Error('Could not update message.');
                 }
+            }).then(result => {
+                this.userData = {
+                    firstName: result.rows[0]['first_name'],
+                    lastName: result.rows[0]['last_name'],
+                    email: result.rows[0]['email'],
+                    username: result.rows[0]['username']
+                }
+                return true;
             }).catch(error => {
                 console.error(error);
                 return false;
@@ -106,6 +120,12 @@ class Post {
     delete(): Promise<boolean> {
         if (this.id) {
             return deletePost(this.id).then(result => {
+                return deleteMessagesFromPost(this.id!);
+
+            }).then(() => {
+                return getUser(this.userId);
+
+            }).then(result => {
                 if (result.rowCount > 0) {
                     this.userData = {
                         firstName: result.rows[0]['first_name'],
@@ -114,11 +134,7 @@ class Post {
                         username: result.rows[0]['username']
                     }
                 }
-                return deleteMessagesFromPost(this.id!);
-
-            }).then(() => {
                 return true;
-
             }).catch(error => {
                 console.error(error);
                 return false;
@@ -169,6 +185,8 @@ class Post {
 
     private static parseRow = (row: any): Post => {
         return new Post({
+            createdAt: row['created_at'],
+            updatedAt: row['updated_at'],
             userId: row['user_id'],
             groupId: row['group_id'],
             title: row['title'],
