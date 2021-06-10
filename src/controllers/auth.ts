@@ -148,8 +148,12 @@ export const confirmEmail = async (req: Request, res: Response, next: NextFuncti
     const successfulActivation = await user.activate(activateToken as string);
 
     if (successfulActivation) {
+        const tokenPayload: AuthToken = { userId: user.id!, activated: user.activated };
+        const token = jwt.sign(tokenPayload, 'secret', { expiresIn: '1h' });
+
         return res.status(200).json({
             activated: user.activated,
+            token: token,
             message: 'You can now sign into the account.'
         });
     } else {
