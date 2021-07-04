@@ -11,6 +11,7 @@ import {
 } from '../database/conversation';
 import { deleteMessagesFromConversation } from '../database/messages';
 import User from './user';
+import Message from './message';
 
 export interface ConversationConfigType {
     createdAt?: Date,
@@ -95,7 +96,7 @@ class Conversation {
      * Finds out if this conversation exists in the database.
      * @returns Whether or not the conversation has been created in the database.
      */
-     isCreated(): Promise<boolean> {
+    isCreated(): Promise<boolean> {
         if (this.id) {
             return getConversation(this.id).then(result => {
                 return result.rowCount > 0;
@@ -108,8 +109,8 @@ class Conversation {
     }
 
     addUser(userId: string): Promise<boolean> {
-        if (!this.id) { 
-            throw new Error('This conversation must be created in the database before users can be added.'); 
+        if (!this.id) {
+            throw new Error('This conversation must be created in the database before users can be added.');
         }
 
         return addUserToConversation(userId, this.id).then(result => {
@@ -125,8 +126,8 @@ class Conversation {
     }
 
     removeUser(userId: string): Promise<boolean> {
-        if (!this.id) { 
-            throw new Error('This conversation must be created in the database before users can be removed.'); 
+        if (!this.id) {
+            throw new Error('This conversation must be created in the database before users can be removed.');
         }
 
         return removeUserFromConversation(userId, this.id).then(result => {
@@ -151,7 +152,7 @@ class Conversation {
     }
 
     members(): Promise<User[]> {
-        if(this.id) {
+        if (this.id) {
             return getUsersInConversation(this.id).then(usersInGroupResult => {
                 const users = usersInGroupResult.rows.map(row => {
                     return User.parseRow(row);
@@ -163,6 +164,20 @@ class Conversation {
             });
         } else {
             return Promise.resolve([]);
+        }
+    }
+
+    snippet(): Promise<Message | null> {
+        if (this.id) {
+            return Message.findByConvoId(this.id, 1).then(messages => {
+                if (messages.length > 0) {
+                    return messages[0];
+                } else {
+                    return null;
+                }
+            });
+        } else {
+            throw new Error('This conversation is not in the database.');
         }
     }
 

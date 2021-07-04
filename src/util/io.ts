@@ -54,7 +54,7 @@ export const updateConversation = (convoId: string, message: Message) => {
         return convo.members();
     }).then(members => {
         members.forEach(member => {
-            if (member.socketId) {
+            if (member.socketId && message.userId !== member.id) {
                 io?.to(member.socketId).emit('message', message);
             }
         });

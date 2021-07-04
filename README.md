@@ -480,7 +480,7 @@ Returns whether or not a user exists, given a username.<br>
 <br>
 
 **`GET /conversations`**<br>
-Returns the conversations which the user is involved in.<br>
+Returns the conversations which the user is involved in. Also returns the last message that was sent so a preview or snippet might displayed.<br>
 ```
 {
     conversations: [
@@ -488,7 +488,19 @@ Returns the conversations which the user is involved in.<br>
             name: 'Pokemangos',
             id: '1234',
             createdAt: '2021-06-10T18:16:50.085Z',
-            updatedAt: '2021-06-10T18:16:50.085Z'
+            updatedAt: '2021-06-10T18:16:50.085Z',
+            snippet: {
+                firstName: 'John',
+                lastName: 'Champion',
+                username: 'appdevjohn',
+                email: 'john@bison.software',
+                hashedPassword: '$2b$12$24.gTVOvhU9vNYlCWtxQ5u9UlinOjZ8.gSyIevxbmCM2oH4Ik9/K2',
+                activated: true,
+                activateToken: '',
+                id: '1234',
+                createdAt: '2021-06-10T18:16:50.085Z',
+                updatedAt: '2021-06-10T18:16:50.085Z'
+            }
         }
     ]
 }

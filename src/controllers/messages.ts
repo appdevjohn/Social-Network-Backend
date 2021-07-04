@@ -33,17 +33,26 @@ export const canMessageUser = (req: Request, res: Response, next: NextFunction) 
 }
 
 export const getConversations = async (req: Request, res: Response, next: NextFunction) => {
-    let conversations: Conversation[] = [];
+    let conversationResponse: any[] = [];
 
     try {
-        conversations = await Conversation.findByUserId(req.userId!);
+        const conversations = await Conversation.findByUserId(req.userId!);
+
+        for await (const conversation of conversations) {
+            const snippet = await conversation.snippet();
+            const convo = {
+                ...conversation,
+                snippet: snippet
+            }
+            conversationResponse.push(convo);
+        }
     } catch (error) {
         console.error(error);
         return next(RequestError.withMessageAndCode('Could not retrieve conversations', 500));
     }
     
     return res.status(200).json({
-        conversations: conversations
+        conversations: conversationResponse
     });
 }
 
