@@ -8,7 +8,8 @@ export interface AccountType {
     email?: string,
     hashedPassword?: string,
     activated?: boolean,
-    activateToken?: string | null
+    activateToken?: string | null,
+    socketId?: string | null
 }
 
 export const getUser = (userId: string): Promise<QueryResult> => {
@@ -23,8 +24,12 @@ export const getUserByUsername = (username: string): Promise<QueryResult> => {
     return query('SELECT * FROM users WHERE username = $1;', [username]);
 }
 
+export const getUserBySocketId = (socketId: string): Promise<QueryResult> => {
+    return query('SELECT * FROM users WHERE socket_id = $1;', [socketId]);
+}
+
 export const createUser = (newAccount: AccountType): Promise<QueryResult> => {
-    return query('INSERT INTO users (first_name, last_name, username, email, hashed_password, activated, activate_token) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *;', [newAccount.firstName, newAccount.lastName, newAccount.username, newAccount.email, newAccount.hashedPassword, newAccount.activated, newAccount.activateToken]);
+    return query('INSERT INTO users (first_name, last_name, username, email, hashed_password, activated, activate_token, socket_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *;', [newAccount.firstName, newAccount.lastName, newAccount.username, newAccount.email, newAccount.hashedPassword, newAccount.activated, newAccount.activateToken, newAccount.socketId]);
 }
 
 export const updateUser = (userId: string, updatedAccount: AccountType): Promise<QueryResult> => {
@@ -55,6 +60,9 @@ export const updateUser = (userId: string, updatedAccount: AccountType): Promise
                 break;
             case 'activateToken':
                 queryString = queryString + ' activate_token = $' + (index + 1)
+                break;
+            case 'socketId':
+                queryString = queryString + ' socket_id = $' + (index + 1)
                 break;
         
             default:

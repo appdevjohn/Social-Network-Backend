@@ -4,6 +4,7 @@ CREATE TABLE users (
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
     user_id BIGSERIAL PRIMARY KEY NOT NULL,
+    socket_id VARCHAR(32),
     first_name VARCHAR(64) NOT NULL,
     last_name VARCHAR(64) NOT NULL,
     username VARCHAR(64) NOT NULL,

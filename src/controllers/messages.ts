@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { validationResult } from 'express-validator';
 
+import { updateConversation } from '../util/io';
 import RequestError from '../util/error';
 import Conversation from '../models/conversation';
 import Message from '../models/message';
@@ -282,9 +283,13 @@ export const newMessage = (req: Request, res: Response, next: NextFunction) => {
     }
 
     return message.create().then(() => {
-        return res.status(201).json({
+        res.status(201).json({
             message: message
-        })
+        });
+        
+        if (convoId) {
+            updateConversation(convoId, message);
+        }
     }).catch(error => {
         console.error(error);
         return next(RequestError.withMessageAndCode('Could not create message.', 500));

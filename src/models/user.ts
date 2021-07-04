@@ -5,7 +5,8 @@ import {
     updateUser,
     deleteUser,
     getUserByEmail,
-    getUserByUsername
+    getUserByUsername,
+    getUserBySocketId
 } from '../database/auth';
 import query from '../database/index';
 
@@ -19,6 +20,7 @@ export interface UserConfigType {
     hashedPassword: string,
     activated: boolean,
     activateToken: string,
+    socketId?: string | null,
     id?: string
 }
 
@@ -37,6 +39,7 @@ class User {
     hashedPassword: string;
     activated: boolean;
     activateToken?: string | null;
+    socketId?: string | null;
     id?: string;
 
     constructor(config: UserConfigType) {
@@ -49,6 +52,7 @@ class User {
         this.hashedPassword = config.hashedPassword || '';
         this.activated = config.activated;
         this.activateToken = config.activateToken;
+        this.socketId = config.socketId;
         this.id = config.id;
     }
 
@@ -64,7 +68,8 @@ class User {
             email: this.email,
             hashedPassword: this.hashedPassword,
             activated: this.activated,
-            activateToken: this.activateToken
+            activateToken: this.activateToken,
+            socketId: this.socketId
         }
 
         return createUser(newAccount).then(result => {
@@ -127,7 +132,8 @@ class User {
                 email: this.email,
                 hashedPassword: this.hashedPassword,
                 activated: this.activated,
-                activateToken: this.activateToken
+                activateToken: this.activateToken,
+                socketId: this.socketId
             }
 
             return updateUser(this.id, updatedAccount).then(result => {
@@ -208,6 +214,18 @@ class User {
         });
     }
 
+    static findBySocketId = (socketId: string): Promise<User> => {
+        return getUserBySocketId(socketId).then(result => {
+            if (result.rowCount > 0) {
+                return User.parseRow(result.rows[0]);
+            } else {
+                throw new Error('Could not find this account.');
+            }
+        }).catch(error => {
+            throw new Error(error);
+        });
+    }
+
     static parseRow = (row: any): User => {
         return new User({
             createdAt: row['created_at'],
@@ -219,6 +237,7 @@ class User {
             hashedPassword: row['hashed_password'],
             activated: row['activated'],
             activateToken: row['activate_token'],
+            socketId: row['socket_id'],
             id: row['user_id']
         });
     }
