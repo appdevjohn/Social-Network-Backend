@@ -29,8 +29,10 @@ export const setupSocketIO = (server: http.Server) => {
         // Remove the socket ID from the user. We'll know the user is not online if the socket ID is null.
         socket.on('disconnect', () => {
             User.findBySocketId(socket.id).then(user => {
-                user.socketId = null
-                user.update();
+                if (user) {
+                    user.socketId = null;
+                    user.update();
+                }
             });
         });
 

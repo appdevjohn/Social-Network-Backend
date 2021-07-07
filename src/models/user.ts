@@ -214,15 +214,16 @@ class User {
         });
     }
 
-    static findBySocketId = (socketId: string): Promise<User> => {
+    static findBySocketId = (socketId: string): Promise<User | null> => {
         return getUserBySocketId(socketId).then(result => {
             if (result.rowCount > 0) {
                 return User.parseRow(result.rows[0]);
             } else {
                 throw new Error('Could not find this account.');
             }
-        }).catch(error => {
-            throw new Error(error);
+        }).catch(() => {
+            // User not online
+            return null;
         });
     }
 
