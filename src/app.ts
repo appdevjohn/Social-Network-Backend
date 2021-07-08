@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 import { setupSocketIO } from './util/io';
 import RequestError from './util/error';
 import authRoutes from './routes/auth';
+import userRoutes from './routes/users';
 import groupRoutes from './routes/groups';
 import postRoutes from './routes/posts';
 import messageRoutes from './routes/messages';
@@ -22,6 +23,7 @@ setupSocketIO(server);
 app.use('/auth', authRoutes);
 app.use('/groups', groupRoutes);
 app.use('/posts', postRoutes);
+app.use('/users', userRoutes);
 app.use(messageRoutes);
 
 app.use((error: RequestError, req: Request, res: Response, next: NextFunction) => {

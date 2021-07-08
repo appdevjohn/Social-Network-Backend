@@ -70,6 +70,49 @@ Activates the account using a code sent the the account holder's inbox.<br>
 ```
 <br>
 
+### Users
+User endpoints are distinct from auth endpoints in that they deal with personal information about the account, such as the name and username.
+<br><br>
+
+**`GET /users/:userId`**<br>
+Returns data for a user.<br>
+|Field|Location|Required|Description|
+|---|---|---|---|
+|userId|param|true|The ID of the user to get.|
+```
+{
+    user: {
+        id: '1234',
+        firstName: 'John',
+        lastName: 'Champion',
+        email: 'john@bison.software',
+        username: 'appdevjohn'
+    }
+}
+```
+<br>
+
+**`PUT /users/edit`**<br>
+Edits a user's profile info.<br>
+|Field|Location|Required|Description|
+|---|---|---|---|
+|userId|body|true|The ID of the user to update.|
+|firstName|body|false|The new first name for the user.|
+|lastName|body|false|The new last name for the user.|
+|username|body|false|The new username for the user.|
+```
+{
+    user: {
+        id: '1234',
+        firstName: 'John',
+        lastName: 'Champion',
+        email: 'john@bison.software',
+        username: 'appdevjohn'
+    }
+}
+```
+<br>
+
 ### Groups
 A group is a community of users. Users can share posts within groups, and only other members of that group can view the posts. Posts can only be sent from within a group. Group members can see who else is in the group and send them direct messages.
 <br><br>

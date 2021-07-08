@@ -7,7 +7,7 @@ import {
     getUserByEmail,
     getUserByUsername,
     getUserBySocketId
-} from '../database/auth';
+} from '../database/user';
 import query from '../database/index';
 
 export interface UserConfigType {

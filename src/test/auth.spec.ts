@@ -12,7 +12,7 @@ describe('Auth Tests', () => {
     const app = express();
 
     const testUsername = 'test_username';
-    const testEmail = 'test_email@test.com'
+    const testEmail = 'test_email@test.com';
 
     before(function () {
         app.use(express.json());

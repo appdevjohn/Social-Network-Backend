@@ -7,7 +7,7 @@ import {
     getPostsFromGroup
 } from '../database/posts';
 import { deleteMessagesFromPost } from '../database/messages';
-import { getUser } from '../database/auth';
+import { getUser } from '../database/user';
 
 export interface PostUserData {
     firstName: string,

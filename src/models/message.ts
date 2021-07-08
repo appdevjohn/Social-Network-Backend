@@ -1,5 +1,5 @@
 import { ContentType, MessageType, getMessage, getMessagesFromConversation, getMessagesFromPost, createMessage, updateMessage, deleteMessage } from '../database/messages';
-import { getUser } from '../database/auth';
+import { getUser } from '../database/user';
 
 export interface MessageUserData {
     firstName: string;
