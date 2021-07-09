@@ -12,7 +12,14 @@ export const ping = async (req: Request, res: Response, next: NextFunction) => {
             const user = await User.findById(req.userId!);
             if (user) {
                 return res.status(200).json({
-                    message: 'Authenticated'
+                    message: 'Authenticated',
+                    user: {
+                        id: user.id,
+                        firstName: user.firstName,
+                        lastName: user.lastName,
+                        username: user.username,
+                        email: user.email
+                    }
                 });
             } else {
                 return next(RequestError.notAuthorized());
@@ -28,9 +35,9 @@ export const ping = async (req: Request, res: Response, next: NextFunction) => {
 export const logIn = async (req: Request, res: Response, next: NextFunction) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({ 
+        return res.status(400).json({
             message: errors.array()[0].msg,
-            errors: errors.array() 
+            errors: errors.array()
         });
     }
 
@@ -69,9 +76,9 @@ export const logIn = async (req: Request, res: Response, next: NextFunction) => 
 export const signUp = async (req: Request, res: Response, next: NextFunction) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({ 
+        return res.status(400).json({
             message: errors.array()[0].msg,
-            errors: errors.array() 
+            errors: errors.array()
         });
     }
 
@@ -106,34 +113,29 @@ export const signUp = async (req: Request, res: Response, next: NextFunction) =>
         activateToken: activateToken
     });
 
-    let accountCreated: boolean;
     try {
-        accountCreated = await newUser.create();
+        await newUser.create();
     } catch (error) {
         return next(RequestError.withMessageAndCode('Something went wrong creating your account.', 500));
     }
 
-    if (accountCreated) {
-        const tokenPayload: AuthToken = { userId: newUser.id!, activated: newUser.activated };
-        const token = jwt.sign(tokenPayload, 'secret', { expiresIn: '1h' });
+    const tokenPayload: AuthToken = { userId: newUser.id!, activated: newUser.activated };
+    const token = jwt.sign(tokenPayload, 'secret', { expiresIn: '1h' });
 
-        return res.status(201).json({
-            user: newUser,
-            token: token,
-            activated: newUser.activated,
-            message: 'Find our activation email to activate your account.'
-        });
-    } else {
-        return next(RequestError.withMessageAndCode('Something went wrong creating your account.', 500));
-    }
+    return res.status(201).json({
+        user: newUser,
+        token: token,
+        activated: newUser.activated,
+        message: 'Find our activation email to activate your account.'
+    });
 }
 
 export const confirmEmail = async (req: Request, res: Response, next: NextFunction) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({ 
+        return res.status(400).json({
             message: errors.array()[0].msg,
-            errors: errors.array() 
+            errors: errors.array()
         });
     }
 
@@ -145,9 +147,10 @@ export const confirmEmail = async (req: Request, res: Response, next: NextFuncti
     } catch (error) {
         return next(RequestError.withMessageAndCode('Account activation failed.', 500));
     }
-    const successfulActivation = await user.activate(activateToken as string);
 
-    if (successfulActivation) {
+    try {
+        await user.activate(activateToken as string);
+        
         const tokenPayload: AuthToken = { userId: user.id!, activated: user.activated };
         const token = jwt.sign(tokenPayload, 'secret', { expiresIn: '1h' });
 
@@ -156,7 +159,8 @@ export const confirmEmail = async (req: Request, res: Response, next: NextFuncti
             token: token,
             message: 'You can now sign into the account.'
         });
-    } else {
+
+    } catch (error) {
         return next(RequestError.withMessageAndCode('The activation code was incorrect.', 406));
     }
 }

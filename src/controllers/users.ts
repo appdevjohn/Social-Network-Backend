@@ -34,18 +34,19 @@ export const updateUser = (req: Request, res: Response, next: NextFunction) => {
         if (firstName) { user.firstName = firstName; }
         if (lastName) { user.lastName = lastName; }
         if (username) { user.username = username; }
-        user.update();
 
-        return res.status(201).json({
-            user: {
-                id: user.id,
-                firstName: user.firstName,
-                lastName: user.lastName,
-                username: user.username,
-                email: user.email
-            }
+        return user.update().then(() => {
+            return res.status(201).json({
+                user: {
+                    id: user.id,
+                    firstName: user.firstName,
+                    lastName: user.lastName,
+                    username: user.username,
+                    email: user.email
+                }
+            });
         });
-
+        
     }).catch(error => {
         console.error(error);
         return next(RequestError.withMessageAndCode('Could not update user.', 500));

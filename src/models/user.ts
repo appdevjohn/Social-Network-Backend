@@ -60,7 +60,7 @@ class User {
      * Creates the user in the database.
      * @returns Whether or not the action was successful.
      */
-    create(): Promise<boolean> {
+    create(): Promise<User> {
         const newAccount: AccountType = {
             firstName: this.firstName,
             lastName: this.lastName,
@@ -77,13 +77,13 @@ class User {
                 this.createdAt = result.rows[0]['created_at'];
                 this.updatedAt = result.rows[0]['updated_at'];
                 this.id = result.rows[0]['user_id'];
-                return true;
+                return this;
             } else {
-                return false;
+                throw new Error('Could not update user on database.');
             }
         }).catch(error => {
             console.error(error);
-            return false;
+            throw new Error(error);
         })
     }
 
@@ -108,14 +108,14 @@ class User {
      * @param token The token used to activate the account.
      * @returns Whether or not the token could successfully activate the account.
      */
-    async activate(token: string): Promise<boolean> {
+    async activate(token: string): Promise<User> {
         if (this.id && token === this.activateToken) {
             this.activated = true;
             this.activateToken = null;
-            const success = await this.update();
-            return success;
+            await this.update();
+            return this;
         } else {
-            return false;
+            throw new Error('The activation token is incorrect.');
         }
     }
 
@@ -123,7 +123,7 @@ class User {
      * Updates the user in the database.
      * @returns Whether or not the action was successful.
      */
-    update(): Promise<boolean> {
+    update(): Promise<User> {
         if (this.id) {
             const updatedAccount: AccountType = {
                 firstName: this.firstName,
@@ -139,16 +139,16 @@ class User {
             return updateUser(this.id, updatedAccount).then(result => {
                 if (result.rowCount > 0) {
                     this.updatedAt = result.rows[0]['updated_at'];
-                    return true;
+                    return this;
                 } else {
-                    return false;
+                    throw new Error('Could not update user with database.');
                 }
             }).catch(error => {
                 console.error(error);
-                return false;
+                throw new Error(error);
             });
         } else {
-            return Promise.resolve(false);
+            throw new Error('This user does not exist.')
         }
     }
 
@@ -156,20 +156,20 @@ class User {
      * Deletes the user from the database.
      * @returns Whether or not the action was successful.
      */
-    delete(): Promise<boolean> {
+    delete(): Promise<User> {
         if (this.id) {
             return deleteUser(this.id).then(result => {
                 if (result.rowCount > 0) {
-                    return true;
+                    return this;
                 } else {
-                    return false;
+                    throw new Error('Could not delete user from database.');
                 }
             }).catch(error => {
                 console.error(error);
-                return false;
+                throw new Error('Could not delete user from database.');
             });
         } else {
-            return Promise.resolve(false);
+            throw new Error('Could not delete user.')
         }
     }
 
