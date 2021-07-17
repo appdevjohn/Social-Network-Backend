@@ -45,7 +45,9 @@ export const updateGroup = (groupId: string, updatedGroup: GroupType): Promise<Q
 }
 
 export const deleteGroup = (groupId: string): Promise<QueryResult> => {
-    return query('DELETE FROM groups WHERE group_id = $1 RETURNING *;', [groupId]);
+    return query('DELETE FROM users_groups WHERE group_id = $1;', [groupId]).then(() => {
+        return query('DELETE FROM groups WHERE group_id = $1 RETURNING *;', [groupId]);
+    });
 }
 
 export const addUserToGroup = (userId: string, groupId: string): Promise<QueryResult> => {
