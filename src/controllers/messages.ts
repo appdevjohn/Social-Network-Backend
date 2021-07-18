@@ -40,8 +40,10 @@ export const getConversations = async (req: Request, res: Response, next: NextFu
 
         for await (const conversation of conversations) {
             const snippet = await conversation.snippet();
+            const lastReadMessageId = await conversation.getLastReadMessageId(req.userId!);
             const convo = {
                 ...conversation,
+                lastReadMessageId: lastReadMessageId,
                 snippet: snippet
             }
             conversationResponse.push(convo);
@@ -69,8 +71,13 @@ export const getConversation = (req: Request, res: Response, next: NextFunction)
 
     let conversation: Conversation;
     let members: User[];
+    let lastReadMessageId: string | null = null;
     return Conversation.findById(convoId).then(convo => {
         conversation = convo;
+        return conversation.getLastReadMessageId(req.userId!);
+
+    }).then(lastReadId => {
+        lastReadMessageId = lastReadId;
         return conversation.members();
 
     }).then(users => {
@@ -79,8 +86,21 @@ export const getConversation = (req: Request, res: Response, next: NextFunction)
 
     }).then(messages => {
         return res.status(200).json({
-            conversation: conversation,
-            members: members,
+            conversation: {
+                ...conversation,
+                lastReadMessageId: lastReadMessageId
+            },
+            members: members.map(member => {
+                return {
+                    firstName: member.firstName,
+                    lastName: member.lastName,
+                    username: member.username,
+                    email: member.email,
+                    activated: member.activated,
+                    id: member.id,
+                    createdAt: member.createdAt,
+                }
+            }),
             messages: messages
         });
 
@@ -182,7 +202,17 @@ export const newConversation = (req: Request, res: Response, next: NextFunction)
     }).then(members => {
         return res.status(201).json({
             conversation: newConversation,
-            members: members
+            members: members.map(member => {
+                return {
+                    firstName: member.firstName,
+                    lastName: member.lastName,
+                    username: member.username,
+                    email: member.email,
+                    activated: member.activated,
+                    id: member.id,
+                    createdAt: member.createdAt,
+                }
+            })
         });
 
     }).catch(error => {
@@ -213,7 +243,17 @@ export const editConversation = (req: Request, res: Response, next: NextFunction
             return conversation.members().then(members => {
                 return res.status(200).json({
                     conversation: conversation,
-                    members: members
+                    members: members.map(member => {
+                        return {
+                            firstName: member.firstName,
+                            lastName: member.lastName,
+                            username: member.username,
+                            email: member.email,
+                            activated: member.activated,
+                            id: member.id,
+                            createdAt: member.createdAt,
+                        }
+                    })
                 });
             }).catch(error => {
                 console.error(error);

@@ -532,15 +532,20 @@ Returns the conversations which the user is involved in. Also returns the last m
             id: '1234',
             createdAt: '2021-06-10T18:16:50.085Z',
             updatedAt: '2021-06-10T18:16:50.085Z',
+            lastReadMessageId: '5678',
             snippet: {
-                firstName: 'John',
-                lastName: 'Champion',
-                username: 'appdevjohn',
-                email: 'john@bison.software',
-                hashedPassword: '$2b$12$24.gTVOvhU9vNYlCWtxQ5u9UlinOjZ8.gSyIevxbmCM2oH4Ik9/K2',
-                activated: true,
-                activateToken: '',
-                id: '1234',
+                userId: '1234',
+                convoId: '1234,
+                postId: null,
+                content: 'Hey folks',
+                type: 'text',
+                userData: {
+                    firstName: 'John',
+                    lastName: 'Champion',
+                    email: 'john@bison.software',
+                    username: 'appdevjohn'
+                },
+                id: '5678',
                 createdAt: '2021-06-10T18:16:50.085Z',
                 updatedAt: '2021-06-10T18:16:50.085Z'
             }
@@ -560,6 +565,7 @@ Returns data for a conversation.<br>
     conversation: {
         name: 'Pokemangos',
         id: '1234',
+        lastReadMessageId: '5678',
         createdAt: '2021-06-10T18:16:50.085Z',
         updatedAt: '2021-06-10T18:16:50.085Z'
     },
@@ -569,12 +575,9 @@ Returns data for a conversation.<br>
             lastName: 'Champion',
             username: 'appdevjohn',
             email: 'john@bison.software',
-            hashedPassword: '$2b$12$24.gTVOvhU9vNYlCWtxQ5u9UlinOjZ8.gSyIevxbmCM2oH4Ik9/K2',
             activated: true,
-            activateToken: '',
             id: '1234',
-            createdAt: '2021-06-10T18:16:50.085Z',
-            updatedAt: '2021-06-10T18:16:50.085Z'
+            createdAt: '2021-06-10T18:16:50.085Z'
         }
     ],
     messages [
@@ -675,12 +678,9 @@ Creates a new conversation.<br>
             lastName: 'Champion',
             username: 'appdevjohn',
             email: 'john@bison.software',
-            hashedPassword: '$2b$12$24.gTVOvhU9vNYlCWtxQ5u9UlinOjZ8.gSyIevxbmCM2oH4Ik9/K2',
             activated: true,
-            activateToken: '',
             id: '1234',
-            createdAt: '2021-06-10T18:16:50.085Z',
-            updatedAt: '2021-06-10T18:16:50.085Z'
+            createdAt: '2021-06-10T18:16:50.085Z'
         }
     ]
 }
@@ -707,12 +707,9 @@ Creates a new conversation.<br>
             lastName: 'Champion',
             username: 'appdevjohn',
             email: 'john@bison.software',
-            hashedPassword: '$2b$12$24.gTVOvhU9vNYlCWtxQ5u9UlinOjZ8.gSyIevxbmCM2oH4Ik9/K2',
             activated: true,
-            activateToken: '',
             id: '1234',
-            createdAt: '2021-06-10T18:16:50.085Z',
-            updatedAt: '2021-06-10T18:16:50.085Z'
+            createdAt: '2021-06-10T18:16:50.085Z'
         }
     ]
 }

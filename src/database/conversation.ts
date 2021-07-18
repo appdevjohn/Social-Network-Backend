@@ -36,12 +36,22 @@ export const updateConversation = (convoId: string, updatedConversation: Convers
     paramKeys.push(convoId);
 
     queryString = queryString + ' WHERE convo_id = $' + paramKeys.length + ' RETURNING *;';
-    
+
     return query(queryString, paramKeys);
 }
 
 export const deleteConversation = (convoId: string): Promise<QueryResult> => {
-    return query('DELETE FROM conversations WHERE convo_id = $1 RETURNING *;', [convoId]);
+    return query('DELETE FROM users_conversations WHERE convo_id = $1;', [convoId]).then(() => {
+        return query('DELETE FROM conversations WHERE convo_id = $1 RETURNING *;', [convoId]);
+    });
+}
+
+export const getLastReadMessageId = (convoId: string, userId: string): Promise<QueryResult> => {
+    return query('SELECT * FROM users_conversations WHERE convo_id = $1 AND user_id = $2;', [convoId, userId]);
+}
+
+export const updateLastReadMessageId = (messageId: string, convoId: string, userId: string): Promise<QueryResult> => {
+    return query('UPDATE users_conversations SET last_read_message_id = $1 WHERE convo_id = $2 AND user_id = $3 RETURNING *;', [messageId, convoId, userId]);
 }
 
 export const addUserToConversation = (userId: string, convoId: string): Promise<QueryResult> => {

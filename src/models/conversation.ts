@@ -7,7 +7,9 @@ import {
     deleteConversation,
     addUserToConversation,
     removeUserFromConversation,
-    getUsersInConversation
+    getUsersInConversation,
+    getLastReadMessageId,
+    updateLastReadMessageId
 } from '../database/conversation';
 import { deleteMessagesFromConversation } from '../database/messages';
 import User from './user';
@@ -179,6 +181,42 @@ class Conversation {
         } else {
             throw new Error('This conversation is not in the database.');
         }
+    }
+
+    getLastReadMessageId = (userId: string): Promise<string | null> => {
+        if (this.id) {
+            return Conversation.getLastReadMessageId(this.id, userId);
+        } else {
+            return Promise.resolve(null);
+        }
+    }
+
+    updateLastReadMessage = (messageId: string, userId: string): Promise<string | null> => {
+        if (this.id) {
+            return Conversation.updateLastReadMessage(messageId, this.id, userId);
+        } else {
+            return Promise.resolve(null);
+        }
+    }
+
+    static getLastReadMessageId = (convoId: string, userId: string): Promise<string | null> => {
+        return getLastReadMessageId(convoId, userId).then(result => {
+            if (result.rows.length > 0) {
+                return result.rows[0]['last_read_message_id'];
+            } else {
+                return null;
+            }
+        });
+    }
+
+    static updateLastReadMessage = (messageId: string, convoId: string, userId: string): Promise<string | null> => {
+        return updateLastReadMessageId(messageId, convoId, userId).then(result => {
+            if (result.rows.length > 0) {
+                return result.rows[0]['last_read_message_id'];
+            } else {
+                return null;
+            }
+        });
     }
 
     static findById = (convoId: string): Promise<Conversation> => {

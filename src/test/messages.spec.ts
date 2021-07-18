@@ -70,9 +70,7 @@ describe('Messages Tests', () => {
                 const convoId = res.body.conversation.id;
                 return Conversation.findById(convoId);
             }).then(conversation => {
-                return User.findByEmail(testEmail).then(user => {
-                    conversation.removeUser(user.id!);
-                });
+                return conversation.delete();
             });
     });
 
@@ -124,7 +122,7 @@ describe('Messages Tests', () => {
 
     it('should be able to send a message in a conversation', function () {
         const testConversation = new Conversation({
-            name: 'Test Conversation'
+            name: 'Test Conversation (Send Message Test)'
         });
         return testConversation.create().then(() => {
             return User.findByEmail(testEmail);
@@ -142,7 +140,7 @@ describe('Messages Tests', () => {
 
     it('should be able to delete a message in a conversation or post', function () {
         const testConversation = new Conversation({
-            name: 'Test Conversation'
+            name: 'Test Conversation (Delete Message Test)'
         });
         return testConversation.create().then(() => {
             return User.findByEmail(testEmail);
@@ -167,7 +165,7 @@ describe('Messages Tests', () => {
 
     it('should be able to get messages from a conversation', function () {
         const testConversation = new Conversation({
-            name: 'Test Conversation'
+            name: 'Test Conversation (Get Messages from Convo Test)'
         });
         return testConversation.create().then(() => {
             return User.findByEmail(testEmail);
@@ -204,12 +202,18 @@ describe('Messages Tests', () => {
 
     it('should be able to get a conversation\'s data', function () {
         const testConversation = new Conversation({
-            name: 'Test Conversation'
+            name: 'Test Conversation (Get Convo Data Test)'
         });
+
+        let user: User;
         return testConversation.create().then(() => {
             return User.findByEmail(testEmail);
 
-        }).then(user => {
+        }).then(usr => {
+            user = usr;
+            return testConversation.addUser(user.id!);
+
+        }).then(() => {
             const message1 = new Message({
                 userId: user.id!,
                 convoId: testConversation.id,
@@ -242,7 +246,7 @@ describe('Messages Tests', () => {
 
     it('should be able to get a single message', function () {
         const testConversation = new Conversation({
-            name: 'Test Conversation'
+            name: 'Test Conversation (Get Single Message Test)'
         });
 
         let message: Message;
@@ -291,5 +295,45 @@ describe('Messages Tests', () => {
                 const validity = res.body.valid;
                 expect(validity).to.be.equal(false);
             })
+    });
+
+    it('should log the last read message for a conversation', async function () {
+        // Set Up
+        const user = await User.findByEmail(testEmail);
+        const secondUser = new User({
+            firstName: 'test_first_2',
+            lastName: 'test_last_2',
+            username: 'test_username_2',
+            email: 'test_email_2@test.com',
+            hashedPassword: 'hashed_password_2',
+            activated: true,
+            activateToken: ''
+        });
+        await secondUser.create();
+
+        const newConversation = new Conversation({ name: 'Test Conversation' });
+        await newConversation.create();
+
+        newConversation.addUser(user.id!);
+        newConversation.addUser(secondUser.id!);
+
+        const newMessage = new Message({
+            userId: user.id!,
+            convoId: newConversation.id,
+            content: 'Test Message',
+            type: ContentType.Text
+        });
+        await newMessage.create();
+
+        // Perform Test
+        const updatedLastMessageId = await Conversation.updateLastReadMessage(newMessage.id!, newConversation.id!, secondUser.id!);
+        const gottenLastMessageId = await Conversation.getLastReadMessageId(newConversation.id!, secondUser.id!);
+        
+        expect(updatedLastMessageId).to.be.equal(newMessage.id!);
+        expect(gottenLastMessageId).to.be.equal(newMessage.id!);
+
+        // Wrap Up
+        await secondUser.delete();
+        await newConversation.delete();
     });
 });

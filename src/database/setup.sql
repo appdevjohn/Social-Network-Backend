@@ -58,7 +58,8 @@ CREATE TABLE users_conversations (
     updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
     users_conversations_id BIGSERIAL PRIMARY KEY NOT NULL,
     user_id BIGINT NOT NULL,
-    convo_id BIGINT NOT NULL
+    convo_id BIGINT NOT NULL,
+    last_read_message_id BIGINT
 );
 
 CREATE TABLE users_groups (
