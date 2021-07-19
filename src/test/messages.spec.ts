@@ -45,6 +45,7 @@ describe('Messages Tests', () => {
         app.get('/conversations/:convoId', messagesController.getConversation);
         app.get('/conversations/:convoId/messages', messagesController.getMessages);
         app.get('/messages/:messageId', messagesController.getMessage);
+        app.put('/conversations/update-last-read-message', messagesController.updateLastReadMessageOfConversation);
         app.use((error: RequestError, req: Request, res: Response, next: NextFunction) => {
             console.error(error.message);
             return res.status(error.code || 500).json({
@@ -328,12 +329,54 @@ describe('Messages Tests', () => {
         // Perform Test
         const updatedLastMessageId = await Conversation.updateLastReadMessage(newMessage.id!, newConversation.id!, secondUser.id!);
         const gottenLastMessageId = await Conversation.getLastReadMessageId(newConversation.id!, secondUser.id!);
-        
+
         expect(updatedLastMessageId).to.be.equal(newMessage.id!);
         expect(gottenLastMessageId).to.be.equal(newMessage.id!);
 
         // Wrap Up
         await secondUser.delete();
         await newConversation.delete();
+        return;
+    });
+
+    it('should be able to update the last read message id with a request', async function () {
+        // Set Up
+        const user = await User.findByEmail(testEmail);
+        const secondUser = new User({
+            firstName: 'test_first_2',
+            lastName: 'test_last_2',
+            username: 'test_username_2',
+            email: 'test_email_2@test.com',
+            hashedPassword: 'hashed_password_2',
+            activated: true,
+            activateToken: ''
+        });
+        await secondUser.create();
+
+        const newConversation = new Conversation({ name: 'Test Conversation' });
+        await newConversation.create();
+
+        newConversation.addUser(user.id!);
+        newConversation.addUser(secondUser.id!);
+
+        const newMessage = new Message({
+            userId: user.id!,
+            convoId: newConversation.id,
+            content: 'Test Message',
+            type: ContentType.Text
+        });
+        await newMessage.create();
+
+        // Perform Test
+        const res = await request(app)
+            .put('/conversations/update-last-read-message')
+            .send({ convoId: newConversation.id, messageId: newMessage.id })
+            .expect(200);
+        expect(res.body.messageId).to.be.equal(newMessage.id);
+
+        // Wrap Up
+        await secondUser.delete();
+        await newConversation.delete();
+        return;
     });
 });

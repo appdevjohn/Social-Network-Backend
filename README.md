@@ -787,3 +787,16 @@ Deletes a message from a conversation.<br>
     }
 }
 ```
+<br>
+
+**`PUT /conversations/update-last-read-message`**<br>
+Updates the ID of the last read message of a conversation for a user.<br>
+|Field|Location|Required|Description|
+|---|---|---|---|
+|convoId|body|true|The ID of the conversation of the message.|
+|messageId|body|true|The ID of the message.|
+```
+{
+    messageId: '1234'
+}
+```

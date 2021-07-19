@@ -43,11 +43,16 @@ export const setupSocketIO = (server: http.Server) => {
                 user.update();
             })
         });
+
+        // Store the id of the last read message.
+        socket.on('read-message', ({ userId, convoId, messageId }) => {
+            Conversation.updateLastReadMessage(messageId, convoId, userId);
+        });
     });
 }
 
 /**
- * Sends an update to 
+ * Sends an update to each participant in a conversation where a message was just sent.
  * @param convoId Participants of this conversation will be sent an update.
  * @param message The message content of the update.
  */

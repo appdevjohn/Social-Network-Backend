@@ -98,4 +98,13 @@ router.delete(
     messagesController.deleteMessage
 );
 
+router.put(
+    '/conversations/update-last-read-message',
+    isAuth,
+    isActivated,
+    body('convoId').isLength({ min: 1 }).withMessage('A conversation ID must be provided.'),
+    body('messageId').isLength({ min: 1 }).withMessage('A message ID must be provided.'),
+    messagesController.updateLastReadMessageOfConversation
+);
+
 export default router;

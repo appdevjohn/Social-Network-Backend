@@ -374,3 +374,26 @@ export const deleteMessage = (req: Request, res: Response, next: NextFunction) =
         return next(RequestError.withMessageAndCode('Could not delete message.', 500));
     })
 }
+
+export const updateLastReadMessageOfConversation = (req: Request, res: Response, next: NextFunction) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ 
+            message: errors.array()[0].msg,
+            errors: errors.array() 
+        });
+    }
+
+    const convoId = req.body.convoId;
+    const messageId = req.body.messageId;
+
+    return Conversation.updateLastReadMessage(messageId, convoId, req.userId!).then(result => {
+        if (result) {
+            return res.status(200).json({
+                messageId: result
+            })
+        } else {
+            return next(RequestError.withMessageAndCode('Last read message could not be saved.', 409));
+        }
+    });
+}
