@@ -3,6 +3,7 @@ import { validationResult } from 'express-validator';
 
 import Group from '../models/group';
 import RequestError from '../util/error';
+import { uploadPrefix } from '../util/upload';
 
 export const validateGroupName = (req: Request, res: Response, next: NextFunction) => {
     const errors = validationResult(req);
@@ -77,7 +78,7 @@ export const getGroup = async (req: Request, res: Response, next: NextFunction) 
                     lastName: member.lastName,
                     username: member.username,
                     email: member.email,
-                    profilePicURL: member.profilePicURL
+                    profilePicURL: uploadPrefix + member.profilePicURL
                 }
             })
         });
@@ -118,7 +119,7 @@ export const newGroup = (req: Request, res: Response, next: NextFunction) => {
                     lastName: member.lastName,
                     username: member.username,
                     email: member.email,
-                    profilePicURL: member.profilePicURL
+                    profilePicURL: uploadPrefix + member.profilePicURL
                 }
             })
         });
@@ -159,7 +160,7 @@ export const editGroup = (req: Request, res: Response, next: NextFunction) => {
                             lastName: member.lastName,
                             username: member.username,
                             email: member.email,
-                            profilePicURL: member.profilePicURL
+                            profilePicURL: uploadPrefix + member.profilePicURL
                         }
                     })
                 });

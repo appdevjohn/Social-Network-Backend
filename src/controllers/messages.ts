@@ -7,6 +7,7 @@ import Conversation from '../models/conversation';
 import Message from '../models/message';
 import User from '../models/user';
 import { ContentType } from '../database/messages';
+import { uploadPrefix } from '../util/upload';
 
 export const canMessageUser = (req: Request, res: Response, next: NextFunction) => {
     const errors = validationResult(req);
@@ -97,7 +98,7 @@ export const getConversation = (req: Request, res: Response, next: NextFunction)
                     lastName: member.lastName,
                     username: member.username,
                     email: member.email,
-                    profilePicURL: member.profilePicURL
+                    profilePicURL: uploadPrefix + member.profilePicURL
                 }
             }),
             messages: messages
@@ -208,7 +209,7 @@ export const newConversation = (req: Request, res: Response, next: NextFunction)
                     lastName: member.lastName,
                     username: member.username,
                     email: member.email,
-                    profilePicURL: member.profilePicURL
+                    profilePicURL: uploadPrefix + member.profilePicURL
                 }
             })
         });
@@ -248,7 +249,7 @@ export const editConversation = (req: Request, res: Response, next: NextFunction
                             lastName: member.lastName,
                             username: member.username,
                             email: member.email,
-                            profilePicURL: member.profilePicURL
+                            profilePicURL: uploadPrefix + member.profilePicURL
                         }
                     })
                 });

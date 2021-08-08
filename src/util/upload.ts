@@ -23,4 +23,6 @@ const fileFilter = (req: Request, file: Express.Multer.File, cb: multer.FileFilt
 
 const upload = multer({ storage: storage, fileFilter: fileFilter });
 
+export const uploadPrefix = 'http://localhost:8080/uploads/';
+
 export default upload;
