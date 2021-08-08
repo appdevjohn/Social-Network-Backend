@@ -1,5 +1,6 @@
 import { ContentType, MessageType, getMessage, getMessagesFromConversation, getMessagesFromPost, createMessage, updateMessage, deleteMessage } from '../database/messages';
 import { getUser } from '../database/user';
+import { uploadPrefix } from '../util/upload';
 
 export interface MessageUserData {
     firstName: string;
@@ -68,7 +69,7 @@ class Message {
                 lastName: result.rows[0]['last_name'],
                 email: result.rows[0]['email'],
                 username: result.rows[0]['username'],
-                profilePicURL: result.rows[0]['profile_pic_url']
+                profilePicURL: uploadPrefix + result.rows[0]['profile_pic_url']
             }
             return true;
         }).catch(error => {
@@ -100,7 +101,7 @@ class Message {
                     lastName: result.rows[0]['last_name'],
                     email: result.rows[0]['email'],
                     username: result.rows[0]['username'],
-                    profilePicURL: result.rows[0]['profile_pic_url']
+                    profilePicURL: uploadPrefix + result.rows[0]['profile_pic_url']
                 }
                 return true;
             }).catch(error => {
@@ -126,7 +127,7 @@ class Message {
                     lastName: result.rows[0]['last_name'],
                     email: result.rows[0]['email'],
                     username: result.rows[0]['username'],
-                    profilePicURL: result.rows[0]['profile_pic_url']
+                    profilePicURL: uploadPrefix + result.rows[0]['profile_pic_url']
                 }
                 return true;
             }).catch(error => {
@@ -202,7 +203,7 @@ class Message {
                 lastName: row['last_name'],
                 email: row['email'],
                 username: row['username'],
-                profilePicURL: row['profile_pic_url']
+                profilePicURL: uploadPrefix + row['profile_pic_url']
             },
             id: row['message_id']
         });

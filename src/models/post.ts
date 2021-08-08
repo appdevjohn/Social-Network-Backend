@@ -8,6 +8,7 @@ import {
 } from '../database/posts';
 import { deleteMessagesFromPost } from '../database/messages';
 import { getUser } from '../database/user';
+import { uploadPrefix } from '../util/upload';
 
 export interface PostUserData {
     firstName: string,
@@ -76,7 +77,7 @@ class Post {
                 lastName: result.rows[0]['last_name'],
                 email: result.rows[0]['email'],
                 username: result.rows[0]['username'],
-                profilePicURL: result.rows[0]['profile_pic_url']
+                profilePicURL: uploadPrefix + result.rows[0]['profile_pic_url']
             }
             return true;
         }).catch(error => {
@@ -108,7 +109,7 @@ class Post {
                     lastName: result.rows[0]['last_name'],
                     email: result.rows[0]['email'],
                     username: result.rows[0]['username'],
-                    profilePicURL: result.rows[0]['profile_pic_url']
+                    profilePicURL: uploadPrefix + result.rows[0]['profile_pic_url']
                 }
                 return true;
             }).catch(error => {
@@ -135,7 +136,7 @@ class Post {
                         lastName: result.rows[0]['last_name'],
                         email: result.rows[0]['email'],
                         username: result.rows[0]['username'],
-                        profilePicURL: result.rows[0]['profile_pic_url']
+                        profilePicURL: uploadPrefix + result.rows[0]['profile_pic_url']
                     }
                 }
                 return true;
@@ -201,7 +202,7 @@ class Post {
                 lastName: row['last_name'],
                 email: row['email'],
                 username: row['username'],
-                profilePicURL: row['profile_pic_url']
+                profilePicURL: uploadPrefix + row['profile_pic_url']
             },
             id: row['post_id']
         });
