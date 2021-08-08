@@ -1,5 +1,6 @@
+import fs from 'fs';
+import path from 'path';
 import { Request, Response, NextFunction } from 'express';
-import { validationResult } from 'express-validator';
 
 import User from '../models/user';
 import RequestError from '../util/error';
@@ -50,5 +51,28 @@ export const updateUser = (req: Request, res: Response, next: NextFunction) => {
     }).catch(error => {
         console.error(error);
         return next(RequestError.withMessageAndCode('Could not update user.', 500));
+    });
+}
+
+export const updateUserImage = (req: Request, res: Response, next: NextFunction) => {
+    const userId = req.userId;
+
+    return User.findById(userId!).then(user => {
+        if (user.profilePicURL) {
+            const filePath = path.join(__dirname, '..', '..', 'uploads', user.profilePicURL);
+            fs.unlink(filePath, () => { console.log('Image Deleted') });
+        }
+
+        user.profilePicURL = req.file?.filename;
+
+        return user.update();
+
+    }).then(user => {
+        return res.status(200).json({
+            user: {
+                ...user,
+                profilePicURL: 'http://localhost:8080/uploads/' + user.profilePicURL
+            }
+        });
     });
 }

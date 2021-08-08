@@ -6,6 +6,7 @@ export interface AccountType {
     lastName?: string,
     username?: string,
     email?: string,
+    profilePicURL?: string | null,
     hashedPassword?: string,
     activated?: boolean,
     activateToken?: string | null,
@@ -51,6 +52,9 @@ export const updateUser = (userId: string, updatedAccount: AccountType): Promise
                 break;
             case 'email':
                 queryString = queryString + ' email = $' + (index + 1)
+                break;
+            case 'profilePicURL':
+                queryString = queryString + ' profile_pic_url = $' + (index + 1)
                 break;
             case 'hashedPassword':
                 queryString = queryString + ' hashed_password = $' + (index + 1)

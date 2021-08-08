@@ -17,6 +17,7 @@ export interface UserConfigType {
     lastName: string,
     username: string,
     email: string,
+    profilePicURL?: string | null,
     hashedPassword: string,
     activated: boolean,
     activateToken: string,
@@ -36,6 +37,7 @@ class User {
     lastName: string;
     username: string;
     email: string;
+    profilePicURL?: string | null;
     hashedPassword: string;
     activated: boolean;
     activateToken?: string | null;
@@ -49,6 +51,7 @@ class User {
         this.lastName = config.lastName || '';
         this.username = config.username || '';
         this.email = config.email || '';
+        this.profilePicURL = config.profilePicURL;
         this.hashedPassword = config.hashedPassword || '';
         this.activated = config.activated;
         this.activateToken = config.activateToken;
@@ -66,6 +69,7 @@ class User {
             lastName: this.lastName,
             username: this.username,
             email: this.email,
+            profilePicURL: this.profilePicURL,
             hashedPassword: this.hashedPassword,
             activated: this.activated,
             activateToken: this.activateToken,
@@ -130,6 +134,7 @@ class User {
                 lastName: this.lastName,
                 username: this.username,
                 email: this.email,
+                profilePicURL: this.profilePicURL,
                 hashedPassword: this.hashedPassword,
                 activated: this.activated,
                 activateToken: this.activateToken,
@@ -235,6 +240,7 @@ class User {
             lastName: row['last_name'],
             username: row['username'],
             email: row['email'],
+            profilePicURL: row['profile_pic_url'],
             hashedPassword: row['hashed_password'],
             activated: row['activated'],
             activateToken: row['activate_token'],
