@@ -14,6 +14,7 @@ export interface PostUserData {
     lastName: string,
     email: string;
     username: string;
+    profilePicURL: string | null;
 }
 
 export interface PostConfigType {
@@ -74,7 +75,8 @@ class Post {
                 firstName: result.rows[0]['first_name'],
                 lastName: result.rows[0]['last_name'],
                 email: result.rows[0]['email'],
-                username: result.rows[0]['username']
+                username: result.rows[0]['username'],
+                profilePicURL: result.rows[0]['profile_pic_url']
             }
             return true;
         }).catch(error => {
@@ -105,7 +107,8 @@ class Post {
                     firstName: result.rows[0]['first_name'],
                     lastName: result.rows[0]['last_name'],
                     email: result.rows[0]['email'],
-                    username: result.rows[0]['username']
+                    username: result.rows[0]['username'],
+                    profilePicURL: result.rows[0]['profile_pic_url']
                 }
                 return true;
             }).catch(error => {
@@ -131,7 +134,8 @@ class Post {
                         firstName: result.rows[0]['first_name'],
                         lastName: result.rows[0]['last_name'],
                         email: result.rows[0]['email'],
-                        username: result.rows[0]['username']
+                        username: result.rows[0]['username'],
+                        profilePicURL: result.rows[0]['profile_pic_url']
                     }
                 }
                 return true;
@@ -196,7 +200,8 @@ class Post {
                 firstName: row['first_name'],
                 lastName: row['last_name'],
                 email: row['email'],
-                username: row['username']
+                username: row['username'],
+                profilePicURL: row['profile_pic_url']
             },
             id: row['post_id']
         });

@@ -15,7 +15,8 @@ export const getUser = (req: Request, res: Response, next: NextFunction) => {
                 firstName: user.firstName,
                 lastName: user.lastName,
                 username: user.username,
-                email: user.email
+                email: user.email,
+                profilePicURL: user.profilePicURL
             }
         });
 
@@ -43,11 +44,12 @@ export const updateUser = (req: Request, res: Response, next: NextFunction) => {
                     firstName: user.firstName,
                     lastName: user.lastName,
                     username: user.username,
-                    email: user.email
+                    email: user.email,
+                    profilePicURL: user.profilePicURL
                 }
             });
         });
-        
+
     }).catch(error => {
         console.error(error);
         return next(RequestError.withMessageAndCode('Could not update user.', 500));
@@ -70,7 +72,11 @@ export const updateUserImage = (req: Request, res: Response, next: NextFunction)
     }).then(user => {
         return res.status(200).json({
             user: {
-                ...user,
+                id: user.id,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                username: user.username,
+                email: user.email,
                 profilePicURL: 'http://localhost:8080/uploads/' + user.profilePicURL
             }
         });

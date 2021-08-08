@@ -7,9 +7,9 @@ import RequestError from '../util/error';
 export const validateGroupName = (req: Request, res: Response, next: NextFunction) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({ 
+        return res.status(400).json({
             message: errors.array()[0].msg,
-            errors: errors.array() 
+            errors: errors.array()
         });
     }
 
@@ -45,9 +45,9 @@ export const getGroups = async (req: Request, res: Response, next: NextFunction)
 export const getGroup = async (req: Request, res: Response, next: NextFunction) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({ 
+        return res.status(400).json({
             message: errors.array()[0].msg,
-            errors: errors.array() 
+            errors: errors.array()
         });
     }
 
@@ -58,7 +58,7 @@ export const getGroup = async (req: Request, res: Response, next: NextFunction) 
         let group: Group;
         if (groupId) {
             group = await Group.findById(groupId);
-            
+
         } else if (groupName) {
             group = await Group.findByName(groupName);
 
@@ -70,7 +70,16 @@ export const getGroup = async (req: Request, res: Response, next: NextFunction) 
 
         return res.status(200).json({
             group: group,
-            members: members
+            members: members.map(member => {
+                return {
+                    id: member.id,
+                    firstName: member.firstName,
+                    lastName: member.lastName,
+                    username: member.username,
+                    email: member.email,
+                    profilePicURL: member.profilePicURL
+                }
+            })
         });
 
     } catch (error) {
@@ -81,9 +90,9 @@ export const getGroup = async (req: Request, res: Response, next: NextFunction) 
 export const newGroup = (req: Request, res: Response, next: NextFunction) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({ 
+        return res.status(400).json({
             message: errors.array()[0].msg,
-            errors: errors.array() 
+            errors: errors.array()
         });
     }
 
@@ -102,7 +111,16 @@ export const newGroup = (req: Request, res: Response, next: NextFunction) => {
     }).then(members => {
         return res.status(201).json({
             group: group,
-            members: members
+            members: members.map(member => {
+                return {
+                    id: member.id,
+                    firstName: member.firstName,
+                    lastName: member.lastName,
+                    username: member.username,
+                    email: member.email,
+                    profilePicURL: member.profilePicURL
+                }
+            })
         });
 
     }).catch(error => {
@@ -114,9 +132,9 @@ export const newGroup = (req: Request, res: Response, next: NextFunction) => {
 export const editGroup = (req: Request, res: Response, next: NextFunction) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({ 
+        return res.status(400).json({
             message: errors.array()[0].msg,
-            errors: errors.array() 
+            errors: errors.array()
         });
     }
 
@@ -134,7 +152,16 @@ export const editGroup = (req: Request, res: Response, next: NextFunction) => {
             return updatedGroup.members().then(members => {
                 return res.status(200).json({
                     group: updatedGroup,
-                    members: members
+                    members: members.map(member => {
+                        return {
+                            id: member.id,
+                            firstName: member.firstName,
+                            lastName: member.lastName,
+                            username: member.username,
+                            email: member.email,
+                            profilePicURL: member.profilePicURL
+                        }
+                    })
                 });
             }).catch(error => {
                 console.error(error);
@@ -152,9 +179,9 @@ export const editGroup = (req: Request, res: Response, next: NextFunction) => {
 export const deleteGroup = (req: Request, res: Response, next: NextFunction) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({ 
+        return res.status(400).json({
             message: errors.array()[0].msg,
-            errors: errors.array() 
+            errors: errors.array()
         });
     }
 

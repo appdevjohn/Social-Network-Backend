@@ -20,6 +20,19 @@ Accounts on this social network require a unique email address, unique username,
 
 **`GET /auth/ping`**<br>
 A token must be present in the Authorization header. This endpoint will return whether or not the token is still valid.
+```
+{
+    message: 'Authenticated',
+    user: {
+        id: '1234',
+        firstName: 'John',
+        lastName: 'Champion',
+        username: 'appdevjohn',
+        email: 'john@bison.software',
+        profilePicURL: 'http://localhost:8080/uploads/image.png'
+    }
+}
+```
 <br><br>
 
 **`PUT /auth/login`**<br>
@@ -30,7 +43,14 @@ Gets an Authorization token for the client.<br>
 |password|body|true|The password the account.|
 ```
 {
-    userId: '1234'
+    user: {
+        id: '1234',
+        firstName: 'John',
+        lastName: 'Champion',
+        username: 'appdevjohn',
+        email: 'john@bison.software',
+        profilePicURL: 'http://localhost:8080/uploads/image.png'
+    }
     token: 'eyJhbGciOiJIUzI1NiI...',
     activated: true,
     message: 'You are now logged in.'
@@ -49,7 +69,14 @@ Creates a new account.<br>
 |password|body|true|The password for the account. Must be at least four characters.|
 ```
 {
-    userId: '1234'
+    user: {
+        id: '1234',
+        firstName: 'John',
+        lastName: 'Champion',
+        username: 'appdevjohn',
+        email: 'john@bison.software',
+        profilePicURL: null
+    }
     token: 'eyJhbGciOiJIUzI1NiI...',
     activated: false,
     message: 'Find our activation email to activate your account.'
@@ -86,7 +113,8 @@ Returns data for a user.<br>
         firstName: 'John',
         lastName: 'Champion',
         email: 'john@bison.software',
-        username: 'appdevjohn'
+        username: 'appdevjohn',
+        profilePicURL: 'http://localhost:8080/uploads/image.png'
     }
 }
 ```
@@ -107,7 +135,27 @@ Edits a user's profile info.<br>
         firstName: 'John',
         lastName: 'Champion',
         email: 'john@bison.software',
-        username: 'appdevjohn'
+        username: 'appdevjohn',
+        profilePicURL: 'http://localhost:8080/uploads/image.png'
+    }
+}
+```
+<br>
+
+**`PUT /users/edit-image`**<br>
+Edits a user's profile picture.<br>
+|Field|Location|Required|Description|
+|---|---|---|---|
+|image|file|true|The image to be set as the profile picture.|
+```
+{
+    user: {
+        id: '1234',
+        firstName: 'John',
+        lastName: 'Champion',
+        email: 'john@bison.software',
+        username: 'appdevjohn',
+        profilePicURL: 'http://localhost:8080/uploads/image.png'
     }
 }
 ```
@@ -161,16 +209,12 @@ Returns details about the group and the members in the group.<br>
     },
     members: [
         {
+            id: '1234',
             firstName: 'John',
             lastName: 'Champion',
             username: 'appdevjohn',
             email: 'john@bison.software',
-            hashedPassword: '$2b$12$24.gTVOvhU9vNYlCWtxQ5u9UlinOjZ8.gSyIevxbmCM2oH4Ik9/K2',
-            activated: true,
-            activateToken: '',
-            id: '1234',
-            createdAt: '2021-06-10T18:16:50.085Z',
-            updatedAt: '2021-06-10T18:16:50.085Z'
+            profilePicURL: 'http://localhost:8080/uploads/image.png'
         }
     ]
 }
@@ -192,16 +236,12 @@ Creates a new group.<br>
     },
     members: [
         {
+            id: '1234',
             firstName: 'John',
             lastName: 'Champion',
             username: 'appdevjohn',
             email: 'john@bison.software',
-            hashedPassword: '$2b$12$24.gTVOvhU9vNYlCWtxQ5u9UlinOjZ8.gSyIevxbmCM2oH4Ik9/K2',
-            activated: true,
-            activateToken: '',
-            id: '1234',
-            createdAt: '2021-06-10T18:16:50.085Z',
-            updatedAt: '2021-06-10T18:16:50.085Z'
+            profilePicURL: 'http://localhost:8080/uploads/image.png'
         }
     ]
 }
@@ -224,16 +264,12 @@ Edits the details of a group.<br>
     },
     members: [
         {
+            id: '1234',
             firstName: 'John',
             lastName: 'Champion',
             username: 'appdevjohn',
             email: 'john@bison.software',
-            hashedPassword: '$2b$12$24.gTVOvhU9vNYlCWtxQ5u9UlinOjZ8.gSyIevxbmCM2oH4Ik9/K2',
-            activated: true,
-            activateToken: '',
-            id: '1234',
-            createdAt: '2021-06-10T18:16:50.085Z',
-            updatedAt: '2021-06-10T18:16:50.085Z'
+            profilePicURL: 'http://localhost:8080/uploads/image.png'
         }
     ]
 }
@@ -279,7 +315,8 @@ Returns all posts from a group.<br>
                 firstName: 'John',
                 lastName: 'Champion',
                 email: 'john@bison.software',
-                username: 'appdevjohn'
+                username: 'appdevjohn',
+                profilePicURL: 'http://localhost:8080/uploads/image.png'
             },
             id: '7654',
             createdAt: '2021-06-10T18:16:50.085Z',
@@ -307,7 +344,8 @@ Returns data for a specific post.<br>
             firstName: 'John',
             lastName: 'Champion',
             email: 'john@bison.software',
-            username: 'appdevjohn'
+            username: 'appdevjohn',
+            profilePicURL: 'http://localhost:8080/uploads/image.png'
         },
         id: '7654',
         createdAt: '2021-06-10T18:16:50.085Z',
@@ -324,7 +362,8 @@ Returns data for a specific post.<br>
                 firstName: 'John',
                 lastName: 'Champion',
                 email: 'john@bison.software',
-                username: 'appdevjohn'
+                username: 'appdevjohn',
+                profilePicURL: 'http://localhost:8080/uploads/image.png'
             },
             id: '2345',
             createdAt: '2021-06-10T18:16:50.085Z',
@@ -354,7 +393,8 @@ Creates a new post.<br>
             firstName: 'John',
             lastName: 'Champion',
             email: 'john@bison.software',
-            username: 'appdevjohn'
+            username: 'appdevjohn',
+            profilePicURL: 'http://localhost:8080/uploads/image.png'
         },
         id: '7654',
         createdAt: '2021-06-10T18:16:50.085Z',
@@ -383,7 +423,8 @@ Edits an existing post.<br>
             firstName: 'John',
             lastName: 'Champion',
             email: 'john@bison.software',
-            username: 'appdevjohn'
+            username: 'appdevjohn',
+            profilePicURL: 'http://localhost:8080/uploads/image.png'
         },
         id: '7654',
         createdAt: '2021-06-10T18:16:50.085Z',
@@ -410,7 +451,8 @@ Edits an existing post.<br>
             firstName: 'John',
             lastName: 'Champion',
             email: 'john@bison.software',
-            username: 'appdevjohn'
+            username: 'appdevjohn',
+            profilePicURL: 'http://localhost:8080/uploads/image.png'
         },
         id: '7654',
         createdAt: '2021-06-10T18:16:50.085Z',
@@ -438,7 +480,8 @@ Gets the current list of messages sent in a post.<br>
                 firstName: 'John',
                 lastName: 'Champion',
                 email: 'john@bison.software',
-                username: 'appdevjohn'
+                username: 'appdevjohn',
+                profilePicURL: 'http://localhost:8080/uploads/image.png'
             },
             id: '2345',
             createdAt: '2021-06-10T18:16:50.085Z',
@@ -468,7 +511,8 @@ Sends a message from within a post.<br>
             firstName: 'John',
             lastName: 'Champion',
             email: 'john@bison.software',
-            username: 'appdevjohn'
+            username: 'appdevjohn',
+            profilePicURL: 'http://localhost:8080/uploads/image.png'
         },
         id: '2345',
         createdAt: '2021-06-10T18:16:50.085Z',
@@ -495,7 +539,8 @@ Deletes a message from a post.<br>
             firstName: 'John',
             lastName: 'Champion',
             email: 'john@bison.software',
-            username: 'appdevjohn'
+            username: 'appdevjohn',
+            profilePicURL: 'http://localhost:8080/uploads/image.png'
         },
         id: '2345',
         createdAt: '2021-06-10T18:16:50.085Z',
@@ -543,7 +588,8 @@ Returns the conversations which the user is involved in. Also returns the last m
                     firstName: 'John',
                     lastName: 'Champion',
                     email: 'john@bison.software',
-                    username: 'appdevjohn'
+                    username: 'appdevjohn',
+                    profilePicURL: 'http://localhost:8080/uploads/image.png'
                 },
                 id: '5678',
                 createdAt: '2021-06-10T18:16:50.085Z',
@@ -571,13 +617,12 @@ Returns data for a conversation.<br>
     },
     members: [
         {
+            id: '1234',
             firstName: 'John',
             lastName: 'Champion',
             username: 'appdevjohn',
             email: 'john@bison.software',
-            activated: true,
-            id: '1234',
-            createdAt: '2021-06-10T18:16:50.085Z'
+            profilePicURL: 'http://localhost:8080/uploads/image.png'
         }
     ],
     messages [
@@ -591,7 +636,8 @@ Returns data for a conversation.<br>
                 firstName: 'John',
                 lastName: 'Champion',
                 email: 'john@bison.software',
-                username: 'appdevjohn'
+                username: 'appdevjohn',
+                profilePicURL: 'http://localhost:8080/uploads/image.png'
             },
             id: '5678',
             createdAt: '2021-06-10T18:16:50.085Z',
@@ -620,7 +666,8 @@ Returns only message data for a conversation.<br>
                 firstName: 'John',
                 lastName: 'Champion',
                 email: 'john@bison.software',
-                username: 'appdevjohn'
+                username: 'appdevjohn',
+                profilePicURL: 'http://localhost:8080/uploads/image.png'
             },
             id: '5678',
             createdAt: '2021-06-10T18:16:50.085Z',
@@ -648,7 +695,8 @@ Returns a single message.<br>
             firstName: 'John',
             lastName: 'Champion',
             email: 'john@bison.software',
-            username: 'appdevjohn'
+            username: 'appdevjohn',
+            profilePicURL: 'http://localhost:8080/uploads/image.png'
         },
         id: '5678',
         createdAt: '2021-06-10T18:16:50.085Z',
@@ -674,13 +722,12 @@ Creates a new conversation.<br>
     },
     members: [
         {
+            id: '1234',
             firstName: 'John',
             lastName: 'Champion',
             username: 'appdevjohn',
             email: 'john@bison.software',
-            activated: true,
-            id: '1234',
-            createdAt: '2021-06-10T18:16:50.085Z'
+            profilePicURL: 'http://localhost:8080/uploads/image.png'
         }
     ]
 }
@@ -703,13 +750,12 @@ Creates a new conversation.<br>
     },
     members: [
         {
+            id: '1234',
             firstName: 'John',
             lastName: 'Champion',
             username: 'appdevjohn',
             email: 'john@bison.software',
-            activated: true,
-            id: '1234',
-            createdAt: '2021-06-10T18:16:50.085Z'
+            profilePicURL: 'http://localhost:8080/uploads/image.png'
         }
     ]
 }
@@ -752,7 +798,8 @@ Sends a message in a conversation.<br>
             firstName: 'John',
             lastName: 'Champion',
             email: 'john@bison.software',
-            username: 'appdevjohn'
+            username: 'appdevjohn',
+            profilePicURL: 'http://localhost:8080/uploads/image.png'
         },
         id: '5678',
         createdAt: '2021-06-10T18:16:50.085Z',
@@ -779,7 +826,8 @@ Deletes a message from a conversation.<br>
             firstName: 'John',
             lastName: 'Champion',
             email: 'john@bison.software',
-            username: 'appdevjohn'
+            username: 'appdevjohn',
+            profilePicURL: 'http://localhost:8080/uploads/image.png'
         },
         id: '5678',
         createdAt: '2021-06-10T18:16:50.085Z',

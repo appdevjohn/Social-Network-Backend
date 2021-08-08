@@ -18,7 +18,8 @@ export const ping = async (req: Request, res: Response, next: NextFunction) => {
                         firstName: user.firstName,
                         lastName: user.lastName,
                         username: user.username,
-                        email: user.email
+                        email: user.email,
+                        profilePicURL: user.profilePicURL
                     }
                 });
             } else {
@@ -59,7 +60,14 @@ export const logIn = async (req: Request, res: Response, next: NextFunction) => 
             const token = jwt.sign(tokenPayload, 'secret', { expiresIn: '1h' });
 
             return res.status(200).json({
-                user: user,
+                user: {
+                    id: user.id,
+                    firstName: user.firstName,
+                    lastName: user.lastName,
+                    username: user.username,
+                    email: user.email,
+                    profilePicURL: user.profilePicURL
+                },
                 token: token,
                 activated: user.activated,
                 message: 'You are now logged in.'
@@ -123,7 +131,14 @@ export const signUp = async (req: Request, res: Response, next: NextFunction) =>
     const token = jwt.sign(tokenPayload, 'secret', { expiresIn: '1h' });
 
     return res.status(201).json({
-        user: newUser,
+        user: {
+            id: newUser.id,
+            firstName: newUser.firstName,
+            lastName: newUser.lastName,
+            username: newUser.username,
+            email: newUser.email,
+            profilePicURL: newUser.profilePicURL
+        },
         token: token,
         activated: newUser.activated,
         message: 'Find our activation email to activate your account.'
@@ -150,7 +165,7 @@ export const confirmEmail = async (req: Request, res: Response, next: NextFuncti
 
     try {
         await user.activate(activateToken as string);
-        
+
         const tokenPayload: AuthToken = { userId: user.id!, activated: user.activated };
         const token = jwt.sign(tokenPayload, 'secret', { expiresIn: '1h' });
 

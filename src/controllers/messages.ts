@@ -92,13 +92,12 @@ export const getConversation = (req: Request, res: Response, next: NextFunction)
             },
             members: members.map(member => {
                 return {
+                    id: member.id,
                     firstName: member.firstName,
                     lastName: member.lastName,
                     username: member.username,
                     email: member.email,
-                    activated: member.activated,
-                    id: member.id,
-                    createdAt: member.createdAt,
+                    profilePicURL: member.profilePicURL
                 }
             }),
             messages: messages
@@ -204,13 +203,12 @@ export const newConversation = (req: Request, res: Response, next: NextFunction)
             conversation: newConversation,
             members: members.map(member => {
                 return {
+                    id: member.id,
                     firstName: member.firstName,
                     lastName: member.lastName,
                     username: member.username,
                     email: member.email,
-                    activated: member.activated,
-                    id: member.id,
-                    createdAt: member.createdAt,
+                    profilePicURL: member.profilePicURL
                 }
             })
         });
@@ -245,13 +243,12 @@ export const editConversation = (req: Request, res: Response, next: NextFunction
                     conversation: conversation,
                     members: members.map(member => {
                         return {
+                            id: member.id,
                             firstName: member.firstName,
                             lastName: member.lastName,
                             username: member.username,
                             email: member.email,
-                            activated: member.activated,
-                            id: member.id,
-                            createdAt: member.createdAt,
+                            profilePicURL: member.profilePicURL
                         }
                     })
                 });
