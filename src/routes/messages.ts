@@ -4,6 +4,7 @@ import { body, param } from 'express-validator';
 import * as messagesController from '../controllers/messages';
 import isAuth from '../middleware/auth';
 import isActivated from '../middleware/activated';
+import upload from '../util/upload';
 
 const router = Router();
 
@@ -78,13 +79,13 @@ router.post(
     '/messages/new',
     isAuth,
     isActivated,
+    upload.single('attachment'),
     body('convoId').isLength({ min: 1 }).withMessage('A conversation ID for this message must be provided.'),
-    body('content').isLength({ min: 1 }).withMessage('Content for this message must be provided'),
-    body('type').custom(value => {
-        if (value !== 'text' && value !== 'image') {
-            throw new Error('The type of message must be provided. It can be either \'text\' or \'image\'.');
-        } else {
+    body('content').custom((value, { req }) => {
+        if (req.file || value.length > 0) {
             return true;
+        } else {
+            throw new Error('Message must have either text content or an attachment.');
         }
     }),
     messagesController.newMessage

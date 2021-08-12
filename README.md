@@ -784,8 +784,8 @@ Sends a message in a conversation.<br>
 |Field|Location|Required|Description|
 |---|---|---|---|
 |convoId|body|true|The ID of the conversation to send a message.|
-|content|body|true|The content of the message, be it text or a link to media.|
-|type|body|true|The type of content of the message. Can either be 'text' or 'image'.|
+|content|body|true, if no attachment|The text content of the message.|
+|attachment|file|true, if no text content|The file to be uploaded as the message content.|
 ```
 {
     message: {

@@ -1,3 +1,5 @@
+import fs from 'fs';
+import path from 'path';
 import { Request, Response, NextFunction } from 'express';
 import { validationResult } from 'express-validator';
 
@@ -308,7 +310,7 @@ export const newMessage = (req: Request, res: Response, next: NextFunction) => {
     const convoId: string | null = req.body.convoId || null;
     const postId: string | null = req.body.postId || null;
     const messageContent: string = req.body.content || '';
-    const messageType: ContentType = req.body.type as ContentType;
+    const filename: string | null = req.file ? req.file.filename : null;
 
     let message: Message;
     if (convoId) {
@@ -316,17 +318,22 @@ export const newMessage = (req: Request, res: Response, next: NextFunction) => {
             userId: req.userId!,
             convoId: convoId,
             content: messageContent,
-            type: messageType
+            type: ContentType.Text
         });
     } else if (postId) {
         message = new Message({
             userId: req.userId!,
             postId: postId,
             content: messageContent,
-            type: messageType
+            type: ContentType.Text
         });
     } else {
         return next(RequestError.withMessageAndCode('A convoId or postId is required to send a new message.', 406));
+    }
+
+    if (filename) {
+        message.content = filename;
+        message.type = ContentType.Image;
     }
 
     return message.create().then(() => {
@@ -357,6 +364,11 @@ export const deleteMessage = (req: Request, res: Response, next: NextFunction) =
     let message: Message;
     Message.findById(messageId).then(msg => {
         message = msg;
+
+        if (message.type !== ContentType.Text) {
+            const filePath = path.join(__dirname, '..', '..', 'uploads', message.content);
+            fs.unlink(filePath, () => { console.log('Image Deleted') });
+        }
         return message.delete();
 
     }).then(success => {
