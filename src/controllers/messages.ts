@@ -353,6 +353,10 @@ export const newMessage = (req: Request, res: Response, next: NextFunction) => {
     }
 
     return message.create().then(() => {
+        if (message.type !== ContentType.Text) {
+            message.content = uploadPrefix + message.content;
+        }
+
         res.status(201).json({
             message: message
         });
