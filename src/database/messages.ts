@@ -34,6 +34,14 @@ export const getMessagesFromPost = (postId: string, limit?: number, offset: numb
     }
 }
 
+export const getAttachmentsFromConversation = (convoId: string) => {
+    return query('SELECT * FROM messages WHERE convo_id = $1 AND type != \'text\';', [convoId]);
+}
+
+export const getAttachmentsFromPost = (postId: string) => {
+    return query('SELECT * FROM messages WHERE post_id = $1 AND type != \'text\';', [postId]);
+}
+
 export const createMessage = (newMessage: MessageType): Promise<QueryResult> => {
     return query('INSERT INTO messages (user_id, convo_id, post_id, content, type) VALUES ($1, $2, $3, $4, $5) RETURNING *', [newMessage.userId, newMessage.convoId, newMessage.postId, newMessage.content, newMessage.type]);
 }

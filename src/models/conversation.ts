@@ -1,3 +1,6 @@
+import fs from 'fs';
+import path from 'path';
+
 import {
     ConversationType,
     getConversation,
@@ -11,7 +14,7 @@ import {
     getLastReadMessageId,
     updateLastReadMessageId
 } from '../database/conversation';
-import { deleteMessagesFromConversation } from '../database/messages';
+import { deleteMessagesFromConversation, getAttachmentsFromConversation } from '../database/messages';
 import User from './user';
 import Message from './message';
 
@@ -80,8 +83,15 @@ class Conversation {
     delete(): Promise<boolean> {
         if (this.id) {
             return deleteConversation(this.id).then(() => {
-                return deleteMessagesFromConversation(this.id!);
+                return Message.findAttachmentsByConvoId(this.id!)
 
+            }).then(attachments => {
+                attachments.forEach(attachment => {
+                    const filePath = path.join(__dirname, '..', '..', 'uploads', attachment.content);
+                    fs.unlink(filePath, () => { console.log('File Deleted') });
+                });
+                return deleteMessagesFromConversation(this.id!);
+                    
             }).then(() => {
                 return true;
 

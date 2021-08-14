@@ -1,4 +1,7 @@
-import { ContentType, MessageType, getMessage, getMessagesFromConversation, getMessagesFromPost, createMessage, updateMessage, deleteMessage } from '../database/messages';
+import fs from 'fs';
+import path from 'path';
+
+import { ContentType, MessageType, getMessage, getMessagesFromConversation, getMessagesFromPost, createMessage, updateMessage, deleteMessage, getAttachmentsFromConversation, getAttachmentsFromPost } from '../database/messages';
 import { getUser } from '../database/user';
 import { uploadPrefix } from '../util/upload';
 
@@ -115,6 +118,11 @@ class Message {
 
     delete(): Promise<boolean> {
         if (this.id) {
+            if (this.type !== ContentType.Text) {
+                const filePath = path.join(__dirname, '..', '..', 'uploads', this.content);
+                fs.unlink(filePath, () => { console.log('File Deleted'); });
+            }
+
             return deleteMessage(this.id).then(result => {
                 if (result.rowCount > 0) {
                     return getUser(this.userId);
@@ -180,6 +188,28 @@ class Message {
 
     static findByPostId = (postId: string, limit?: number, offset: number = 0): Promise<Message[]> => {
         return getMessagesFromPost(postId, limit, offset).then(result => {
+            const messages = result.rows.map(row => {
+                return Message.parseRow(row);
+            });
+            return messages;
+        }).catch(error => {
+            throw new Error(error);
+        });
+    }
+
+    static findAttachmentsByConvoId = (convoId: string): Promise<Message[]> => {
+        return getAttachmentsFromConversation(convoId).then(result => {
+            const messages = result.rows.map(row => {
+                return Message.parseRow(row);
+            });
+            return messages;
+        }).catch(error => {
+            throw new Error(error);
+        });
+    }
+
+    static findAttachmentsByPostId = (postId: string): Promise<Message[]> => {
+        return getAttachmentsFromPost(postId).then(result => {
             const messages = result.rows.map(row => {
                 return Message.parseRow(row);
             });

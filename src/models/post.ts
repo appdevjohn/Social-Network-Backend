@@ -1,3 +1,6 @@
+import fs from 'fs';
+import path from 'path';
+
 import {
     PostType,
     getPost,
@@ -6,9 +9,10 @@ import {
     deletePost,
     getPostsFromGroup
 } from '../database/posts';
-import { deleteMessagesFromPost } from '../database/messages';
+import { deleteMessagesFromPost, getAttachmentsFromPost } from '../database/messages';
 import { getUser } from '../database/user';
 import { uploadPrefix } from '../util/upload';
+import Message from './message';
 
 export interface PostUserData {
     firstName: string,
@@ -123,7 +127,14 @@ class Post {
 
     delete(): Promise<boolean> {
         if (this.id) {
-            return deletePost(this.id).then(result => {
+            return deletePost(this.id).then(() => {
+                return Message.findAttachmentsByPostId(this.id!)
+
+            }).then(attachments => {
+                attachments.forEach(attachment => {
+                    const filePath = path.join(__dirname, '..', '..', 'uploads', attachment.content);
+                    fs.unlink(filePath, () => { console.log('File Deleted') });
+                });
                 return deleteMessagesFromPost(this.id!);
 
             }).then(() => {
