@@ -88,6 +88,12 @@ export const getConversation = (req: Request, res: Response, next: NextFunction)
         return Message.findByConvoId(conversation.id!);
 
     }).then(messages => {
+        messages.forEach(message => {
+            if (message.type !== ContentType.Text) {
+                message.content = uploadPrefix + message.content;
+            }
+        })
+
         return res.status(200).json({
             conversation: {
                 ...conversation,
@@ -127,6 +133,12 @@ export const getMessages = async (req: Request, res: Response, next: NextFunctio
 
     try {
         messages = await Message.findByConvoId(convoId);
+        messages.forEach(message => {
+            if (message.type !== ContentType.Text) {
+                message.content = uploadPrefix + message.content;
+            }
+        });
+
     } catch (error) {
         return next(RequestError.withMessageAndCode('Could not retrieve messages.', 500));
     }
@@ -149,6 +161,10 @@ export const getMessage = async (req: Request, res: Response, next: NextFunction
 
     try {
         const message = await Message.findById(messageId);
+        if (message.type !== ContentType.Text) {
+            message.content = uploadPrefix + message.content;
+        }
+
         return res.status(200).json({
             message: message
         });
