@@ -71,6 +71,8 @@ export const getConversation = (req: Request, res: Response, next: NextFunction)
     }
 
     const convoId = req.params.convoId;
+    const limit = parseInt(req.query.limit as string) || 256;
+    const offset = parseInt(req.query.offset as string) || 0;
 
     let conversation: Conversation;
     let members: User[];
@@ -85,7 +87,7 @@ export const getConversation = (req: Request, res: Response, next: NextFunction)
 
     }).then(users => {
         members = users;
-        return Message.findByConvoId(conversation.id!);
+        return Message.findByConvoId(conversation.id!, limit, offset);
 
     }).then(messages => {
         messages.forEach(message => {
@@ -128,11 +130,13 @@ export const getMessages = async (req: Request, res: Response, next: NextFunctio
     }
 
     const convoId = req.params.convoId;
+    const limit = parseInt(req.query.limit as string) || 256;
+    const offset = parseInt(req.query.startAt as string) || 0;
 
     let messages: Message[];
 
     try {
-        messages = await Message.findByConvoId(convoId);
+        messages = await Message.findByConvoId(convoId, limit, offset);
         messages.forEach(message => {
             if (message.type !== ContentType.Text) {
                 message.content = uploadPrefix + message.content;

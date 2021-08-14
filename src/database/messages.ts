@@ -18,19 +18,19 @@ export const getMessage = (messageId: string): Promise<QueryResult> => {
     return query('SELECT * FROM messages FULL JOIN users USING (user_id) WHERE messages.message_id = $1;', [messageId]);
 }
 
-export const getMessagesFromConversation = (convoId: string, limit?: number): Promise<QueryResult> => {
+export const getMessagesFromConversation = (convoId: string, limit?: number, offset: number = 0): Promise<QueryResult> => {
     if (limit) {
-        return query('SELECT messages.*, users.first_name, users.last_name, users.email, users.username, users.profile_pic_url FROM messages FULL JOIN users USING (user_id) WHERE messages.convo_id = $1 ORDER BY messages.created_at DESC LIMIT $2;', [convoId, `${limit}`]); 
+        return query('SELECT messages.*, users.first_name, users.last_name, users.email, users.username, users.profile_pic_url FROM messages FULL JOIN users USING (user_id) WHERE messages.convo_id = $1 ORDER BY messages.created_at DESC LIMIT $2 OFFSET $3;', [convoId, `${limit}`, `${offset}`]); 
     } else {
-        return query('SELECT messages.*, users.first_name, users.last_name, users.email, users.username, users.profile_pic_url FROM messages FULL JOIN users USING (user_id) WHERE messages.convo_id = $1 ORDER BY messages.created_at DESC;', [convoId]); 
+        return query('SELECT messages.*, users.first_name, users.last_name, users.email, users.username, users.profile_pic_url FROM messages FULL JOIN users USING (user_id) WHERE messages.convo_id = $1 ORDER BY messages.created_at DESC OFFSET $2;', [convoId, `${offset}`]); 
     }
 }
 
-export const getMessagesFromPost = (postId: string, limit?: number): Promise<QueryResult> => {
+export const getMessagesFromPost = (postId: string, limit?: number, offset: number = 0): Promise<QueryResult> => {
     if (limit) {
-        return query('SELECT * FROM messages WHERE post_id = $1 ORDER BY created_at DESC LIMIT $2;', [postId, `${limit}`]);
+        return query('SELECT * FROM messages WHERE post_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3;', [postId, `${limit}`, `${offset}`]);
     } else {
-        return query('SELECT * FROM messages WHERE post_id = $1 ORDER BY created_at DESC;', [postId]);
+        return query('SELECT * FROM messages WHERE post_id = $1 ORDER BY created_at DESC OFFSET $2;', [postId, `${offset}`]);
     }
 }
 

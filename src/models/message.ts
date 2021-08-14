@@ -167,8 +167,8 @@ class Message {
         });
     }
 
-    static findByConvoId = (convoId: string, limit?: number): Promise<Message[]> => {
-        return getMessagesFromConversation(convoId, limit).then(result => {
+    static findByConvoId = (convoId: string, limit?: number, offset: number = 0): Promise<Message[]> => {
+        return getMessagesFromConversation(convoId, limit, offset).then(result => {
             const messages = result.rows.map(row => {
                 return Message.parseRow(row);
             });
@@ -178,8 +178,8 @@ class Message {
         });
     }
 
-    static findByPostId = (postId: string, limit?: number): Promise<Message[]> => {
-        return getMessagesFromPost(postId, limit).then(result => {
+    static findByPostId = (postId: string, limit?: number, offset: number = 0): Promise<Message[]> => {
+        return getMessagesFromPost(postId, limit, offset).then(result => {
             const messages = result.rows.map(row => {
                 return Message.parseRow(row);
             });
