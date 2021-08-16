@@ -9,6 +9,8 @@ import {
     getUserBySocketId
 } from '../database/user';
 import query from '../database/index';
+import Conversation from './conversation';
+import Group from './group';
 
 export interface UserConfigType {
     createdAt?: Date,
@@ -163,7 +165,25 @@ class User {
      */
     delete(): Promise<User> {
         if (this.id) {
-            return deleteUser(this.id).then(result => {
+            return Conversation.findByUserId(this.id!).then(conversations => {
+                const leaveConvoPromises = conversations.map(convo => {
+                    return convo.removeUser(this.id!);
+                });
+                return Promise.all(leaveConvoPromises);
+
+            }).then(() => {
+                return Group.findByUserId(this.id!);
+
+            }).then(groups => {
+                const leaveGroupPromises = groups.map(group => {
+                    return group.removeUser(this.id!);
+                });
+                return Promise.all(leaveGroupPromises);
+
+            }).then(() => {
+                return deleteUser(this.id!);
+
+            }).then(result => {
                 if (result.rowCount > 0) {
                     return this;
                 } else {

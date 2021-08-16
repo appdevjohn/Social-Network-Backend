@@ -25,7 +25,7 @@ export const setupSocketIO = (server: http.Server) => {
     });
 
     io.on('connection', socket => {
-        
+
         // Remove the socket ID from the user. We'll know the user is not online if the socket ID is null.
         socket.on('disconnect', () => {
             User.findBySocketId(socket.id).then(user => {
@@ -33,15 +33,21 @@ export const setupSocketIO = (server: http.Server) => {
                     user.socketId = null;
                     user.update();
                 }
+            }).catch(error => {
+                console.error('On socket disconnect, there was an error.', error);
             });
         });
 
         // Add the socket ID to the user's account so we can send updates to their device.
         socket.on('subscribe', ({ userId }) => {
-            User.findById(userId).then(user => {
-                user.socketId = socket.id
-                user.update();
-            })
+            if (userId) {
+                User.findById(userId).then(user => {
+                    user.socketId = socket.id
+                    user.update();
+                }).catch(error => {
+                    console.error('On socket connect, there was an error', error);
+                });
+            }
         });
 
         // Store the id of the last read message.

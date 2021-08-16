@@ -43,6 +43,12 @@ router.put(
 );
 
 router.put(
+    '/resend-verification-code',
+    isAuth,
+    authController.resendEmailVerificationCode
+);
+
+router.put(
     '/request-new-password',
     authController.requestPasswordReset
 );
@@ -50,6 +56,12 @@ router.put(
 router.put(
     '/reset-password',
     authController.resetPassword
+);
+
+router.delete(
+    '/delete-account',
+    isAuth,
+    authController.deleteAccount
 );
 
 export default router;

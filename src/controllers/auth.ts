@@ -181,6 +181,12 @@ export const confirmEmail = async (req: Request, res: Response, next: NextFuncti
     }
 }
 
+export const resendEmailVerificationCode = (req: Request, res: Response, next: NextFunction) => {
+    return res.status(200).json({
+        message: 'A new verification code has been emailed.'
+    });
+}
+
 export const requestPasswordReset = (req: Request, res: Response, next: NextFunction) => {
     return res.status(200).json({
         status: 'Reset Email Sent',
@@ -192,5 +198,20 @@ export const resetPassword = (req: Request, res: Response, next: NextFunction) =
     return res.status(200).json({
         status: 'Password Reset',
         message: 'You can now sign into the account.'
+    });
+}
+
+export const deleteAccount = (req: Request, res: Response, next: NextFunction) => {
+    return User.findById(req.userId!).then(user => {
+        return user.delete();
+
+    }).then(user => {
+        return res.status(200).json({
+            user: user,
+            message: 'User account has been deleted.'
+        });
+
+    }).catch(error => {
+        return next(error);
     });
 }
