@@ -5,7 +5,7 @@ import { validationResult } from 'express-validator';
 
 import RequestError from '../util/error';
 import User, { AuthToken } from '../models/user';
-import { uploadPrefix } from '../util/upload';
+import { getUploadURL } from '../util/upload';
 
 export const ping = async (req: Request, res: Response, next: NextFunction) => {
     if (req.userId) {
@@ -20,7 +20,7 @@ export const ping = async (req: Request, res: Response, next: NextFunction) => {
                         lastName: user.lastName,
                         username: user.username,
                         email: user.email,
-                        profilePicURL: uploadPrefix + user.profilePicURL
+                        profilePicURL: getUploadURL(user.profilePicURL)
                     }
                 });
             } else {
@@ -67,7 +67,7 @@ export const logIn = async (req: Request, res: Response, next: NextFunction) => 
                     lastName: user.lastName,
                     username: user.username,
                     email: user.email,
-                    profilePicURL: uploadPrefix + user.profilePicURL
+                    profilePicURL: getUploadURL(user.profilePicURL)
                 },
                 token: token,
                 activated: user.activated,
@@ -138,7 +138,7 @@ export const signUp = async (req: Request, res: Response, next: NextFunction) =>
             lastName: newUser.lastName,
             username: newUser.username,
             email: newUser.email,
-            profilePicURL: uploadPrefix + newUser.profilePicURL
+            profilePicURL: getUploadURL(newUser.profilePicURL)
         },
         token: token,
         activated: newUser.activated,

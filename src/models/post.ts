@@ -11,7 +11,7 @@ import {
 } from '../database/posts';
 import { deleteMessagesFromPost, getAttachmentsFromPost } from '../database/messages';
 import { getUser } from '../database/user';
-import { uploadPrefix } from '../util/upload';
+import { getUploadURL } from '../util/upload';
 import Message from './message';
 
 export interface PostUserData {
@@ -81,7 +81,7 @@ class Post {
                 lastName: result.rows[0]['last_name'],
                 email: result.rows[0]['email'],
                 username: result.rows[0]['username'],
-                profilePicURL: uploadPrefix + result.rows[0]['profile_pic_url']
+                profilePicURL: getUploadURL(result.rows[0]['profile_pic_url'])
             }
             return true;
         }).catch(error => {
@@ -113,7 +113,7 @@ class Post {
                     lastName: result.rows[0]['last_name'],
                     email: result.rows[0]['email'],
                     username: result.rows[0]['username'],
-                    profilePicURL: uploadPrefix + result.rows[0]['profile_pic_url']
+                    profilePicURL: getUploadURL(result.rows[0]['profile_pic_url'])
                 }
                 return true;
             }).catch(error => {
@@ -147,7 +147,7 @@ class Post {
                         lastName: result.rows[0]['last_name'],
                         email: result.rows[0]['email'],
                         username: result.rows[0]['username'],
-                        profilePicURL: uploadPrefix + result.rows[0]['profile_pic_url']
+                        profilePicURL: getUploadURL(result.rows[0]['profile_pic_url'])
                     }
                 }
                 return true;
@@ -213,7 +213,7 @@ class Post {
                 lastName: row['last_name'],
                 email: row['email'],
                 username: row['username'],
-                profilePicURL: uploadPrefix + row['profile_pic_url']
+                profilePicURL: getUploadURL(row['profile_pic_url'])
             },
             id: row['post_id']
         });

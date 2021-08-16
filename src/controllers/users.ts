@@ -4,7 +4,7 @@ import { Request, Response, NextFunction } from 'express';
 
 import User from '../models/user';
 import RequestError from '../util/error';
-import { uploadPrefix } from '../util/upload';
+import { getUploadURL } from '../util/upload';
 
 export const getUser = (req: Request, res: Response, next: NextFunction) => {
     const userId = req.params.userId;
@@ -17,7 +17,7 @@ export const getUser = (req: Request, res: Response, next: NextFunction) => {
                 lastName: user.lastName,
                 username: user.username,
                 email: user.email,
-                profilePicURL: uploadPrefix + user.profilePicURL
+                profilePicURL: getUploadURL(user.profilePicURL)
             }
         });
 
@@ -46,7 +46,7 @@ export const updateUser = (req: Request, res: Response, next: NextFunction) => {
                     lastName: user.lastName,
                     username: user.username,
                     email: user.email,
-                    profilePicURL: uploadPrefix + user.profilePicURL
+                    profilePicURL: getUploadURL(user.profilePicURL)
                 }
             });
         });
@@ -78,7 +78,7 @@ export const updateUserImage = (req: Request, res: Response, next: NextFunction)
                 lastName: user.lastName,
                 username: user.username,
                 email: user.email,
-                profilePicURL: uploadPrefix + user.profilePicURL
+                profilePicURL: getUploadURL(user.profilePicURL)
             }
         });
     });

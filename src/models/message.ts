@@ -3,7 +3,7 @@ import path from 'path';
 
 import { ContentType, MessageType, getMessage, getMessagesFromConversation, getMessagesFromPost, createMessage, updateMessage, deleteMessage, getAttachmentsFromConversation, getAttachmentsFromPost } from '../database/messages';
 import { getUser } from '../database/user';
-import { uploadPrefix } from '../util/upload';
+import { getUploadURL } from '../util/upload';
 
 export interface MessageUserData {
     firstName: string;
@@ -72,7 +72,7 @@ class Message {
                 lastName: result.rows[0]['last_name'],
                 email: result.rows[0]['email'],
                 username: result.rows[0]['username'],
-                profilePicURL: uploadPrefix + result.rows[0]['profile_pic_url']
+                profilePicURL: getUploadURL(result.rows[0]['profile_pic_url'])
             }
             return true;
         }).catch(error => {
@@ -104,7 +104,7 @@ class Message {
                     lastName: result.rows[0]['last_name'],
                     email: result.rows[0]['email'],
                     username: result.rows[0]['username'],
-                    profilePicURL: uploadPrefix + result.rows[0]['profile_pic_url']
+                    profilePicURL: getUploadURL(result.rows[0]['profile_pic_url'])
                 }
                 return true;
             }).catch(error => {
@@ -135,7 +135,7 @@ class Message {
                     lastName: result.rows[0]['last_name'],
                     email: result.rows[0]['email'],
                     username: result.rows[0]['username'],
-                    profilePicURL: uploadPrefix + result.rows[0]['profile_pic_url']
+                    profilePicURL: getUploadURL(result.rows[0]['profile_pic_url'])
                 }
                 return true;
             }).catch(error => {
@@ -233,7 +233,7 @@ class Message {
                 lastName: row['last_name'],
                 email: row['email'],
                 username: row['username'],
-                profilePicURL: uploadPrefix + row['profile_pic_url']
+                profilePicURL: getUploadURL(row['profile_pic_url'])
             },
             id: row['message_id']
         });

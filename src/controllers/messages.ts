@@ -9,7 +9,7 @@ import Conversation from '../models/conversation';
 import Message from '../models/message';
 import User from '../models/user';
 import { ContentType } from '../database/messages';
-import { uploadPrefix } from '../util/upload';
+import { getUploadURL } from '../util/upload';
 
 export const canMessageUser = (req: Request, res: Response, next: NextFunction) => {
     const errors = validationResult(req);
@@ -92,7 +92,7 @@ export const getConversation = (req: Request, res: Response, next: NextFunction)
     }).then(messages => {
         messages.forEach(message => {
             if (message.type !== ContentType.Text) {
-                message.content = uploadPrefix + message.content;
+                message.content = getUploadURL(message.content)!;
             }
         })
 
@@ -108,7 +108,7 @@ export const getConversation = (req: Request, res: Response, next: NextFunction)
                     lastName: member.lastName,
                     username: member.username,
                     email: member.email,
-                    profilePicURL: uploadPrefix + member.profilePicURL
+                    profilePicURL: getUploadURL(member.profilePicURL)
                 }
             }),
             messages: messages
@@ -131,7 +131,7 @@ export const getMessages = async (req: Request, res: Response, next: NextFunctio
 
     const convoId = req.params.convoId;
     const limit = parseInt(req.query.limit as string) || 256;
-    const offset = parseInt(req.query.startAt as string) || 0;
+    const offset = parseInt(req.query.offset as string) || 0;
 
     let messages: Message[];
 
@@ -139,7 +139,7 @@ export const getMessages = async (req: Request, res: Response, next: NextFunctio
         messages = await Message.findByConvoId(convoId, limit, offset);
         messages.forEach(message => {
             if (message.type !== ContentType.Text) {
-                message.content = uploadPrefix + message.content;
+                message.content = getUploadURL(message.content)!;
             }
         });
 
@@ -166,7 +166,7 @@ export const getMessage = async (req: Request, res: Response, next: NextFunction
     try {
         const message = await Message.findById(messageId);
         if (message.type !== ContentType.Text) {
-            message.content = uploadPrefix + message.content;
+            message.content = getUploadURL(message.content)!;
         }
 
         return res.status(200).json({
@@ -231,7 +231,7 @@ export const newConversation = (req: Request, res: Response, next: NextFunction)
                     lastName: member.lastName,
                     username: member.username,
                     email: member.email,
-                    profilePicURL: uploadPrefix + member.profilePicURL
+                    profilePicURL: getUploadURL(member.profilePicURL)
                 }
             })
         });
@@ -271,7 +271,7 @@ export const editConversation = (req: Request, res: Response, next: NextFunction
                             lastName: member.lastName,
                             username: member.username,
                             email: member.email,
-                            profilePicURL: uploadPrefix + member.profilePicURL
+                            profilePicURL: getUploadURL(member.profilePicURL)
                         }
                     })
                 });
@@ -358,7 +358,7 @@ export const newMessage = (req: Request, res: Response, next: NextFunction) => {
 
     return message.create().then(() => {
         if (message.type !== ContentType.Text) {
-            message.content = uploadPrefix + message.content;
+            message.content = getUploadURL(message.content)!;
         }
 
         res.status(201).json({
