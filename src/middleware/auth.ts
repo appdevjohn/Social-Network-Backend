@@ -14,7 +14,7 @@ const isAuth = (req: Request, res: Response, next: NextFunction) => {
         const token = authHeader.split(' ')[1];
         let decodedToken: AuthToken;
         try {
-            decodedToken = jwt.verify(token, 'secret') as AuthToken;
+            decodedToken = jwt.verify(token, process.env.TOKEN_SECRET as string) as AuthToken;
         } catch (error) {
             req.userId = null;
             throw RequestError.notAuthorized();

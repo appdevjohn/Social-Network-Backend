@@ -1,7 +1,8 @@
 import http from 'http';
 import { Server } from 'socket.io';
+import jwt from 'jsonwebtoken';
 
-import User from '../models/user';
+import User, { AuthToken } from '../models/user';
 import Conversation from '../models/conversation';
 import Message from '../models/message';
 
@@ -39,14 +40,19 @@ export const setupSocketIO = (server: http.Server) => {
         });
 
         // Add the socket ID to the user's account so we can send updates to their device.
-        socket.on('subscribe', ({ userId }) => {
-            if (userId) {
-                User.findById(userId).then(user => {
+        socket.on('subscribe', async ({ token }) => {
+            let decodedToken: AuthToken;
+            try {
+                decodedToken = jwt.verify(token, process.env.TOKEN_SECRET as string) as AuthToken;
+                if (decodedToken.userId && decodedToken.activated) {
+                    const user = await User.findById(decodedToken.userId);
                     user.socketId = socket.id
                     user.update();
-                }).catch(error => {
-                    console.error('On socket connect, there was an error', error);
-                });
+                } else {
+                    throw new Error('User is ineligible for updates.');
+                }
+            } catch (error) {
+                console.error('Error on subscribing to socket.', error);
             }
         });
 

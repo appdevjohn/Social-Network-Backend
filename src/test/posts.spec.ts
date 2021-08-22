@@ -1,6 +1,8 @@
 import express, { Request, Response, NextFunction } from 'express';
 import { expect } from 'chai';
 import request from 'supertest';
+import dotenv from 'dotenv';
+import path from 'path';
 
 import * as postsController from '../controllers/posts';
 import * as messagesController from '../controllers/messages';
@@ -17,6 +19,7 @@ describe('Posts Tests', () => {
     const testEmail = 'test_email@test.com';
 
     before(async function () {
+        dotenv.config({ path: path.join(__dirname, '..', '..', '.env') });
         app.use(express.json());
 
         const testUser = new User({

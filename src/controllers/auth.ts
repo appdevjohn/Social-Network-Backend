@@ -58,7 +58,7 @@ export const logIn = async (req: Request, res: Response, next: NextFunction) => 
 
         if (match) {
             const tokenPayload: AuthToken = { userId: user.id!, activated: user.activated };
-            const token = jwt.sign(tokenPayload, 'secret', { expiresIn: '1h' });
+            const token = jwt.sign(tokenPayload, process.env.TOKEN_SECRET as string, { expiresIn: '1h' });
 
             return res.status(200).json({
                 user: {
@@ -129,7 +129,7 @@ export const signUp = async (req: Request, res: Response, next: NextFunction) =>
     }
 
     const tokenPayload: AuthToken = { userId: newUser.id!, activated: newUser.activated };
-    const token = jwt.sign(tokenPayload, 'secret', { expiresIn: '1h' });
+    const token = jwt.sign(tokenPayload, process.env.TOKEN_SECRET as string, { expiresIn: '1h' });
 
     return res.status(201).json({
         user: {
@@ -168,7 +168,7 @@ export const confirmEmail = async (req: Request, res: Response, next: NextFuncti
         await user.activate(activateToken as string);
 
         const tokenPayload: AuthToken = { userId: user.id!, activated: user.activated };
-        const token = jwt.sign(tokenPayload, 'secret', { expiresIn: '1h' });
+        const token = jwt.sign(tokenPayload, process.env.TOKEN_SECRET as string, { expiresIn: '1h' });
 
         return res.status(200).json({
             activated: user.activated,

@@ -1,6 +1,8 @@
 import express, { Request, Response, NextFunction } from 'express';
 import { expect } from 'chai';
 import request from 'supertest';
+import dotenv from 'dotenv';
+import path from 'path';
 
 import RequestError from '../util/error';
 import isAuth from '../middleware/auth';
@@ -15,6 +17,7 @@ describe('Auth Tests', () => {
     const testEmail = 'test_email@test.com';
 
     before(function () {
+        dotenv.config({ path: path.join(__dirname, '..', '..', '.env') });
         app.use(express.json());
 
         app.get('/ping', isAuth, authController.ping);
