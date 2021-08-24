@@ -92,6 +92,7 @@ Activates the account using a code sent the the account holder's inbox.<br>
 ```
 {
     activated: true,
+    token: 'eyJhbGciOiJIUzI1NiI...',
     message: 'You can now sign into the account.'
 }
 ```

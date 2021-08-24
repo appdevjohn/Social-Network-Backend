@@ -13,6 +13,9 @@ CREATE TABLE users (
     hashed_password VARCHAR(128) NOT NULL,
     activated BOOLEAN NOT NULL DEFAULT false,
     activate_token VARCHAR(128),
+    activate_token_timestamp TIMESTAMP NOT NULL DEFAULT NOW(),
+    reset_password_token VARCHAR(128),
+    reset_password_token_timestamp TIMESTAMP NOT NULL DEFAULT NOW(),
     UNIQUE(email),
     UNIQUE(username)
 );
@@ -82,6 +85,24 @@ BEGIN
    END IF;
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION update_auth_timestamps()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.activate_token IS DISTINCT FROM OLD.activate_token THEN
+        NEW.activate_token_timestamp = NOW();
+    END IF;
+
+    IF NEW.reset_password_token IS DISTINCT FROM OLD.reset_password_token THEN
+        NEW.reset_password_token_timestamp = NOW();
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER update_auth_timestamps BEFORE INSERT OR UPDATE ON users
+FOR EACH ROW EXECUTE PROCEDURE update_auth_timestamps();
 
 CREATE TRIGGER update_timestamp BEFORE UPDATE ON users
 FOR EACH ROW EXECUTE PROCEDURE update_timestamp();

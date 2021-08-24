@@ -18,6 +18,7 @@
         "@types/jsonwebtoken": "^8.5.1",
         "@types/multer": "^1.4.7",
         "@types/pg": "^7.14.11",
+        "axios": "^0.21.1",
         "bcrypt": "^5.0.1",
         "cors": "^2.8.5",
         "dotenv": "^9.0.2",

@@ -2,15 +2,16 @@ import { QueryResult } from 'pg';
 import query from './index';
 
 export interface AccountType {
-    firstName?: string,
-    lastName?: string,
-    username?: string,
-    email?: string,
-    profilePicURL?: string | null,
-    hashedPassword?: string,
-    activated?: boolean,
-    activateToken?: string | null,
-    socketId?: string | null
+    firstName?: string;
+    lastName?: string;
+    username?: string;
+    email?: string;
+    profilePicURL?: string | null;
+    hashedPassword?: string;
+    activated?: boolean;
+    activateToken?: string | null;
+    resetPasswordToken?: string | null;
+    socketId?: string | null;
 }
 
 export const getUser = (userId: string): Promise<QueryResult> => {
@@ -30,7 +31,7 @@ export const getUserBySocketId = (socketId: string): Promise<QueryResult> => {
 }
 
 export const createUser = (newAccount: AccountType): Promise<QueryResult> => {
-    return query('INSERT INTO users (first_name, last_name, username, email, hashed_password, activated, activate_token, socket_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *;', [newAccount.firstName, newAccount.lastName, newAccount.username, newAccount.email, newAccount.hashedPassword, newAccount.activated, newAccount.activateToken, newAccount.socketId]);
+    return query('INSERT INTO users (first_name, last_name, username, email, hashed_password, activated, activate_token, reset_password_token, socket_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *;', [newAccount.firstName, newAccount.lastName, newAccount.username, newAccount.email, newAccount.hashedPassword, newAccount.activated, newAccount.activateToken, newAccount.resetPasswordToken, newAccount.socketId]);
 }
 
 export const updateUser = (userId: string, updatedAccount: AccountType): Promise<QueryResult> => {
@@ -64,6 +65,9 @@ export const updateUser = (userId: string, updatedAccount: AccountType): Promise
                 break;
             case 'activateToken':
                 queryString = queryString + ' activate_token = $' + (index + 1)
+                break;
+            case 'resetPasswordToken':
+                queryString = queryString + ' reset_password_token = $' + (index + 1)
                 break;
             case 'socketId':
                 queryString = queryString + ' socket_id = $' + (index + 1)

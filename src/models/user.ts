@@ -13,18 +13,21 @@ import Conversation from './conversation';
 import Group from './group';
 
 export interface UserConfigType {
-    createdAt?: Date,
-    updatedAt?: Date,
-    firstName: string,
-    lastName: string,
-    username: string,
-    email: string,
-    profilePicURL?: string | null,
-    hashedPassword: string,
-    activated: boolean,
-    activateToken: string,
-    socketId?: string | null,
-    id?: string
+    createdAt?: Date;
+    updatedAt?: Date;
+    firstName: string;
+    lastName: string;
+    username: string;
+    email: string;
+    profilePicURL?: string | null;
+    hashedPassword: string;
+    activated: boolean;
+    activateToken?: string | null;
+    activateTokenTimestamp?: Date | null;
+    resetPasswordToken?: string | null;
+    resetPasswordTokenTimestamp?: Date | null;
+    socketId?: string | null;
+    id?: string;
 }
 
 export interface AuthToken {
@@ -43,6 +46,9 @@ class User {
     hashedPassword: string;
     activated: boolean;
     activateToken?: string | null;
+    activateTokenTimestamp: Date;
+    resetPasswordToken?: string | null;
+    resetPasswordTokenTimestamp: Date;
     socketId?: string | null;
     id?: string;
 
@@ -57,6 +63,9 @@ class User {
         this.hashedPassword = config.hashedPassword || '';
         this.activated = config.activated;
         this.activateToken = config.activateToken;
+        this.activateTokenTimestamp = config.activateTokenTimestamp || new Date();
+        this.resetPasswordToken = config.resetPasswordToken;
+        this.resetPasswordTokenTimestamp = config.resetPasswordTokenTimestamp || new Date();
         this.socketId = config.socketId;
         this.id = config.id;
     }
@@ -75,6 +84,7 @@ class User {
             hashedPassword: this.hashedPassword,
             activated: this.activated,
             activateToken: this.activateToken,
+            resetPasswordToken: this.resetPasswordToken,
             socketId: this.socketId
         }
 
@@ -82,6 +92,8 @@ class User {
             if (result.rowCount > 0) {
                 this.createdAt = result.rows[0]['created_at'];
                 this.updatedAt = result.rows[0]['updated_at'];
+                this.activateTokenTimestamp = result.rows[0]['activate_token_timestamp'];
+                this.resetPasswordTokenTimestamp = result.rows[0]['reset_password_token_timestamp'];
                 this.id = result.rows[0]['user_id'];
                 return this;
             } else {
@@ -115,13 +127,20 @@ class User {
      * @returns Whether or not the token could successfully activate the account.
      */
     async activate(token: string): Promise<User> {
-        if (this.id && token === this.activateToken) {
+        if (this.id) {
+            if (token !== this.activateToken) {
+                throw new Error('The activation token is incorrect.');
+            } else if (this.activateTokenTimestamp < new Date(Date.now() - 15 * 60 * 1000)) {
+                throw new Error('The activation token is expired. You need to request a new one.');
+            }
+
             this.activated = true;
             this.activateToken = null;
             await this.update();
             return this;
+
         } else {
-            throw new Error('The activation token is incorrect.');
+            throw new Error('User is not yet saved to the database.');
         }
     }
 
@@ -146,6 +165,8 @@ class User {
             return updateUser(this.id, updatedAccount).then(result => {
                 if (result.rowCount > 0) {
                     this.updatedAt = result.rows[0]['updated_at'];
+                    this.activateTokenTimestamp = result.rows[0]['activate_token_timestamp'];
+                    this.resetPasswordTokenTimestamp = result.rows[0]['reset_password_token_timestamp'];
                     return this;
                 } else {
                     throw new Error('Could not update user with database.');
@@ -264,6 +285,9 @@ class User {
             hashedPassword: row['hashed_password'],
             activated: row['activated'],
             activateToken: row['activate_token'],
+            activateTokenTimestamp: row['activate_token_timestamp'],
+            resetPasswordToken: row['reset_password_token'],
+            resetPasswordTokenTimestamp: row['reset_password_token_timestamp'],
             socketId: row['socket_id'],
             id: row['user_id']
         });

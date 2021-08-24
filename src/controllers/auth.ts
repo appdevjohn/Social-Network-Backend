@@ -177,7 +177,7 @@ export const confirmEmail = async (req: Request, res: Response, next: NextFuncti
         });
 
     } catch (error) {
-        return next(RequestError.withMessageAndCode('The activation code was incorrect.', 406));
+        return next(RequestError.withMessageAndCode(error.message, 406));
     }
 }
 
