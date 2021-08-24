@@ -1,27 +1,22 @@
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 
-const sendEmail = () => {
-    axios.post('https://api.sendgrid.com/v3/mail/send', {
+const sendEmail = (toEmail: string, toName: string, subject: string, content: string): Promise<AxiosResponse<any>> => {
+    return axios.post('https://api.sendgrid.com/v3/mail/send', {
         personalizations: [
             {
                 to: [
                     {
-                        email: 'johnt.champion@gmail.com',
-                        name: 'John Champion'
+                        email: toEmail,
+                        name: toName
                     }
                 ],
-                subject: 'Test Email'
+                subject: subject
             }
         ],
         content: [
             {
-                type: 'text/html',
-                value: `
-                <html>
-                <head></head>
-                <body>SendGrid Test!</body>
-                </html>
-                `
+                type: 'text/plain',
+                value: content
             }
         ],
         from: {
@@ -33,11 +28,7 @@ const sendEmail = () => {
             Authorization: 'Bearer ' + process.env.SENDGRID_API_KEY,
             'Content-Type': 'application/json'
         }
-    }).then(response => {
-        console.log(response);
-    }).catch(error => {
-        console.error(error);
-    })
+    });
 }
 
 export default sendEmail;

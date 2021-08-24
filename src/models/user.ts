@@ -1,3 +1,4 @@
+import { AxiosResponse } from 'axios';
 import {
     AccountType,
     getUser,
@@ -11,6 +12,7 @@ import {
 import query from '../database/index';
 import Conversation from './conversation';
 import Group from './group';
+import sendEmail from '../util/mail';
 
 export interface UserConfigType {
     createdAt?: Date;
@@ -217,6 +219,23 @@ class User {
         } else {
             throw new Error('Could not delete user.')
         }
+    }
+
+    sendActivationCodeEmail = (): Promise<AxiosResponse<any>> => {
+        return sendEmail(
+            this.email,
+            `${this.firstName} ${this.lastName}`,
+            'Verification Code - Messenger Hawk',
+            `Your verification code is ${this.activateToken}.`
+        );
+    }
+
+    static generateActivateToken = (): string => {
+        let activateToken = Math.floor(Math.random() * 1000000).toString();
+        while (activateToken.length < 6) {
+            activateToken = '0' + activateToken;
+        }
+        return activateToken;
     }
 
     static accountWithEmailExists = async (email: string): Promise<boolean> => {

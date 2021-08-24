@@ -107,10 +107,6 @@ export const signUp = async (req: Request, res: Response, next: NextFunction) =>
     }
 
     const hashedPassword = await bcrypt.hash(password, 12);
-    let activateToken = Math.floor(Math.random() * 1000000).toString();
-    while (activateToken.length < 6) {
-        activateToken = '0' + activateToken;
-    }
 
     const newUser = new User({
         firstName: firstName,
@@ -119,11 +115,12 @@ export const signUp = async (req: Request, res: Response, next: NextFunction) =>
         email: email,
         hashedPassword: hashedPassword,
         activated: false,
-        activateToken: activateToken
+        activateToken: User.generateActivateToken()
     });
 
     try {
         await newUser.create();
+        await newUser.sendActivationCodeEmail();
     } catch (error) {
         return next(RequestError.withMessageAndCode('Something went wrong creating your account.', 500));
     }
@@ -181,10 +178,20 @@ export const confirmEmail = async (req: Request, res: Response, next: NextFuncti
     }
 }
 
-export const resendEmailVerificationCode = (req: Request, res: Response, next: NextFunction) => {
-    return res.status(200).json({
-        message: 'A new verification code has been emailed.'
-    });
+export const resendEmailVerificationCode = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const user = await User.findById(req.userId!);
+        user.activateToken = User.generateActivateToken();
+        await user.update();
+
+        await user.sendActivationCodeEmail();
+
+        return res.status(200).json({
+            message: 'A new verification code has been emailed.'
+        });
+    } catch (error) {
+        return next(RequestError.withMessageAndCode('There was an error generating a new activation code.', 500));
+    }
 }
 
 export const requestPasswordReset = (req: Request, res: Response, next: NextFunction) => {
