@@ -15,7 +15,7 @@ const sendEmail = (toEmail: string, toName: string, subject: string, content: st
         ],
         content: [
             {
-                type: 'text/plain',
+                type: 'text/html',
                 value: content
             }
         ],

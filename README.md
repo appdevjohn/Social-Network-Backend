@@ -98,6 +98,59 @@ Activates the account using a code sent the the account holder's inbox.<br>
 ```
 <br>
 
+**`PUT /auth/resend-verification-code`**<br>
+Sends a new email with a new account activation code to the user.<br>
+```
+{
+    message: 'A new verification code has been emailed.'
+}
+```
+<br>
+
+**`PUT /auth/request-new-password`**<br>
+Sends a password reset link to an email address.<br>
+|Field|Location|Required|Description|
+|---|---|---|---|
+|email|body|true|The email account to send the password reset link.|
+```
+{
+    status: 'Reset Email Sent',
+    message: 'A password reset email has been sent to the account holder.'
+}
+```
+<br>
+
+**`PUT /auth/reset-password`**<br>
+Resets an account's password.<br>
+|Field|Location|Required|Description|
+|---|---|---|---|
+|resetPasswordToken|body|true|The password reset token that was embedded in the link emailed to the user.|
+|newPassword|body|true|The new account password.|
+```
+{
+    status: 'Password Reset',
+    message: 'You can now sign into the account.'
+}
+```
+<br>
+
+**`DELETE /auth/delete-account`**<br>
+Deletes a user account. The account to be deleted will be that which is embedded in the authentication token.<br>
+```
+{
+    user: {
+        id: '1234',
+        firstName: 'John',
+        lastName: 'Champion',
+        username: 'appdevjohn',
+        email: 'john@bison.software',
+        profilePicURL: 'http://localhost:8080/uploads/image.png'
+    },
+    message: 'User account has been deleted.'
+}
+```
+<br>
+
 ### Users
 User endpoints are distinct from auth endpoints in that they deal with personal information about the account, such as the name and username.
 <br><br>

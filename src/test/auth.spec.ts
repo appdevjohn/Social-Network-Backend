@@ -16,6 +16,8 @@ describe('Auth Tests', () => {
     const testUsername = 'test_username';
     const testEmail = 'test_email@test.com';
 
+    process.env.NODE_ENV = 'test';
+
     before(function () {
         dotenv.config({ path: path.join(__dirname, '..', '..', '.env') });
         app.use(express.json());
@@ -30,6 +32,14 @@ describe('Auth Tests', () => {
                 message: error.message
             });
         });
+    });
+
+    afterEach(function () {
+        return User.findByEmail(testEmail).then(user => {
+            return user.delete();
+        }).catch(error => {
+            return Promise.resolve();
+        })
     });
 
     it('should throw an error if no authorization header is present', function () {
@@ -58,12 +68,7 @@ describe('Auth Tests', () => {
         return request(app)
             .post('/signup')
             .send({ firstName: 'test_first', lastName: 'test_last', username: testUsername, email: testEmail, password: 'asdf' })
-            .expect(201)
-            .then(res => {
-                return User.findByEmail(testEmail);
-            }).then(user => {
-                return user.delete();
-            });
+            .expect(201);
     });
 
     it('should fail to activate accounts with a wrong code', function () {
@@ -77,10 +82,6 @@ describe('Auth Tests', () => {
                     .set('Authorization', 'Bearer ' + token)
                     .send({ activateToken: '0' })
                     .expect(406);
-            }).then(() => {
-                return User.findByEmail(testEmail);
-            }).then(user => {
-                return user.delete();
             });
     });
 
@@ -98,10 +99,6 @@ describe('Auth Tests', () => {
                         .send({ activateToken: user.activateToken })
                         .expect(200);
                 });
-            }).then(() => {
-                return User.findByEmail(testEmail);
-            }).then(user => {
-                return user.delete();
             });
     });
 
@@ -124,10 +121,6 @@ describe('Auth Tests', () => {
                     .put('/login')
                     .send({ email: testEmail, password: 'asdf' })
                     .expect(200);
-            }).then(() => {
-                return User.findByEmail(testEmail);
-            }).then(user => {
-                return user.delete();
             });
     });
 
@@ -150,10 +143,6 @@ describe('Auth Tests', () => {
                     .put('/login')
                     .send({ email: testEmail, password: 'incorrect_password' })
                     .expect(401);
-            }).then(() => {
-                return User.findByEmail(testEmail);
-            }).then(user => {
-                return user.delete();
             });
     });
 
@@ -177,10 +166,6 @@ describe('Auth Tests', () => {
                     .set('Authorization', 'Bearer ' + token)
                     .send()
                     .expect(200);
-            }).then(() => {
-                return User.findByEmail(testEmail);
-            }).then(user => {
-                return user.delete();
             });
     });
 
@@ -205,10 +190,87 @@ describe('Auth Tests', () => {
                     .send();
             }).then(res => {
                 expect(res.statusCode).to.not.equal(200);
-            }).then(() => {
+            });
+    });
+});
+
+describe('Password Reset Tests', () => {
+    const app = express();
+
+    const testUsername = 'test_username';
+    const testEmail = 'test_email@test.com';
+
+    process.env.NODE_ENV = 'test';
+
+    before(async function () {
+        dotenv.config({ path: path.join(__dirname, '..', '..', '.env') });
+        app.use(express.json());
+
+        app.put('/request-new-password', authController.requestPasswordReset);
+        app.put('/reset-password', authController.resetPassword);
+
+        app.use((error: RequestError, req: Request, res: Response, next: NextFunction) => {
+            return res.status(error.code || 500).json({
+                message: error.message
+            });
+        });
+
+        const newUser = new User({
+            firstName: 'Test_First',
+            lastName: 'Test_Last',
+            username: testUsername,
+            email: testEmail,
+            hashedPassword: 'not_set',
+            activated: false
+        });
+
+        await newUser.create();
+    });
+
+    beforeEach(async function () {
+        const user = await User.findByEmail(testEmail);
+        user.resetPasswordToken = null;
+        await user.update();
+    });
+
+    after(async function () {
+        const user = await User.findByEmail(testEmail);
+        await user.delete();
+    })
+
+    it('should set a token when a password reset is requested', function () {
+        return request(app)
+            .put('/request-new-password')
+            .send({ email: testEmail })
+            .expect(200)
+            .then(() => {
                 return User.findByEmail(testEmail);
             }).then(user => {
-                return user.delete();
+                expect(user.resetPasswordToken).to.not.be.equal(null);
+                expect(user.resetPasswordToken).to.not.be.equal(undefined);
+            });
+    });
+
+    it('should reset a password', async function () {
+        let originalHashedPassword: string | null = null;
+
+        return request(app)
+            .put('/request-new-password')
+            .send({ email: testEmail })
+            .expect(200)
+            .then(() => {
+                return User.findByEmail(testEmail);
+            }).then(user => {
+                originalHashedPassword = user.hashedPassword;
+
+                return request(app)
+                    .put('/reset-password')
+                    .send({ resetPasswordToken: user.resetPasswordToken, newPassword: 'new_reset_password' })
+                    .expect(200);
+            }).then(res => {
+                return User.findByEmail(testEmail);
+            }).then(user => {
+                expect(user.hashedPassword).to.not.equal(originalHashedPassword);
             });
     });
 });

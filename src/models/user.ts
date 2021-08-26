@@ -1,3 +1,5 @@
+import fs from 'fs';
+import path from 'path';
 import { AxiosResponse } from 'axios';
 import {
     AccountType,
@@ -7,7 +9,8 @@ import {
     deleteUser,
     getUserByEmail,
     getUserByUsername,
-    getUserBySocketId
+    getUserBySocketId,
+    getUserByResetPasswordToken
 } from '../database/user';
 import query from '../database/index';
 import Conversation from './conversation';
@@ -161,6 +164,7 @@ class User {
                 hashedPassword: this.hashedPassword,
                 activated: this.activated,
                 activateToken: this.activateToken,
+                resetPasswordToken: this.resetPasswordToken,
                 socketId: this.socketId
             }
 
@@ -207,6 +211,11 @@ class User {
                 return deleteUser(this.id!);
 
             }).then(result => {
+                if (this.profilePicURL) {
+                    const imgPath = path.join(__dirname, '..', '..', 'uploads', this.profilePicURL);
+                    fs.unlink(imgPath, () => { console.log('Profile Picture Deleted') });
+                }
+
                 if (result.rowCount > 0) {
                     return this;
                 } else {
@@ -221,13 +230,27 @@ class User {
         }
     }
 
-    sendActivationCodeEmail = (): Promise<AxiosResponse<any>> => {
-        return sendEmail(
-            this.email,
-            `${this.firstName} ${this.lastName}`,
-            'Verification Code - Messenger Hawk',
-            `Your verification code is ${this.activateToken}.`
-        );
+    sendActivationCodeEmail = (): Promise<void>/*Promise<AxiosResponse<any>>*/ => {
+        return Promise.resolve();
+        // return sendEmail(
+        //     this.email,
+        //     `${this.firstName} ${this.lastName}`,
+        //     'Verification Code - Messenger Hawk',
+        //     `Your verification code is ${this.activateToken}.`
+        // );
+    }
+
+    sendPasswordResetEmail = (): Promise<void>/*Promise<AxiosResponse<any>>*/ => {
+        const rootDomain = process.env.SERVICE_DOMAIN_NAME ? process.env.SERVICE_DOMAIN_NAME : 'http://localhost:8080';
+        const url = rootDomain + '/' + this.resetPasswordToken;
+
+        return Promise.resolve();
+        // return sendEmail(
+        //     this.email,
+        //     `${this.firstName} ${this.lastName}`,
+        //     'Reset Password - Messenger Hawk',
+        //     `Please click <a href="${url}">here</a> to reset your password. If you did not request a password reset, someone may be tyring to break into your account.`
+        // );
     }
 
     static generateActivateToken = (): string => {
@@ -269,6 +292,18 @@ class User {
 
     static findByUsername = (username: string): Promise<User> => {
         return getUserByUsername(username).then(result => {
+            if (result.rowCount > 0) {
+                return User.parseRow(result.rows[0]);
+            } else {
+                throw new Error('Could not find this account.');
+            }
+        }).catch(error => {
+            throw new Error(error);
+        });
+    }
+
+    static findByResetPasswordToken = (resetPasswordToken: string): Promise<User> => {
+        return getUserByResetPasswordToken(resetPasswordToken).then(result => {
             if (result.rowCount > 0) {
                 return User.parseRow(result.rows[0]);
             } else {

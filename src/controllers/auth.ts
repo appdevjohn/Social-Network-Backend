@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcrypt';
+import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import { validationResult } from 'express-validator';
 
@@ -120,7 +121,10 @@ export const signUp = async (req: Request, res: Response, next: NextFunction) =>
 
     try {
         await newUser.create();
-        await newUser.sendActivationCodeEmail();
+        if (process.env.NODE_ENV !== 'test') {
+            await newUser.sendActivationCodeEmail();
+        }
+
     } catch (error) {
         return next(RequestError.withMessageAndCode('Something went wrong creating your account.', 500));
     }
@@ -184,28 +188,64 @@ export const resendEmailVerificationCode = async (req: Request, res: Response, n
         user.activateToken = User.generateActivateToken();
         await user.update();
 
-        await user.sendActivationCodeEmail();
+        if (process.env.NODE_ENV !== 'test') {
+            await user.sendActivationCodeEmail();
+        }
 
         return res.status(200).json({
             message: 'A new verification code has been emailed.'
         });
+
     } catch (error) {
         return next(RequestError.withMessageAndCode('There was an error generating a new activation code.', 500));
     }
 }
 
 export const requestPasswordReset = (req: Request, res: Response, next: NextFunction) => {
-    return res.status(200).json({
-        status: 'Reset Email Sent',
-        message: 'A password reset email has been sent to the account holder.'
+    const email = req.body.email;
+
+    const buffer = crypto.randomBytes(32);
+    const token = buffer.toString('hex');
+
+    return User.findByEmail(email).then(user => {
+        user.resetPasswordToken = token;
+        return user.update();
+
+    }).then(user => {
+        if (process.env.NODE_ENV !== 'test') {
+            user.sendPasswordResetEmail();
+        }
+
+        return res.status(200).json({
+            status: 'Reset Email Sent',
+            message: 'A password reset email has been sent to the account holder.'
+        });
+
+    }).catch(error => {
+        return next(RequestError.withMessageAndCode(error.message, 404));
     });
 }
 
-export const resetPassword = (req: Request, res: Response, next: NextFunction) => {
-    return res.status(200).json({
-        status: 'Password Reset',
-        message: 'You can now sign into the account.'
-    });
+export const resetPassword = async (req: Request, res: Response, next: NextFunction) => {
+    const resetPasswordToken = req.body.resetPasswordToken;
+    const newPassword = req.body.newPassword;
+
+    try {
+        const newHashedPassword = await bcrypt.hash(newPassword, 12);
+
+        const user = await User.findByResetPasswordToken(resetPasswordToken);
+
+        user.hashedPassword = newHashedPassword;
+        await user.update();
+
+        return res.status(200).json({
+            status: 'Password Reset',
+            message: 'You can now sign into the account.'
+        });
+
+    } catch (error) {
+        return next(RequestError.withMessageAndCode(error.message, 500));
+    }
 }
 
 export const deleteAccount = (req: Request, res: Response, next: NextFunction) => {
@@ -214,11 +254,18 @@ export const deleteAccount = (req: Request, res: Response, next: NextFunction) =
 
     }).then(user => {
         return res.status(200).json({
-            user: user,
+            user: {
+                id: user.id,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                username: user.username,
+                email: user.email,
+                profilePicURL: getUploadURL(user.profilePicURL)
+            },
             message: 'User account has been deleted.'
         });
 
     }).catch(error => {
-        return next(error);
+        return next(RequestError.withMessageAndCode(error.message, 500));
     });
 }

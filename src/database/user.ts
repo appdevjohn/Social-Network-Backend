@@ -30,6 +30,10 @@ export const getUserBySocketId = (socketId: string): Promise<QueryResult> => {
     return query('SELECT * FROM users WHERE socket_id = $1;', [socketId]);
 }
 
+export const getUserByResetPasswordToken = (resetPasswordToken: string): Promise<QueryResult> => {
+    return query('SELECT * FROM users WHERE reset_password_token = $1;', [resetPasswordToken]);
+}
+
 export const createUser = (newAccount: AccountType): Promise<QueryResult> => {
     return query('INSERT INTO users (first_name, last_name, username, email, hashed_password, activated, activate_token, reset_password_token, socket_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *;', [newAccount.firstName, newAccount.lastName, newAccount.username, newAccount.email, newAccount.hashedPassword, newAccount.activated, newAccount.activateToken, newAccount.resetPasswordToken, newAccount.socketId]);
 }

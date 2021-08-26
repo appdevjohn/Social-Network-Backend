@@ -120,7 +120,7 @@ class Message {
         if (this.id) {
             if (this.type !== ContentType.Text) {
                 const filePath = path.join(__dirname, '..', '..', 'uploads', this.content);
-                fs.unlink(filePath, () => { console.log('File Deleted'); });
+                fs.unlink(filePath, () => { console.log('File Deleted') });
             }
 
             return deleteMessage(this.id).then(result => {
