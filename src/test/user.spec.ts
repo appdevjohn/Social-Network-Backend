@@ -14,6 +14,8 @@ describe('User Tests', () => {
     const testUsername = 'test_username';
     const testEmail = 'test_email@test.com';
 
+    process.env.NODE_ENV = 'test';
+
     before(async function () {
         dotenv.config({ path: path.join(__dirname, '..', '..', '.env') });
         app.use(express.json());

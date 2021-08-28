@@ -231,16 +231,12 @@ export const resetPassword = async (req: Request, res: Response, next: NextFunct
     const newPassword = req.body.newPassword;
 
     try {
-        const newHashedPassword = await bcrypt.hash(newPassword, 12);
-
         const user = await User.findByResetPasswordToken(resetPasswordToken);
-
-        user.hashedPassword = newHashedPassword;
-        await user.update();
+        await user.resetPassword(newPassword);
 
         return res.status(200).json({
             status: 'Password Reset',
-            message: 'You can now sign into the account.'
+            message: 'Password has been reset.'
         });
 
     } catch (error) {

@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import bcrypt from 'bcrypt';
 import { AxiosResponse } from 'axios';
 import {
     AccountType,
@@ -149,6 +150,24 @@ class User {
         }
     }
 
+    async resetPassword(newPassword: string): Promise<User> {
+        if (this.id) {
+            if (this.resetPasswordTokenTimestamp < new Date(Date.now() - 15 * 60 * 1000)) {
+                throw new Error('This reset token is expired.');
+            }
+            const newHashedPassword = await bcrypt.hash(newPassword, 12);
+
+            this.hashedPassword = newHashedPassword;
+            this.resetPasswordToken = null;
+            await this.update();
+            
+            return this;
+
+        } else {
+            throw new Error('User is not yet saved to database.');
+        }
+    }
+
     /**
      * Updates the user in the database.
      * @returns Whether or not the action was successful.
@@ -230,27 +249,25 @@ class User {
         }
     }
 
-    sendActivationCodeEmail = (): Promise<void>/*Promise<AxiosResponse<any>>*/ => {
-        return Promise.resolve();
-        // return sendEmail(
-        //     this.email,
-        //     `${this.firstName} ${this.lastName}`,
-        //     'Verification Code - Messenger Hawk',
-        //     `Your verification code is ${this.activateToken}.`
-        // );
+    sendActivationCodeEmail = (): Promise<AxiosResponse<any>> => {
+        return sendEmail(
+            this.email,
+            `${this.firstName} ${this.lastName}`,
+            'Verification Code - Messenger Hawk',
+            `Your verification code is ${this.activateToken}. It expires in 15 minutes.`
+        );
     }
 
-    sendPasswordResetEmail = (): Promise<void>/*Promise<AxiosResponse<any>>*/ => {
-        const rootDomain = process.env.SERVICE_DOMAIN_NAME ? process.env.SERVICE_DOMAIN_NAME : 'http://localhost:8080';
-        const url = rootDomain + '/' + this.resetPasswordToken;
+    sendPasswordResetEmail = (): Promise<AxiosResponse<any>> => {
+        const rootDomain = process.env.SERVICE_DOMAIN_NAME ? process.env.SERVICE_DOMAIN_NAME : 'http://localhost:3000';
+        const url = rootDomain + '/auth/reset-password/' + this.resetPasswordToken;
 
-        return Promise.resolve();
-        // return sendEmail(
-        //     this.email,
-        //     `${this.firstName} ${this.lastName}`,
-        //     'Reset Password - Messenger Hawk',
-        //     `Please click <a href="${url}">here</a> to reset your password. If you did not request a password reset, someone may be tyring to break into your account.`
-        // );
+        return sendEmail(
+            this.email,
+            `${this.firstName} ${this.lastName}`,
+            'Reset Password - Messenger Hawk',
+            `Please click <a href="${url}">here</a> to reset your password. If you did not request a password reset, someone may be tyring to break into your account.`
+        );
     }
 
     static generateActivateToken = (): string => {
