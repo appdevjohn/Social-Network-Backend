@@ -178,7 +178,7 @@ export const confirmEmail = async (req: Request, res: Response, next: NextFuncti
         });
 
     } catch (error) {
-        return next(RequestError.withMessageAndCode(error.message, 406));
+        return next(RequestError.withMessageAndCode('There was an error activating your account.', 406));
     }
 }
 
@@ -240,7 +240,7 @@ export const resetPassword = async (req: Request, res: Response, next: NextFunct
         });
 
     } catch (error) {
-        return next(RequestError.withMessageAndCode(error.message, 500));
+        return next(RequestError.withMessageAndCode('There was an error resetting your password.', 500));
     }
 }
 

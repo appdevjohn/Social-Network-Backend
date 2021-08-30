@@ -51,7 +51,7 @@ export const setupSocketIO = (server: http.Server) => {
                     throw new Error('User is ineligible for updates.');
                 }
             } catch (error) {
-                console.error(error.message);
+                console.error(error);
             }
         });
 
