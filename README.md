@@ -2,15 +2,26 @@
 This is an open source API for common social network features. It comes complete with Authentication, Messaging, and Posting, with Stories coming in the future.
 
 ## Setting Up
-To run this on a local machine, PostgreSQL must be started. This was tested with PostgreSQL 14, but that version is not necessarily a requirement. Once Postgres is running, the database can be set up - this can be done with the `setup.sql` file in `src/database`. An environment variable file `.env` must also be created to define at least the following variables:
+To run this on a local machine, PostgreSQL must be started. This was tested with PostgreSQL 13, but that version is not necessarily a requirement. Once Postgres is running, the database can be set up - this can be done with the `setup.sql` file in [this repository](https://github.com/appdevjohn/Social-Network-PostgreSQL-Config/blob/master/setup.sql). An environment variable file `.env` must also be created to define at least the following variables. Five are used to connect to the PostgreSQL database, and one is used in JSON web token generation.
 ```
 PGUSER=user
 PGHOST=localhost
 PGDATABASE=social_network
 PGPASSWORD=password1
 PGPORT=5432
+TOKEN_SECRET=somesecret
+
+SENDGRID_API_KEY=sendgridapikey                         # Optional - For sending emails with SendGrid
+SERVICE_DOMAIN_NAME=https://www.this-service-url.com    # Optional - For generating links to the web app.
 ```
 Once the database and environment variables are set up, the app can be run with `npm run dev`. A production build can be generated with `npm run build`, then it can be run with `npm start`. After setting everything up, it is recommended to run `npm test` to ensure everything is working.
+
+### Setting Up with Docker
+This app can be run in docker as long as the required environment variables listed above are set. A port must also be mapped.
+```
+docker run --env-file -p 8080:8080 social-network-backend
+```
+If you're connecting to the database through a docker network, make sure the PGHOST environment variable is the name of the container running the database.
 
 ## Endpoints
 
