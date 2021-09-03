@@ -47,8 +47,6 @@ export const setupSocketIO = (server: http.Server) => {
                     const user = await User.findById(decodedToken.userId);
                     user.socketId = socket.id
                     user.update();
-                } else {
-                    throw new Error('User is ineligible for updates.');
                 }
             } catch (error) {
                 console.error(error);

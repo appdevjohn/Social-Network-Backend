@@ -3,6 +3,7 @@ import path from 'path';
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+dotenv.config({ path: path.join(__dirname, '..', '.env') });
 
 import { setupSocketIO } from './util/io';
 import RequestError from './util/error';
@@ -11,8 +12,6 @@ import userRoutes from './routes/users';
 import groupRoutes from './routes/groups';
 import postRoutes from './routes/posts';
 import messageRoutes from './routes/messages';
-
-dotenv.config({ path: path.join(__dirname, '..', '.env') });
 
 const app = express();
 const server = http.createServer(app);
