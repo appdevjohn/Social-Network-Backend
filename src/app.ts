@@ -28,12 +28,18 @@ app.use('/posts', postRoutes);
 app.use('/users', userRoutes);
 app.use(messageRoutes);
 
+app.get('/health-check', (req: Request, res: Response, next: NextFunction) => {
+    return res.status(200).json({
+        message: 'Alive and well.'
+    });
+})
+
 app.use((error: RequestError, req: Request, res: Response, next: NextFunction) => {
     return res.status(error.code || 500).json({
         message: error.message
     });
 });
 
-server.listen(8080, () => {
+server.listen(process.env.PORT || 8080, () => {
     console.log('Now listening on port 8080.');
 });
