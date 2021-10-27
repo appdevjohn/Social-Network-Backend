@@ -4,6 +4,9 @@ import request from 'supertest';
 import dotenv from 'dotenv';
 import path from 'path';
 
+dotenv.config({ path: path.join(__dirname, '..', '..', '.env') });
+process.env.NODE_ENV = 'test';
+
 import * as usersController from '../controllers/users';
 import User from '../models/user';
 import RequestError from '../util/error';
@@ -14,10 +17,7 @@ describe('User Tests', () => {
     const testUsername = 'test_username';
     const testEmail = 'test_email@test.com';
 
-    process.env.NODE_ENV = 'test';
-
     before(async function () {
-        dotenv.config({ path: path.join(__dirname, '..', '..', '.env') });
         app.use(express.json());
 
         const testUser = new User({

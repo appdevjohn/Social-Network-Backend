@@ -358,6 +358,163 @@ Deletes a group and all of the posts in that group.<br>
 ```
 <br>
 
+**`POST /groups/:groupId/add-user`**<br>
+Adds a user to a group. Users can either be added pre-approved or in a pending-approval state.<br>
+|Field|Location|Required|Description|
+|---|---|---|---|
+|groupId|param|true|The ID of the group which to add the user.|
+|userId|body|true|The ID of the user which to add to the group.|
+|approved|body|true|Boolean value representing whether this user is approved immediately. If false, they will have to be approved by an admin.|
+```
+{
+    group: {
+        id: '1234',
+        name: 'Nintendo Gamers',
+        createdAt: '2021-06-10T18:16:50.085Z',
+        updatedAt: '2021-06-10T18:16:50.085Z'
+    }
+}
+```
+<br>
+
+**`POST /groups/:groupId/remove-user`**<br>
+Removes a user from a group. If user was pending approval to join the group, that request will be cancelled.<br>
+|Field|Location|Required|Description|
+|---|---|---|---|
+|groupId|param|true|The ID of the group which to remove the user.|
+|userId|body|true|The ID of the user which to remove from the group.|
+```
+{
+    group: {
+        id: '1234',
+        name: 'Nintendo Gamers',
+        createdAt: '2021-06-10T18:16:50.085Z',
+        updatedAt: '2021-06-10T18:16:50.085Z'
+    },
+    userId: '1234'
+}
+```
+<br>
+
+**`POST /groups/:groupId/requests/:userId/approve`**<br>
+Removes a user from a group. If user was pending approval to join the group, that request will be cancelled.<br>
+|Field|Location|Required|Description|
+|---|---|---|---|
+|groupId|param|true|The ID of the group which to add the user.|
+|userId|param|true|The ID of the user which to add to the group.|
+```
+{
+    group: {
+        id: '1234',
+        name: 'Nintendo Gamers',
+        createdAt: '2021-06-10T18:16:50.085Z',
+        updatedAt: '2021-06-10T18:16:50.085Z'
+    },
+    userId: '1234'
+}
+```
+<br>
+
+**`PUT /groups/:groupId/set-admin`**<br>
+Sets the admin status of a user within a group to true or false.<br>
+|Field|Location|Required|Description|
+|---|---|---|---|
+|groupId|param|true|The ID of the group which to add the user.|
+|userId|body|true|The ID of the user which to add to the group.|
+|admin|body|true|Whether or not this user is an admin.|
+```
+{
+    group: {
+        id: '1234',
+        name: 'Nintendo Gamers',
+        createdAt: '2021-06-10T18:16:50.085Z',
+        updatedAt: '2021-06-10T18:16:50.085Z'
+    }
+}
+```
+<br>
+
+**`GET /groups/:groupId/requests`**<br>
+Returns the complete list of requests to join a group.<br>
+|Field|Location|Required|Description|
+|---|---|---|---|
+|groupId|param|true|The ID of the group which to get join requests.|
+```
+{
+    group: {
+        id: '1234',
+        name: 'Nintendo Gamers',
+        createdAt: '2021-06-10T18:16:50.085Z',
+        updatedAt: '2021-06-10T18:16:50.085Z'
+    },
+    users: [
+        {
+            id: '1234',
+            firstName: 'John',
+            lastName: 'Champion',
+            username: 'appdevjohn',
+            email: 'john@bison.software',
+            profilePicURL: 'http://localhost:8080/uploads/image.png'
+        }
+    ]
+}
+```
+<br>
+
+**`GET /groups/:groupId/admins`**<br>
+Returns the list of admins in a group.<br>
+|Field|Location|Required|Description|
+|---|---|---|---|
+|groupId|param|true|The ID of the group which to find the admins.|
+```
+{
+    group: {
+        id: '1234',
+        name: 'Nintendo Gamers',
+        createdAt: '2021-06-10T18:16:50.085Z',
+        updatedAt: '2021-06-10T18:16:50.085Z'
+    },
+    users: [
+        {
+            id: '1234',
+            firstName: 'John',
+            lastName: 'Champion',
+            username: 'appdevjohn',
+            email: 'john@bison.software',
+            profilePicURL: 'http://localhost:8080/uploads/image.png'
+        }
+    ]
+}
+```
+<br>
+
+**`GET /groups/:groupId/members`**<br>
+Returns the complete list of members in a group.<br>
+|Field|Location|Required|Description|
+|---|---|---|---|
+|groupId|param|true|The ID of the group which to get the members.|
+```
+{
+    group: {
+        id: '1234',
+        name: 'Nintendo Gamers',
+        createdAt: '2021-06-10T18:16:50.085Z',
+        updatedAt: '2021-06-10T18:16:50.085Z'
+    },
+    users: [
+        {
+            id: '1234',
+            firstName: 'John',
+            lastName: 'Champion',
+            username: 'appdevjohn',
+            email: 'john@bison.software',
+            profilePicURL: 'http://localhost:8080/uploads/image.png'
+        }
+    ]
+}
+```
+<br>
+
 ### Posts
 A post contains a title and content, which can be text, media, or both. Users who are authorized to see the post can comment on the post.
 <br><br>

@@ -1,8 +1,8 @@
-import { QueryResult } from 'pg';
+import { Query, QueryResult } from 'pg';
 import query from './index';
 
 export interface GroupType {
-    name?: string
+    name?: string;
 }
 
 export const getGroup = (groupId: string): Promise<QueryResult> => {
@@ -50,14 +50,30 @@ export const deleteGroup = (groupId: string): Promise<QueryResult> => {
     });
 }
 
-export const addUserToGroup = (userId: string, groupId: string): Promise<QueryResult> => {
-    return query('INSERT INTO users_groups (user_id, group_id) VALUES ($1, $2) RETURNING *;', [userId, groupId]);
+export const addUserToGroup = (userId: string, groupId: string, approved: boolean, admin: boolean): Promise<QueryResult> => {
+    return query('INSERT INTO users_groups (user_id, group_id, approved, admin_status) VALUES ($1, $2, $3, $4) RETURNING *;', [userId, groupId, approved, admin]);
+}
+
+export const approveUserInGroup = (userId: string, groupId: string): Promise<QueryResult> => {
+    return query('UPDATE users_groups SET approved = true WHERE user_id = $1 AND group_id = $2 RETURNING *;', [userId, groupId]);
 }
 
 export const removeUserFromGroup = (userId: string, groupId: string): Promise<QueryResult> => {
     return query('DELETE FROM users_groups WHERE user_id = $1 AND group_id = $2 RETURNING *;', [userId, groupId]);
 }
 
+export const setAdminStatus = (userId: string, groupId: string, admin: boolean) => {
+    return query('UPDATE users_groups SET admin_status = $1, approved = true WHERE user_id = $2 and group_id = $3 RETURNING *;', [admin, userId, groupId]);
+}
+
+export const getUsersRequestingApproval = (groupId: string): Promise<QueryResult> => {
+    return query('SELECT users.* FROM users_groups RIGHT JOIN users USING (user_id) WHERE group_id = $1 AND approved = false;', [groupId]);
+}
+
+export const getAdminsInGroup = (groupId: string) => {
+    return query('SELECT * FROM users_groups RIGHT JOIN users USING (user_id) WHERE group_id = $1 AND approved = true AND admin_status = true;', [groupId]);
+}
+
 export const getUsersInGroup = (groupId: string): Promise<QueryResult> => {
-    return query('SELECT * FROM users_groups RIGHT JOIN users USING (user_id) WHERE group_id = $1', [groupId]);
+    return query('SELECT users.* FROM users_groups RIGHT JOIN users USING (user_id) WHERE group_id = $1 AND approved = true;', [groupId]);
 }

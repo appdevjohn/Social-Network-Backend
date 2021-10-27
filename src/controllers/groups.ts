@@ -104,7 +104,7 @@ export const newGroup = (req: Request, res: Response, next: NextFunction) => {
     });
 
     return group.create().then(() => {
-        return group.addUser(req.userId!);
+        return group.addUser(req.userId!, true, true);
 
     }).then(() => {
         return group.members();
@@ -148,29 +148,25 @@ export const editGroup = (req: Request, res: Response, next: NextFunction) => {
         updatedGroup.name = groupName;
         return updatedGroup.update();
 
-    }).then(success => {
-        if (success) {
-            return updatedGroup.members().then(members => {
-                return res.status(200).json({
-                    group: updatedGroup,
-                    members: members.map(member => {
-                        return {
-                            id: member.id,
-                            firstName: member.firstName,
-                            lastName: member.lastName,
-                            username: member.username,
-                            email: member.email,
-                            profilePicURL: getUploadURL(member.profilePicURL)
-                        }
-                    })
-                });
-            }).catch(error => {
-                console.error(error);
-                return next(RequestError.withMessageAndCode('Could not update group.', 500));
+    }).then(() => {
+        return updatedGroup.members().then(members => {
+            return res.status(200).json({
+                group: updatedGroup,
+                members: members.map(member => {
+                    return {
+                        id: member.id,
+                        firstName: member.firstName,
+                        lastName: member.lastName,
+                        username: member.username,
+                        email: member.email,
+                        profilePicURL: getUploadURL(member.profilePicURL)
+                    }
+                })
             });
-        } else {
+        }).catch(error => {
+            console.error(error);
             return next(RequestError.withMessageAndCode('Could not update group.', 500));
-        }
+        });
     }).catch(error => {
         console.error(error);
         return next(RequestError.withMessageAndCode('Could not update group.', 500));
@@ -193,16 +189,225 @@ export const deleteGroup = (req: Request, res: Response, next: NextFunction) => 
         deletedGroup = group;
         return deletedGroup.delete();
 
-    }).then(success => {
-        if (success) {
-            return res.status(200).json({
-                group: deletedGroup
-            });
-        } else {
-            return next(RequestError.withMessageAndCode('Could not delete group.', 500));
-        }
+    }).then(() => {
+        return res.status(200).json({
+            group: deletedGroup
+        });
     }).catch(error => {
         console.error(error);
         return next(RequestError.withMessageAndCode('Could not delete group.', 500));
     });
+}
+
+export const addUserToGroup = async (req: Request, res: Response, next: NextFunction) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({
+            message: errors.array()[0].msg,
+            errors: errors.array()
+        });
+    }
+
+    const groupId: string = req.params.groupId;
+    const userId: string = req.body.userId;
+    const approved: boolean = req.body.approved;
+
+    try {
+        const group = await Group.findById(groupId);
+        await group.addUser(userId, approved, false);
+
+        return res.status(201).json({
+            group: group
+        });
+
+    } catch (error) {
+        console.error(error);
+        return next(RequestError.withMessageAndCode('Something went wrong adding this user to a group.', 500));
+    }
+}
+
+export const removeUserFromGroup = async (req: Request, res: Response, next: NextFunction) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({
+            message: errors.array()[0].msg,
+            errors: errors.array()
+        });
+    }
+
+    const groupId: string = req.params.groupId;
+    const userId: string = req.body.userId;
+
+    try {
+        const group = await Group.findById(groupId);
+        await group.removeUser(userId)
+
+        return res.status(200).json({
+            group: group,
+            userId: userId
+        });
+
+    } catch (error) {
+        console.error(error);
+        return next(RequestError.withMessageAndCode('Something went wrong approving this user.', 500));
+    }
+}
+
+export const approveUserJoinRequest = async (req: Request, res: Response, next: NextFunction) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({
+            message: errors.array()[0].msg,
+            errors: errors.array()
+        });
+    }
+
+    const groupId: string = req.params.groupId;
+    const userId: string = req.params.userId;
+
+    try {
+        const group = await Group.findById(groupId);
+        await group.approveUser(userId);
+
+        return res.status(200).json({
+            group: group,
+            userId: userId
+        });
+
+    } catch (error) {
+        console.error(error);
+        return next(RequestError.withMessageAndCode('Something went wrong approving this user.', 500));
+    }
+}
+
+export const setAdminStatusOfMember = async (req: Request, res: Response, next: NextFunction) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({
+            message: errors.array()[0].msg,
+            errors: errors.array()
+        });
+    }
+
+    const groupId: string = req.params.groupId;
+    const userId: string = req.body.userId;
+    const adminStatus: boolean = req.body.admin;
+
+    try {
+        const group = await Group.findById(groupId);
+        await group.setAdmin(userId, adminStatus);
+
+        return res.status(200).json({
+            group: group
+        });
+
+    } catch (error) {
+        console.error(error);
+        return next(RequestError.withMessageAndCode('Something went wrong making this user an admin.', 500));
+    }
+}
+
+export const getGroupJoinRequests = async (req: Request, res: Response, next: NextFunction) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({
+            message: errors.array()[0].msg,
+            errors: errors.array()
+        });
+    }
+
+    const groupId: string = req.params.groupId;
+
+    try {
+        const group = await Group.findById(groupId);
+        const usersRequesting = await group.requests();
+
+        return res.status(200).json({
+            group: group,
+            users: usersRequesting.map(user => {
+                return {
+                    id: user.id,
+                    firstName: user.firstName,
+                    lastName: user.lastName,
+                    username: user.username,
+                    email: user.email,
+                    profilePicURL: getUploadURL(user.profilePicURL)
+                }
+            })
+        });
+
+    } catch (error) {
+        console.error(error);
+        return next(RequestError.withMessageAndCode('Something went wrong adding this user to a group.', 500));
+    }
+}
+
+export const getAdminsInGroup = async (req: Request, res: Response, next: NextFunction) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({
+            message: errors.array()[0].msg,
+            errors: errors.array()
+        });
+    }
+
+    const groupId: string = req.params.groupId;
+
+    try {
+        const group = await Group.findById(groupId);
+        const admins = await group.admins();
+
+        return res.status(200).json({
+            group: group,
+            admins: admins.map(user => {
+                return {
+                    id: user.id,
+                    firstName: user.firstName,
+                    lastName: user.lastName,
+                    username: user.username,
+                    email: user.email,
+                    profilePicURL: getUploadURL(user.profilePicURL)
+                }
+            })
+        });
+
+    } catch (error) {
+        console.error(error);
+        return next(RequestError.withMessageAndCode('Something went wrong getting admins for this group.', 500));
+    }
+}
+
+export const getMembersInGroup = async (req: Request, res: Response, next: NextFunction) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({
+            message: errors.array()[0].msg,
+            errors: errors.array()
+        });
+    }
+
+    const groupId: string = req.params.groupId;
+
+    try {
+        const group = await Group.findById(groupId);
+        const members = await group.members();
+
+        return res.status(200).json({
+            group: group,
+            members: members.map(user => {
+                return {
+                    id: user.id,
+                    firstName: user.firstName,
+                    lastName: user.lastName,
+                    username: user.username,
+                    email: user.email,
+                    profilePicURL: getUploadURL(user.profilePicURL)
+                }
+            })
+        });
+
+    } catch (error) {
+        console.error(error);
+        return next(RequestError.withMessageAndCode('Something went wrong getting admins for this group.', 500));
+    }
 }

@@ -4,6 +4,9 @@ import request from 'supertest';
 import dotenv from 'dotenv';
 import path from 'path';
 
+dotenv.config({ path: path.join(__dirname, '..', '..', '.env') });
+process.env.NODE_ENV = 'test';
+
 import * as groupsController from '../controllers/groups';
 import User from '../models/user';
 import RequestError from '../util/error';
@@ -14,10 +17,7 @@ describe('Groups Tests', () => {
 
     const testEmail = 'test_email@test.com';
 
-    process.env.NODE_ENV = 'test';
-
     before(async function () {
-        dotenv.config({ path: path.join(__dirname, '..', '..', '.env') });
         app.use(express.json());
 
         const testUser = new User({
@@ -41,6 +41,13 @@ describe('Groups Tests', () => {
         app.post('/new', groupsController.newGroup);
         app.put('/edit', groupsController.editGroup);
         app.delete('/delete', groupsController.deleteGroup);
+        app.post('/:groupId/add-user', groupsController.addUserToGroup);
+        app.post('/:groupId/remove-user', groupsController.removeUserFromGroup);
+        app.post('/:groupId/requests/:userId/approve', groupsController.approveUserJoinRequest);
+        app.put('/:groupId/set-admin', groupsController.setAdminStatusOfMember);
+        app.get('/:groupId/requests', groupsController.getGroupJoinRequests);
+        app.get('/:groupId/admins', groupsController.getAdminsInGroup);
+        app.get('/:groupId/members', groupsController.getMembersInGroup);
 
         app.use((error: RequestError, req: Request, res: Response, next: NextFunction) => {
             console.error(error.message);
@@ -167,5 +174,237 @@ describe('Groups Tests', () => {
         }).then(isCreated => {
             expect(isCreated).to.be.equal(false);
         });
+    });
+
+    it('should be able to add a user to a group', async function () {
+        const userToAdd = new User({
+            firstName: 'userToAdd_first',
+            lastName: 'userToAdd_last',
+            username: 'userToAdd_username',
+            email: 'userToAdd@test.com',
+            hashedPassword: 'hashed_password',
+            activated: true,
+            activateToken: ''
+        });
+
+        await userToAdd.create();
+
+        const createGroupResponse = await request(app)
+            .post('/new')
+            .send({ name: 'Add User to this Group' })
+            .expect(201);
+
+        const groupId = createGroupResponse.body.group.id;
+
+        await request(app)
+            .post(`/${groupId}/add-user`)
+            .send({ userId: userToAdd.id })
+            .expect(201);
+
+        const group = await Group.findById(groupId);
+        await group.delete();
+        await userToAdd.delete();
+    });
+
+    it('should be able to remove a user from a group', async function () {
+        const userToAdd = new User({
+            firstName: 'userToAdd_first',
+            lastName: 'userToAdd_last',
+            username: 'userToAdd_username',
+            email: 'userToAdd@test.com',
+            hashedPassword: 'hashed_password',
+            activated: true,
+            activateToken: ''
+        });
+
+        await userToAdd.create();
+
+        const createGroupResponse = await request(app)
+            .post('/new')
+            .send({ name: 'Add User to this Group' })
+            .expect(201);
+
+        const groupId = createGroupResponse.body.group.id;
+
+        await request(app)
+            .post(`/${groupId}/add-user`)
+            .send({ userId: userToAdd.id })
+            .expect(201);
+
+        await request(app)
+            .post(`/${groupId}/remove-user`)
+            .send({ userId: userToAdd.id })
+            .expect(200);
+
+        const group = await Group.findById(groupId);
+        await group.delete();
+        await userToAdd.delete();
+    });
+
+    it('should be able to approve a user\'s join request', async function () {
+        const userToAdd = new User({
+            firstName: 'userToAdd_first',
+            lastName: 'userToAdd_last',
+            username: 'userToAdd_username',
+            email: 'userToAdd@test.com',
+            hashedPassword: 'hashed_password',
+            activated: true,
+            activateToken: ''
+        });
+
+        await userToAdd.create();
+
+        const createGroupResponse = await request(app)
+            .post('/new')
+            .send({ name: 'Add User to this Group' })
+            .expect(201);
+
+        const groupId = createGroupResponse.body.group.id;
+
+        await request(app)
+            .post(`/${groupId}/add-user`)
+            .send({ userId: userToAdd.id })
+            .expect(201);
+
+        await request(app)
+            .post(`/${groupId}/requests/${userToAdd.id}/approve`)
+            .expect(200);
+
+        const group = await Group.findById(groupId);
+        const memberLength = (await group.members()).length;
+
+        await group.delete();
+        await userToAdd.delete();
+
+        expect(memberLength).to.equal(2);
+    });
+
+    it('should be able to give and remove admin status to a member of a group', async function () {
+        // PUT /groups/:groupId/set-admin
+
+        const userToAdd = new User({
+            firstName: 'userToMakeAdmin_first',
+            lastName: 'userToMakeAdmin_last',
+            username: 'userToMakeAdmin_username',
+            email: 'userToMakeAdmin@test.com',
+            hashedPassword: 'hashed_password',
+            activated: true,
+            activateToken: ''
+        });
+
+        await userToAdd.create();
+
+        const createGroupResponse = await request(app)
+            .post('/new')
+            .send({ name: 'View Requests of this Group' })
+            .expect(201);
+
+        const groupId = createGroupResponse.body.group.id;
+
+        await request(app)
+            .post(`/${groupId}/add-user`)
+            .send({ userId: userToAdd.id })
+            .expect(201);
+
+        await request(app)
+            .put(`/${groupId}/set-admin`)
+            .send({ userId: userToAdd.id, admin: true })
+            .expect(200);
+
+
+        let group = await Group.findById(groupId);
+        let admins = await group.admins();
+        let members = await group.members();
+
+        expect(admins.length).to.equal(2);
+        expect(members.length).to.equal(2);
+
+        await request(app)
+            .put(`/${groupId}/set-admin`)
+            .send({ userId: userToAdd.id, admin: false })
+            .expect(200);
+
+        group = await Group.findById(groupId);
+        admins = await group.admins();
+        members = await group.members();
+
+        expect(admins.length).to.equal(1);
+        expect(members.length).to.equal(2);
+
+        await group.delete();
+        await userToAdd.delete();
+
+    });
+
+    it('should be able to get a list of join requests', async function () {
+        const userToAdd = new User({
+            firstName: 'userToAdd_first',
+            lastName: 'userToAdd_last',
+            username: 'userToAdd_username',
+            email: 'userToAdd@test.com',
+            hashedPassword: 'hashed_password',
+            activated: true,
+            activateToken: ''
+        });
+
+        await userToAdd.create();
+
+        const createGroupResponse = await request(app)
+            .post('/new')
+            .send({ name: 'View Requests of this Group' })
+            .expect(201);
+
+        const groupId = createGroupResponse.body.group.id;
+
+        await request(app)
+            .post(`/${groupId}/add-user`)
+            .send({ userId: userToAdd.id, approved: false })
+            .expect(201);
+
+        const requestsResult = await request(app)
+            .get(`/${groupId}/requests`)
+            .expect(200);
+
+        const group = await Group.findById(groupId);
+        await group.delete();
+        await userToAdd.delete();
+
+        expect(requestsResult?.body?.users).to.have.length(1);
+    });
+
+    it('should be able to get a list of admins for a group', async function () {
+        const userToAdd = new User({
+            firstName: 'userToAdd_first',
+            lastName: 'userToAdd_last',
+            username: 'userToAdd_username',
+            email: 'userToAdd@test.com',
+            hashedPassword: 'hashed_password',
+            activated: true,
+            activateToken: ''
+        });
+
+        await userToAdd.create();
+
+        const createGroupResponse = await request(app)
+            .post('/new')
+            .send({ name: 'View Admins of this Group' })
+            .expect(201);
+
+        const groupId = createGroupResponse.body.group.id;
+
+        await request(app)
+            .post(`/${groupId}/add-user`)
+            .send({ userId: userToAdd.id })
+            .expect(201);
+
+        const requestsResult = await request(app)
+            .get(`/${groupId}/admins`)
+            .expect(200);
+
+        const group = await Group.findById(groupId);
+        await group.delete();
+        await userToAdd.delete();
+
+        expect(requestsResult?.body?.admins).to.have.length(1);
     });
 });

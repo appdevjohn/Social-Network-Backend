@@ -4,6 +4,9 @@ import request from 'supertest';
 import dotenv from 'dotenv';
 import path from 'path';
 
+dotenv.config({ path: path.join(__dirname, '..', '..', '.env') });
+process.env.NODE_ENV = 'test';
+
 import RequestError from '../util/error';
 import isAuth from '../middleware/auth';
 import isActivated from '../middleware/activated';
@@ -16,10 +19,7 @@ describe('Auth Tests', () => {
     const testUsername = 'test_username';
     const testEmail = 'test_email@test.com';
 
-    process.env.NODE_ENV = 'test';
-
     before(function () {
-        dotenv.config({ path: path.join(__dirname, '..', '..', '.env') });
         app.use(express.json());
 
         app.get('/ping', isAuth, authController.ping);
@@ -169,7 +169,7 @@ describe('Auth Tests', () => {
             });
     });
 
-    it('should throw an error on an unauthorized ping', async function () {
+    it('should throw an error on an unauthorized ping', function () {
         return request(app)
             .post('/signup')
             .send({ firstName: 'test_first', lastName: 'test_last', username: testUsername, email: testEmail, password: 'asdf' })
