@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import { validationResult } from 'express-validator';
@@ -104,6 +104,7 @@ export const signUp = async (req: Request, res: Response, next: NextFunction) =>
             return next(RequestError.withMessageAndCode('This email account is taken.', 409));
         }
     } catch (error) {
+        console.error(error);
         return next(RequestError.withMessageAndCode('Something went wrong creating your account.', 500));
     }
 
