@@ -8,8 +8,6 @@ services:
       - data:/var/lib/postgresql/data
   backend:
     build: ./
-    env_file: 
-      - ./.env
     volumes: 
       - ./src:/app/src:ro
       - storage:/app/uploads

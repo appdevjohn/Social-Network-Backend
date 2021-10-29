@@ -19,9 +19,20 @@ Once the database and environment variables are set up, the app can be run with 
 ### Setting Up with Docker
 This app can be run in docker as long as the required environment variables listed above are set. A port must also be mapped.
 ```
-docker run --env-file -p 8080:8080 social-network-backend
+docker run -p 8080:8080 social-network-backend
 ```
 If you're connecting to the database through a docker network, make sure the PGHOST environment variable is the name of the container running the database.
+
+### Setting Up with Docker Compose
+This API is the core of a three-part system to spin up a social network. If the two other repositories are cloned in addition to this one, you can use Docker Compose to spin them all up properly. Follow the configuration instructions for each on setting up environment variables, then run the following command.Note that each folder on the drive must be named appropriately so the containers can communicate. By default, the container names are `postgres`, `backend`, and `frontend`.
+```
+docker-compose up
+```
+
+- Frontend: https://github.com/appdevjohn/Messenger-Hawk
+- Database: https://github.com/appdevjohn/Social-Network-PostgreSQL-Config
+
+
 
 ## Endpoints
 
@@ -44,7 +55,7 @@ A token must be present in the Authorization header. This endpoint will return w
     }
 }
 ```
-<br><br>
+<br>
 
 **`PUT /auth/login`**<br>
 Gets an Authorization token for the client.<br>
