@@ -24,15 +24,10 @@ docker run -p 8080:8080 social-network-backend
 If you're connecting to the database through a docker network, make sure the PGHOST environment variable is the name of the container running the database.
 
 ### Setting Up with Docker Compose
-This API is the core of a three-part system to spin up a social network. If the two other repositories are cloned in addition to this one, you can use Docker Compose to spin them all up properly. Follow the configuration instructions for each on setting up environment variables, then run the following command.Note that each folder on the drive must be named appropriately so the containers can communicate. By default, the container names are `postgres`, `backend`, and `frontend`.
+This API is the core of a three-part system to spin up a social network. If the [frontend](https://github.com/appdevjohn/Messenger-Hawk) and [database](https://github.com/appdevjohn/Social-Network-PostgreSQL-Config) repositories are cloned in addition to this one, you can use Docker Compose to spin them all up properly. Follow the configuration instructions for each on setting up environment variables, then run the following command.Note that each folder on the drive must be named appropriately so the containers can communicate. By default, the container names are `postgres`, `backend`, and `frontend`.
 ```
 docker-compose up
 ```
-
-- Frontend: https://github.com/appdevjohn/Messenger-Hawk
-- Database: https://github.com/appdevjohn/Social-Network-PostgreSQL-Config
-
-
 
 ## Endpoints
 
