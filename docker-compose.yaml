@@ -1,0 +1,32 @@
+version: '3.8'
+services: 
+  postgres:
+    build: ../postgresql-config
+    env_file: 
+      - ../postgresql-config/.env
+    volumes: 
+      - data:/var/lib/postgresql/data
+  backend:
+    build: ./
+    env_file: 
+      - ./.env
+    volumes: 
+      - ./src:/app/src:ro
+      - storage:/app/uploads
+    ports: 
+      - '8080:8080'
+    depends_on: 
+      - postgres
+  frontend:
+    build: ../frontend
+    ports: 
+      - '3000:3000'
+    volumes:
+      - ../frontend/src:/app/src:ro
+    stdin_open: true
+    tty: true
+    depends_on:
+      - backend
+volumes: 
+  data:
+  storage:
