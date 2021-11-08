@@ -21,6 +21,7 @@ export interface GroupConfigType {
     createdAt?: Date,
     updatedAt?: Date,
     name: string,
+    description: string,
     approved?: boolean,
     admin?: boolean,
     id?: string
@@ -30,6 +31,7 @@ class Group {
     createdAt?: Date;
     updatedAt?: Date;
     name: string;
+    description: string;
     approved?: boolean;
     admin?: boolean;
     id?: string;
@@ -38,6 +40,7 @@ class Group {
         this.createdAt = config.createdAt;
         this.updatedAt = config.updatedAt;
         this.name = config.name;
+        this.description = config.description;
         this.id = config.id;
 
         if (config.approved) {
@@ -50,7 +53,8 @@ class Group {
 
     create(): Promise<void> {
         const newGroup: GroupType = {
-            name: this.name
+            name: this.name,
+            description: this.description
         }
 
         return createGroup(newGroup).then(result => {
@@ -63,7 +67,8 @@ class Group {
     update(): Promise<void> {
         if (this.id) {
             const updatedGroup: GroupType = {
-                name: this.name
+                name: this.name,
+                description: this.description
             }
 
             return updateGroup(this.id, updatedGroup).then(result => {
@@ -208,7 +213,10 @@ class Group {
         return getGroup(groupId).then(result => {
             if (result.rowCount > 0) {
                 return new Group({
+                    createdAt: result.rows[0]['created_at'],
+                    updatedAt: result.rows[0]['updated_at'],
                     name: result.rows[0]['name'],
+                    description: result.rows[0]['description'],
                     id: result.rows[0]['group_id']
                 });
             } else {
@@ -224,6 +232,7 @@ class Group {
                     createdAt: result.rows[0]['created_at'],
                     updatedAt: result.rows[0]['updated_at'],
                     name: result.rows[0]['name'],
+                    description: result.rows[0]['description'],
                     id: result.rows[0]['group_id']
                 });
             } else {
@@ -240,6 +249,7 @@ class Group {
                     createdAt: row['created_at'],
                     updatedAt: row['updated_at'],
                     name: row['name'],
+                    description: row['description'],
                     approved: row['approved'],
                     admin: row['admin_status'],
                     id: row['group_id']

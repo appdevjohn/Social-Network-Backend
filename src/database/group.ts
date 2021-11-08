@@ -3,6 +3,7 @@ import query from './index';
 
 export interface GroupType {
     name?: string;
+    description?: string;
 }
 
 export const getGroup = (groupId: string): Promise<QueryResult> => {
@@ -18,7 +19,7 @@ export const getGroupsByUserId = (userId: string): Promise<QueryResult> => {
 }
 
 export const createGroup = (newGroup: GroupType): Promise<QueryResult> => {
-    return query('INSERT INTO groups (name) VALUES ($1) RETURNING *', [newGroup.name]);
+    return query('INSERT INTO groups (name, description) VALUES ($1, $2) RETURNING *', [newGroup.name, newGroup.description]);
 }
 
 export const updateGroup = (groupId: string, updatedGroup: GroupType): Promise<QueryResult> => {
@@ -31,6 +32,9 @@ export const updateGroup = (groupId: string, updatedGroup: GroupType): Promise<Q
         switch (key) {
             case 'name':
                 queryString = queryString + ' name = $' + (index + 1)
+                break;
+            case 'description':
+                queryString = queryString + ' description = $' + (index + 1)
                 break;
 
             default:

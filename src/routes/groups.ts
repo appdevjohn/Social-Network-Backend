@@ -35,6 +35,7 @@ router.post(
     isAuth,
     isActivated,
     body('name').isLength({ min: 1 }).withMessage('A group name is required.'),
+    body('description').isLength({ min: 1 }).withMessage('A group description is required.'),
     groupsController.newGroup
 );
 

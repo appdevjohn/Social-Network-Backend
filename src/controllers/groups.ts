@@ -98,9 +98,11 @@ export const newGroup = (req: Request, res: Response, next: NextFunction) => {
     }
 
     const groupName: string = req.body.name.trim();
+    const groupDescription: string = req.body.description.trim();
 
     const group = new Group({
-        name: groupName
+        name: groupName,
+        description: groupDescription
     });
 
     return group.create().then(() => {

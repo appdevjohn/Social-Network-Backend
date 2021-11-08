@@ -67,7 +67,8 @@ describe('Groups Tests', () => {
 
     it('should be able to validate a valid group name', function () {
         const testGroup = new Group({
-            name: 'test-group'
+            name: 'test-group',
+            description: 'test-group-description'
         });
 
         return testGroup.create().then(() => {
@@ -85,7 +86,8 @@ describe('Groups Tests', () => {
 
     it('should be able to validate an invalid group name', function () {
         const testGroup = new Group({
-            name: 'test-group'
+            name: 'test-group',
+            description: 'test-group-description'
         });
 
         return testGroup.create().then(() => {
@@ -109,7 +111,8 @@ describe('Groups Tests', () => {
 
     it('should be able to get a specific group', function () {
         const testGroup = new Group({
-            name: 'test-group'
+            name: 'test-group',
+            description: 'test-group-description'
         });
 
         return testGroup.create().then(() => {
@@ -128,7 +131,7 @@ describe('Groups Tests', () => {
     it('should be able to create a new group', function () {
         return request(app)
             .post('/new')
-            .send({ name: 'Create Group' })
+            .send({ name: 'Create Group', description: 'Description of the created group.' })
             .expect(201)
             .then(res => {
                 const groupId = res.body.group.id;
@@ -140,7 +143,8 @@ describe('Groups Tests', () => {
 
     it('should be able to edit an existing group', function () {
         const testGroup = new Group({
-            name: 'To Be Updated'
+            name: 'To Be Updated',
+            description: 'to-be-updated-description'
         });
 
         return testGroup.create().then(() => {
@@ -159,7 +163,8 @@ describe('Groups Tests', () => {
 
     it('should be able to delete an existing group', function () {
         const testGroup = new Group({
-            name: 'To Be Deleted'
+            name: 'To Be Deleted',
+            description: 'to-be-deleted-description'
         });
 
         return testGroup.create().then(() => {
@@ -191,7 +196,7 @@ describe('Groups Tests', () => {
 
         const createGroupResponse = await request(app)
             .post('/new')
-            .send({ name: 'Add User to this Group' })
+            .send({ name: 'Add User to this Group', description: 'Adding user to this group.' })
             .expect(201);
 
         const groupId = createGroupResponse.body.group.id;
@@ -221,7 +226,7 @@ describe('Groups Tests', () => {
 
         const createGroupResponse = await request(app)
             .post('/new')
-            .send({ name: 'Add User to this Group' })
+            .send({ name: 'Add User to this Group', description: 'Removing user from this group.' })
             .expect(201);
 
         const groupId = createGroupResponse.body.group.id;
@@ -256,7 +261,7 @@ describe('Groups Tests', () => {
 
         const createGroupResponse = await request(app)
             .post('/new')
-            .send({ name: 'Add User to this Group' })
+            .send({ name: 'Add User to this Group', description: 'Adding user to this group.' })
             .expect(201);
 
         const groupId = createGroupResponse.body.group.id;
@@ -296,7 +301,7 @@ describe('Groups Tests', () => {
 
         const createGroupResponse = await request(app)
             .post('/new')
-            .send({ name: 'View Requests of this Group' })
+            .send({ name: 'View Requests of this Group', description: 'Will view requests of this group.' })
             .expect(201);
 
         const groupId = createGroupResponse.body.group.id;
@@ -351,7 +356,7 @@ describe('Groups Tests', () => {
 
         const createGroupResponse = await request(app)
             .post('/new')
-            .send({ name: 'View Requests of this Group' })
+            .send({ name: 'View Requests of this Group', description: 'Will view requests of this group.' })
             .expect(201);
 
         const groupId = createGroupResponse.body.group.id;
@@ -387,7 +392,7 @@ describe('Groups Tests', () => {
 
         const createGroupResponse = await request(app)
             .post('/new')
-            .send({ name: 'View Admins of this Group' })
+            .send({ name: 'View Admins of this Group', description: 'Will view admins of this group.' })
             .expect(201);
 
         const groupId = createGroupResponse.body.group.id;

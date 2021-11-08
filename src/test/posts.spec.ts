@@ -66,7 +66,8 @@ describe('Posts Tests', () => {
 
     it('should be able to retrieve posts from a group', function () {
         const testGroup = new Group({
-            name: 'Test Group'
+            name: 'Test Group',
+            description: 'test-group-description'
         });
 
         return testGroup.create().then(() => {
@@ -114,7 +115,8 @@ describe('Posts Tests', () => {
 
     it('should be able to retrieve a single post', function () {
         const testGroup = new Group({
-            name: 'Test Group'
+            name: 'Test Group',
+            description: 'test-group-description'
         });
 
         let testPost: Post;
@@ -148,7 +150,8 @@ describe('Posts Tests', () => {
 
     it('should be able to create a new post', function () {
         const testGroup = new Group({
-            name: 'Test Group'
+            name: 'Test Group',
+            description: 'test-group-description'
         });
 
         return testGroup.create().then(() => {
@@ -172,7 +175,8 @@ describe('Posts Tests', () => {
 
     it('should be able to update an existing post', function () {
         const testGroup = new Group({
-            name: 'Test Group'
+            name: 'Test Group',
+            description: 'test-group-description'
         });
 
         let testPost: Post;
@@ -209,7 +213,8 @@ describe('Posts Tests', () => {
 
     it('should be able to delete a post', function () {
         const testGroup = new Group({
-            name: 'Test Group'
+            name: 'Test Group',
+            description: 'test-group-description'
         });
 
         let testPost: Post;
@@ -242,7 +247,8 @@ describe('Posts Tests', () => {
 
     it('should be able to retrieve the messages of a post', function () {
         const testGroup = new Group({
-            name: 'Test Group'
+            name: 'Test Group',
+            description: 'test-group-description'
         });
 
         let currentUser: User;
@@ -293,7 +299,8 @@ describe('Posts Tests', () => {
 
     it('should be able to comment on a post', function () {
         const testGroup = new Group({
-            name: 'Test Group'
+            name: 'Test Group',
+            description: 'test-group-description'
         });
 
         let currentUser: User;
@@ -330,7 +337,8 @@ describe('Posts Tests', () => {
 
     it('should be able to delete a comment from a post', function () {
         const testGroup = new Group({
-            name: 'Test Group'
+            name: 'Test Group',
+            description: 'test-group-description'
         });
 
         let currentUser: User;
