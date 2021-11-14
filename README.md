@@ -297,6 +297,7 @@ Creates a new group.<br>
 |Field|Location|Required|Description|
 |---|---|---|---|
 |name|body|true|The name of the group. Must be unique.|
+|description|body|true|A group description.|
 ```
 {
     group: {
@@ -324,7 +325,8 @@ Edits the details of a group.<br>
 |Field|Location|Required|Description|
 |---|---|---|---|
 |id|body|true|The ID of the group to modify.|
-|name|body|true|The updated name of the group. Must be unique.|
+|name|body|false|The updated name of the group. Must be unique.|
+|description|body|false|The updated description of the group.|
 ```
 {
     group: {

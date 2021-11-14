@@ -142,12 +142,18 @@ export const editGroup = (req: Request, res: Response, next: NextFunction) => {
     }
 
     const groupId: string = req.body.id;
-    const groupName: string = req.body.name.trim();
+    const groupName: string | null = req.body.name ? req.body.name.trim() : null;
+    const groupDescription: string | null = req.body.description ? req.body.description.trim() : null;
 
     let updatedGroup: Group;
     return Group.findById(groupId).then(group => {
         updatedGroup = group;
-        updatedGroup.name = groupName;
+        if (groupName && groupName.length > 0) {
+            updatedGroup.name = groupName;
+        }
+        if (groupDescription && groupDescription.length > 0) {
+            updatedGroup.description = groupDescription;
+        }
         return updatedGroup.update();
 
     }).then(() => {
