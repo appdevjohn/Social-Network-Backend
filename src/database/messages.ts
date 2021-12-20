@@ -28,9 +28,9 @@ export const getMessagesFromConversation = (convoId: string, limit?: number, off
 
 export const getMessagesFromPost = (postId: string, limit?: number, offset: number = 0): Promise<QueryResult> => {
     if (limit) {
-        return query('SELECT * FROM messages WHERE post_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3;', [postId, `${limit}`, `${offset}`]);
+        return query('SELECT messages.*, users.first_name, users.last_name, users.email, users.username, users.profile_pic_url FROM messages FULL JOIN users USING (user_id) WHERE post_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3;', [postId, `${limit}`, `${offset}`]);
     } else {
-        return query('SELECT * FROM messages WHERE post_id = $1 ORDER BY created_at DESC OFFSET $2;', [postId, `${offset}`]);
+        return query('SELECT messages.*, users.first_name, users.last_name, users.email, users.username, users.profile_pic_url FROM messages FULL JOIN users USING (user_id) WHERE post_id = $1 ORDER BY created_at DESC OFFSET $2;', [postId, `${offset}`]);
     }
 }
 
