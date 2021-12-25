@@ -29,6 +29,28 @@ export const validateGroupName = (req: Request, res: Response, next: NextFunctio
     });
 }
 
+export const getGroupWithNameLike = (req: Request, res: Response, next: NextFunction) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({
+            message: errors.array()[0].msg,
+            errors: errors.array()
+        });
+    }
+
+    const groupSearch: string = req.params.groupName;
+
+    Group.findByNameLike(groupSearch, 20).then(groups => {
+        return res.status(200).json({
+            groups: groups
+        });
+
+    }).catch(error => {
+        console.error(error);
+        return next(RequestError.withMessageAndCode('Could not search the database for groups with this name.', 500));
+    })
+}
+
 export const getGroups = async (req: Request, res: Response, next: NextFunction) => {
     let groups: Group[];
 

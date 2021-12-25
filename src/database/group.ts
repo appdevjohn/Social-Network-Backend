@@ -18,6 +18,11 @@ export const getGroupsByUserId = (userId: string): Promise<QueryResult> => {
     return query('SELECT DISTINCT groups.* FROM users FULL JOIN users_groups USING (user_id) FULL JOIN groups USING (group_id) WHERE users.user_id = $1;', [userId]);
 }
 
+export const getGroupsByNameLike = (name: string, limit: number = 20): Promise<QueryResult> => {
+    const nameLike = `%${name.toLowerCase()}%`;
+    return query('SELECT * FROM groups WHERE LOWER(name) LIKE $1 LIMIT $2;', [nameLike, `${limit}`]);
+}
+
 export const createGroup = (newGroup: GroupType): Promise<QueryResult> => {
     return query('INSERT INTO groups (name, description) VALUES ($1, $2) RETURNING *', [newGroup.name, newGroup.description]);
 }

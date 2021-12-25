@@ -16,6 +16,14 @@ router.get(
 );
 
 router.get(
+    '/search/:groupName',
+    isAuth,
+    isActivated,
+    param('groupName').isLength({ min: 3 }).withMessage('A search query with at least three characters is required.'),
+    groupsController.getGroupWithNameLike
+);
+
+router.get(
     '/',
     isAuth,
     isActivated,

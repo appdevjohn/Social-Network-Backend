@@ -12,7 +12,8 @@ import {
     approveUserInGroup,
     getUsersRequestingApproval,
     setAdminStatus,
-    getAdminsInGroup
+    getAdminsInGroup,
+    getGroupsByNameLike
 } from '../database/group';
 import { deletePostsFromGroup } from '../database/posts';
 import User from './user';
@@ -238,6 +239,20 @@ class Group {
             } else {
                 throw new Error('Could not find this grouop.');
             }
+        });
+    }
+
+    static findByNameLike = (name: string, limit?: number): Promise<Group[]> => {
+        return getGroupsByNameLike(name, limit).then(result => {
+            return result.rows.map(r => {
+                return new Group({
+                    createdAt: r['created_at'],
+                    updatedAt: r['updated_at'],
+                    name: r['name'],
+                    description: r['description'],
+                    id: r['group_id']
+                });
+            });
         });
     }
 
