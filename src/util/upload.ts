@@ -28,7 +28,7 @@ const upload = multer({ storage: storage, fileFilter: fileFilter });
 
 export const getUploadURL = (filename: string | null | undefined): string | null => {
     if (filename) {
-        return 'http://localhost:8080/uploads/' + filename;
+        return (process.env.SERVICE_DOMAIN_NAME ? `${process.env.SERVICE_DOMAIN_NAME}/uploads/` : 'http://localhost:8080/uploads/') + filename;
     } else {
         return null;
     }

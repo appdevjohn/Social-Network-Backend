@@ -100,6 +100,7 @@ export const getGroup = async (req: Request, res: Response, next: NextFunction) 
                     lastName: member.lastName,
                     username: member.username,
                     email: member.email,
+                    admin: member.admin,
                     profilePicURL: getUploadURL(member.profilePicURL)
                 }
             })

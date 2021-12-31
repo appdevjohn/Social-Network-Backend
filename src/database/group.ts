@@ -84,5 +84,5 @@ export const getAdminsInGroup = (groupId: string) => {
 }
 
 export const getUsersInGroup = (groupId: string): Promise<QueryResult> => {
-    return query('SELECT users.* FROM users_groups RIGHT JOIN users USING (user_id) WHERE group_id = $1 AND approved = true;', [groupId]);
+    return query('SELECT users.*, users_groups.admin_status FROM users_groups RIGHT JOIN users USING (user_id) WHERE group_id = $1 AND approved = true;', [groupId]);
 }

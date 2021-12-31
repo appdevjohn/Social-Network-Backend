@@ -32,6 +32,8 @@ export interface UserConfigType {
     activateTokenTimestamp?: Date | null;
     resetPasswordToken?: string | null;
     resetPasswordTokenTimestamp?: Date | null;
+    approved?: boolean,
+    admin?: boolean,
     socketId?: string | null;
     id?: string;
 }
@@ -55,6 +57,8 @@ class User {
     activateTokenTimestamp: Date;
     resetPasswordToken?: string | null;
     resetPasswordTokenTimestamp: Date;
+    approved?: boolean;
+    admin?: boolean;
     socketId?: string | null;
     id?: string;
 
@@ -74,6 +78,13 @@ class User {
         this.resetPasswordTokenTimestamp = config.resetPasswordTokenTimestamp || new Date();
         this.socketId = config.socketId;
         this.id = config.id;
+
+        if (config.approved !== undefined) {
+            this.approved = config.approved;
+        }
+        if (config.admin !== undefined) {
+            this.admin = config.admin;
+        }
     }
 
     /**
@@ -259,7 +270,7 @@ class User {
     }
 
     sendPasswordResetEmail = (): Promise<AxiosResponse<any>> => {
-        const rootDomain = process.env.SERVICE_DOMAIN_NAME ? process.env.SERVICE_DOMAIN_NAME : 'http://localhost:3000';
+        const rootDomain = process.env.APP_DOMAIN_NAME ? process.env.APP_DOMAIN_NAME : 'http://localhost:3000';
         const url = rootDomain + '/auth/reset-password/' + this.resetPasswordToken;
 
         return sendEmail(
@@ -359,6 +370,8 @@ class User {
             activateTokenTimestamp: row['activate_token_timestamp'],
             resetPasswordToken: row['reset_password_token'],
             resetPasswordTokenTimestamp: row['reset_password_token_timestamp'],
+            approved: row['approved'],
+            admin: row['admin_status'],
             socketId: row['socket_id'],
             id: row['user_id']
         });

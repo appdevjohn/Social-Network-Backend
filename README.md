@@ -12,7 +12,7 @@ PGPORT=5432
 TOKEN_SECRET=somesecret
 
 SENDGRID_API_KEY=sendgridapikey                         # Optional - For sending emails with SendGrid
-SERVICE_DOMAIN_NAME=https://www.this-service-url.com    # Optional - For generating links to the web app.
+APP_DOMAIN_NAME=https://www.this-service-url.com    # Optional - For generating links to the web app.
 ```
 Once the database and environment variables are set up, the app can be run with `npm run dev`. A production build can be generated with `npm run build`, then it can be run with `npm start`. After setting everything up, it is recommended to run `npm test` to ensure everything is working.
 
