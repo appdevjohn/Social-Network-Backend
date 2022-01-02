@@ -285,6 +285,7 @@ Returns details about the group and the members in the group.<br>
             lastName: 'Champion',
             username: 'appdevjohn',
             email: 'john@bison.software',
+            admin: false,
             profilePicURL: 'http://localhost:8080/uploads/image.png'
         }
     ]
@@ -313,6 +314,7 @@ Creates a new group.<br>
             lastName: 'Champion',
             username: 'appdevjohn',
             email: 'john@bison.software',
+            admin: false,
             profilePicURL: 'http://localhost:8080/uploads/image.png'
         }
     ]
@@ -342,6 +344,7 @@ Edits the details of a group.<br>
             lastName: 'Champion',
             username: 'appdevjohn',
             email: 'john@bison.software',
+            admin: false,
             profilePicURL: 'http://localhost:8080/uploads/image.png'
         }
     ]
@@ -375,6 +378,8 @@ Adds a user to a group. Users can either be added pre-approved or in a pending-a
 |approved|body|true|Boolean value representing whether this user is approved immediately. If false, they will have to be approved by an admin.|
 ```
 {
+    joined: true,
+    admin: false,
     group: {
         id: '1234',
         name: 'Nintendo Gamers',
@@ -393,6 +398,7 @@ Removes a user from a group. If user was pending approval to join the group, tha
 |userId|body|true|The ID of the user which to remove from the group.|
 ```
 {
+    removed: true,
     group: {
         id: '1234',
         name: 'Nintendo Gamers',
@@ -516,6 +522,7 @@ Returns the complete list of members in a group.<br>
             lastName: 'Champion',
             username: 'appdevjohn',
             email: 'john@bison.software',
+            admin: false,
             profilePicURL: 'http://localhost:8080/uploads/image.png'
         }
     ]

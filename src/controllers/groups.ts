@@ -144,6 +144,7 @@ export const newGroup = (req: Request, res: Response, next: NextFunction) => {
                     lastName: member.lastName,
                     username: member.username,
                     email: member.email,
+                    admin: member.admin,
                     profilePicURL: getUploadURL(member.profilePicURL)
                 }
             })
@@ -190,6 +191,7 @@ export const editGroup = (req: Request, res: Response, next: NextFunction) => {
                         lastName: member.lastName,
                         username: member.username,
                         email: member.email,
+                        admin: member.admin,
                         profilePicURL: getUploadURL(member.profilePicURL)
                     }
                 })
@@ -248,6 +250,8 @@ export const addUserToGroup = async (req: Request, res: Response, next: NextFunc
         await group.addUser(userId, approved, false);
 
         return res.status(201).json({
+            joined: approved,
+            admin: false,
             group: group
         });
 
@@ -274,6 +278,7 @@ export const removeUserFromGroup = async (req: Request, res: Response, next: Nex
         await group.removeUser(userId)
 
         return res.status(200).json({
+            removed: true,
             group: group,
             userId: userId
         });
@@ -432,6 +437,7 @@ export const getMembersInGroup = async (req: Request, res: Response, next: NextF
                     lastName: user.lastName,
                     username: user.username,
                     email: user.email,
+                    admin: user.admin,
                     profilePicURL: getUploadURL(user.profilePicURL)
                 }
             })
