@@ -15,7 +15,7 @@ export const getGroupByName = (name: string): Promise<QueryResult> => {
 }
 
 export const getGroupsByUserId = (userId: string): Promise<QueryResult> => {
-    return query('SELECT DISTINCT groups.* FROM users FULL JOIN users_groups USING (user_id) FULL JOIN groups USING (group_id) WHERE users.user_id = $1;', [userId]);
+    return query('SELECT DISTINCT groups.*, users_groups.admin_status, users_groups.approved FROM users FULL JOIN users_groups USING (user_id) FULL JOIN groups USING (group_id) WHERE users.user_id = $1;', [userId]);
 }
 
 export const getGroupsByNameLike = (name: string, limit: number = 20): Promise<QueryResult> => {
@@ -84,5 +84,9 @@ export const getAdminsInGroup = (groupId: string) => {
 }
 
 export const getUsersInGroup = (groupId: string): Promise<QueryResult> => {
-    return query('SELECT users.*, users_groups.admin_status FROM users_groups RIGHT JOIN users USING (user_id) WHERE group_id = $1 AND approved = true;', [groupId]);
+    return query('SELECT users.*, users_groups.admin_status, users_groups.approved FROM users_groups RIGHT JOIN users USING (user_id) WHERE group_id = $1 AND approved = true;', [groupId]);
+}
+
+export const getAdminCountForGroup = (groupId: string) => {
+    return query('SELECT COUNT(*) FROM users_groups WHERE group_id = $1 AND admin_status = true;', [groupId]);
 }

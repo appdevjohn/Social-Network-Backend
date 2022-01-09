@@ -13,7 +13,8 @@ import {
     getUsersRequestingApproval,
     setAdminStatus,
     getAdminsInGroup,
-    getGroupsByNameLike
+    getGroupsByNameLike,
+    getAdminCountForGroup
 } from '../database/group';
 import { deletePostsFromGroup } from '../database/posts';
 import User from './user';
@@ -162,7 +163,16 @@ class Group {
             throw new Error('This group must be created in the database admins can be set.');
         }
 
-        return setAdminStatus(userId, this.id, adminStatus).then(adminStatusResult => {
+        return getAdminCountForGroup(this.id).then(groupCountResult => {
+            const adminCount = groupCountResult.rows[0]['count'];
+
+            if (adminCount <= 1 && !adminStatus) {
+                throw new Error('There must be at least one admin of this group.');
+            } else {
+                return setAdminStatus(userId, this.id!, adminStatus);
+            }
+
+        }).then(adminStatusResult => {
             if (adminStatusResult.rowCount > 0) {
                 return;
             } else {

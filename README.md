@@ -266,7 +266,7 @@ Returns all of the groups the user is currently involved in.<br>
 <br>
 
 **`GET /groups/:groupId`**<br>
-Returns details about the group and the members in the group.<br>
+Returns details about the group, the members in the group, and the users requesting to join.<br>
 |Field|Location|Required|Description|
 |---|---|---|---|
 |groupId|param|true|The ID of the group.|
@@ -285,8 +285,19 @@ Returns details about the group and the members in the group.<br>
             lastName: 'Champion',
             username: 'appdevjohn',
             email: 'john@bison.software',
-            admin: false,
+            admin: true,
             profilePicURL: 'http://localhost:8080/uploads/image.png'
+        }
+    ],
+    requests: [
+        {
+            id: '5678',
+            firstName: 'James',
+            lastName: 'Hamil',
+            username: 'jameshamil',
+            email: 'james@bison.software',
+            admin: false,
+            profilePicURL: 'http://localhost:8080/uploads/image2.png'
         }
     ]
 }
@@ -378,11 +389,11 @@ Adds a user to a group. Users can either be added pre-approved or in a pending-a
 |approved|body|true|Boolean value representing whether this user is approved immediately. If false, they will have to be approved by an admin.|
 ```
 {
-    joined: true,
-    admin: false,
     group: {
         id: '1234',
         name: 'Nintendo Gamers',
+        approved: true,
+        admin: false,
         createdAt: '2021-06-10T18:16:50.085Z',
         updatedAt: '2021-06-10T18:16:50.085Z'
     }
@@ -430,7 +441,7 @@ Removes a user from a group. If user was pending approval to join the group, tha
 <br>
 
 **`PUT /groups/:groupId/set-admin`**<br>
-Sets the admin status of a user within a group to true or false.<br>
+Sets the admin status of a user within a group to true or false. There must always be at least one admin user in a group.<br>
 |Field|Location|Required|Description|
 |---|---|---|---|
 |groupId|param|true|The ID of the group which to add the user.|
@@ -443,7 +454,9 @@ Sets the admin status of a user within a group to true or false.<br>
         name: 'Nintendo Gamers',
         createdAt: '2021-06-10T18:16:50.085Z',
         updatedAt: '2021-06-10T18:16:50.085Z'
-    }
+    },
+    userId: '1234',
+    admin: true
 }
 ```
 <br>

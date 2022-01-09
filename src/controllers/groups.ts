@@ -48,7 +48,7 @@ export const getGroupWithNameLike = (req: Request, res: Response, next: NextFunc
     }).catch(error => {
         console.error(error);
         return next(RequestError.withMessageAndCode('Could not search the database for groups with this name.', 500));
-    })
+    });
 }
 
 export const getGroups = async (req: Request, res: Response, next: NextFunction) => {
@@ -90,6 +90,7 @@ export const getGroup = async (req: Request, res: Response, next: NextFunction) 
         }
 
         const members = await group.members();
+        const requests = await group.requests();
 
         return res.status(200).json({
             group: group,
@@ -102,6 +103,16 @@ export const getGroup = async (req: Request, res: Response, next: NextFunction) 
                     email: member.email,
                     admin: member.admin,
                     profilePicURL: getUploadURL(member.profilePicURL)
+                }
+            }),
+            requests: requests.map(user => {
+                return {
+                    id: user.id,
+                    firstName: user.firstName,
+                    lastName: user.lastName,
+                    username: user.username,
+                    email: user.email,
+                    profilePicURL: getUploadURL(user.profilePicURL)
                 }
             })
         });
@@ -152,7 +163,7 @@ export const newGroup = (req: Request, res: Response, next: NextFunction) => {
 
     }).catch(error => {
         console.error(error);
-        return next(RequestError.withMessageAndCode('Could not create group', 500));
+        return next(RequestError.withMessageAndCode('Could not create group.', 500));
     })
 }
 
@@ -243,16 +254,18 @@ export const addUserToGroup = async (req: Request, res: Response, next: NextFunc
 
     const groupId: string = req.params.groupId;
     const userId: string = req.body.userId;
-    const approved: boolean = req.body.approved;
+    // const approved: boolean = req.body.approved;
 
     try {
         const group = await Group.findById(groupId);
-        await group.addUser(userId, approved, false);
+        await group.addUser(userId, false, false);
 
         return res.status(201).json({
-            joined: approved,
-            admin: false,
-            group: group
+            group: {
+                ...group,
+                admin: false,
+                approved: false
+            }
         });
 
     } catch (error) {
@@ -334,12 +347,13 @@ export const setAdminStatusOfMember = async (req: Request, res: Response, next: 
         await group.setAdmin(userId, adminStatus);
 
         return res.status(200).json({
-            group: group
+            group: group,
+            userId: userId,
+            admin: adminStatus
         });
 
     } catch (error) {
-        console.error(error);
-        return next(RequestError.withMessageAndCode('Something went wrong making this user an admin.', 500));
+        return next(RequestError.withMessageAndCode((error as Error).message, 500));
     }
 }
 
