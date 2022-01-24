@@ -90,3 +90,11 @@ export const getUsersInGroup = (groupId: string): Promise<QueryResult> => {
 export const getAdminCountForGroup = (groupId: string) => {
     return query('SELECT COUNT(*) FROM users_groups WHERE group_id = $1 AND admin_status = true;', [groupId]);
 }
+
+export const getAdminStatusOfUserForGroup = (groupId: string, userId: string) => {
+    return query('SELECT COUNT(*) FROM users_groups WHERE group_id = $1 AND user_id = $2 AND admin_status = true;', [groupId, userId]);
+}
+
+export const getMemberStatusOfUserForGroup = (groupId: string, userId: string) => {
+    return query('SELECT COUNT(*) FROM users_groups WHERE group_id = $1 AND user_id = $2;', [groupId, userId]);
+}

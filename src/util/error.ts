@@ -24,6 +24,18 @@ class RequestError extends Error {
         error.code = 401;
         return error;
     }
+
+    static notGroupAdmin = () => {
+        const error = new RequestError('This account is not an admin of this group.');
+        error.code = 401;
+        return error;
+    }
+
+    static notGroupMember = () => {
+        const error = new RequestError('This account is not a member of this group.');
+        error.code = 401;
+        return error;
+    }
 }
 
 export default RequestError;

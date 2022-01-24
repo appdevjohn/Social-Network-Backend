@@ -10,11 +10,11 @@ export interface PostType {
 }
 
 export const getPost = (postId: string): Promise<QueryResult> => {
-    return query('SELECT * FROM posts FULL JOIN users USING (user_id) WHERE posts.post_id = $1;', [postId]);
+    return query('SELECT posts.*, users.first_name, users.last_name, users.username, users.email, users.profile_pic_url FROM posts FULL JOIN users USING (user_id) WHERE posts.post_id = $1;', [postId]);
 }
 
 export const getPostsFromGroup = (groupId: string): Promise<QueryResult> => {
-    return query('SELECT * FROM posts FULL JOIN users USING (user_id) WHERE posts.group_id = $1;', [groupId]);
+    return query('SELECT posts.*, users.first_name, users.last_name, users.username, users.email, users.profile_pic_url FROM posts FULL JOIN users USING (user_id) WHERE posts.group_id = $1;', [groupId]);
 }
 
 export const createPost = (newPost: PostType): Promise<QueryResult> => {

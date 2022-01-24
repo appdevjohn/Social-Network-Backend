@@ -14,7 +14,9 @@ import {
     setAdminStatus,
     getAdminsInGroup,
     getGroupsByNameLike,
-    getAdminCountForGroup
+    getAdminCountForGroup,
+    getAdminStatusOfUserForGroup,
+    getMemberStatusOfUserForGroup
 } from '../database/group';
 import { deletePostsFromGroup } from '../database/posts';
 import User from './user';
@@ -218,6 +220,28 @@ class Group {
             });
             return users;
         });
+    }
+
+    isUserAdmin = (groupId: string, userId: string): Promise<boolean> => {
+        return Group.isUserAdmin(groupId, userId);
+    }
+
+    isUserMember = (groupId: string, userId: string): Promise<boolean> => {
+        return Group.isUserMember(groupId, userId);
+    }
+
+    static isUserAdmin = (groupId: string, userId: string): Promise<boolean> => {
+        return getAdminStatusOfUserForGroup(groupId, userId).then(result => {
+            const isAdmin = result.rows[0]['count'] > 0;
+            return isAdmin;
+        })
+    }
+
+    static isUserMember = (groupId: string, userId: string): Promise<boolean> => {
+        return getMemberStatusOfUserForGroup(groupId, userId).then(result => {
+            const isMember = result.rows[0]['count'] > 0;
+            return isMember;
+        })
     }
 
     static findById = (groupId: string): Promise<Group> => {
