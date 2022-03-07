@@ -5,6 +5,7 @@ import * as postsController from '../controllers/posts';
 import * as messagesController from '../controllers/messages';
 import isAuth from '../middleware/auth';
 import isActivated from '../middleware/activated';
+import upload from '../util/upload';
 
 const router = Router();
 
@@ -44,10 +45,10 @@ router.put(
 );
 
 router.delete(
-    '/delete',
+    '/:postId',
     isAuth,
     isActivated,
-    body('postId').isLength({ min: 1 }).withMessage('A post ID is required to delete a post.'),
+    param('postId').isLength({ min: 1 }).withMessage('A post ID is required to delete a post.'),
     postsController.deletePost
 );
 
@@ -63,13 +64,13 @@ router.post(
     '/add-message',
     isAuth,
     isActivated,
+    upload.single('attachment'),
     body('postId').isLength({ min: 1 }).withMessage('A post ID for this message must be provided.'),
-    body('content').isLength({ min: 1 }).withMessage('Content for this message must be provided'),
-    body('type').custom(value => {
-        if (value !== 'text' && value !== 'image') {
-            throw new Error('The type of message must be provided. It can be either \'text\' or \'image\'.');
-        } else {
+    body('content').custom((value, { req }) => {
+        if (req.file || value.length > 0) {
             return true;
+        } else {
+            throw new Error('Message must have either text content or an attachment.');
         }
     }),
     messagesController.newMessage

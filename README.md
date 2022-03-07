@@ -275,6 +275,7 @@ Returns details about the group, the members in the group, and the users request
     group: {
         id: '1234',
         name: 'Nintendo Gamers',
+        description: 'Group for Nintendo and gaming enthusiasts.',
         createdAt: '2021-06-10T18:16:50.085Z',
         updatedAt: '2021-06-10T18:16:50.085Z'
     },
@@ -315,6 +316,7 @@ Creates a new group.<br>
     group: {
         id: '1234',
         name: 'Nintendo Gamers',
+        description: 'Group for Nintendo and gaming enthusiasts.',
         createdAt: '2021-06-10T18:16:50.085Z',
         updatedAt: '2021-06-10T18:16:50.085Z'
     },
@@ -345,6 +347,7 @@ Edits the details of a group.<br>
     group: {
         id: '1234',
         name: 'Nintendo Gamers',
+        description: 'Group for Nintendo and gaming enthusiasts.',
         createdAt: '2021-06-10T18:16:50.085Z',
         updatedAt: '2021-06-10T18:16:50.085Z'
     },
@@ -373,6 +376,7 @@ Deletes a group and all of the posts in that group.<br>
     group: {
         id: '1234',
         name: 'Nintendo Gamers',
+        description: 'Group for Nintendo and gaming enthusiasts.',
         createdAt: '2021-06-10T18:16:50.085Z',
         updatedAt: '2021-06-10T18:16:50.085Z'
     }
@@ -413,6 +417,7 @@ Removes a user from a group. If user was pending approval to join the group, tha
     group: {
         id: '1234',
         name: 'Nintendo Gamers',
+        description: 'Group for Nintendo and gaming enthusiasts.',
         createdAt: '2021-06-10T18:16:50.085Z',
         updatedAt: '2021-06-10T18:16:50.085Z'
     },
@@ -452,6 +457,7 @@ Sets the admin status of a user within a group to true or false. There must alwa
     group: {
         id: '1234',
         name: 'Nintendo Gamers',
+        description: 'Group for Nintendo and gaming enthusiasts.',
         createdAt: '2021-06-10T18:16:50.085Z',
         updatedAt: '2021-06-10T18:16:50.085Z'
     },
@@ -471,6 +477,7 @@ Returns the complete list of requests to join a group.<br>
     group: {
         id: '1234',
         name: 'Nintendo Gamers',
+        description: 'Group for Nintendo and gaming enthusiasts.',
         createdAt: '2021-06-10T18:16:50.085Z',
         updatedAt: '2021-06-10T18:16:50.085Z'
     },
@@ -498,6 +505,7 @@ Returns the list of admins in a group.<br>
     group: {
         id: '1234',
         name: 'Nintendo Gamers',
+        description: 'Group for Nintendo and gaming enthusiasts.',
         createdAt: '2021-06-10T18:16:50.085Z',
         updatedAt: '2021-06-10T18:16:50.085Z'
     },
@@ -525,6 +533,7 @@ Returns the complete list of members in a group.<br>
     group: {
         id: '1234',
         name: 'Nintendo Gamers',
+        description: 'Group for Nintendo and gaming enthusiasts.',
         createdAt: '2021-06-10T18:16:50.085Z',
         updatedAt: '2021-06-10T18:16:50.085Z'
     },
@@ -684,11 +693,11 @@ Edits an existing post.<br>
 ```
 <br>
 
-**`DELETE /posts/delete`**<br>
+**`DELETE /posts/:postId`**<br>
 Edits an existing post.<br>
 |Field|Location|Required|Description|
 |---|---|---|---|
-|postId|body|true|The ID of post to be deleted.|
+|postId|param|true|The ID of post to be deleted.|
 ```
 {
     post: {
@@ -747,8 +756,8 @@ Sends a message from within a post.<br>
 |Field|Location|Required|Description|
 |---|---|---|---|
 |postId|body|true|The ID of post where the message should be sent.|
-|content|body|true|The content of the message, be it text or a link to media.|
-|type|body|true|The type of content of the message. Can either be 'text' or 'image'.|
+|content|body|true, if no attachment|The text content of the message.|
+|attachment|file|true, if no text content|The file to be uploaded as the message content.|
 ```
 {
     message: {

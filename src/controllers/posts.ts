@@ -4,13 +4,15 @@ import { validationResult } from 'express-validator';
 import Post from '../models/post';
 import Message from '../models/message';
 import RequestError from '../util/error';
+import { ContentType } from '../database/messages';
+import { getUploadURL } from '../util/upload';
 
 export const getPosts = (req: Request, res: Response, next: NextFunction) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({ 
+        return res.status(400).json({
             message: errors.array()[0].msg,
-            errors: errors.array() 
+            errors: errors.array()
         });
     }
 
@@ -29,9 +31,9 @@ export const getPosts = (req: Request, res: Response, next: NextFunction) => {
 export const getPost = (req: Request, res: Response, next: NextFunction) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({ 
+        return res.status(400).json({
             message: errors.array()[0].msg,
-            errors: errors.array() 
+            errors: errors.array()
         });
     }
 
@@ -39,10 +41,17 @@ export const getPost = (req: Request, res: Response, next: NextFunction) => {
 
     return Post.findById(postId).then(post => {
         return Message.findByPostId(post.id!).then(messages => {
+            messages.forEach(message => {
+                if (message.type !== ContentType.Text) {
+                    message.content = getUploadURL(message.content)!;
+                }
+            });
+
             return res.status(200).json({
                 post: post,
                 messages: messages
             });
+
         });
     }).catch(error => {
         console.error(error);
@@ -53,9 +62,9 @@ export const getPost = (req: Request, res: Response, next: NextFunction) => {
 export const newPost = (req: Request, res: Response, next: NextFunction) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({ 
+        return res.status(400).json({
             message: errors.array()[0].msg,
-            errors: errors.array() 
+            errors: errors.array()
         });
     }
 
@@ -87,23 +96,23 @@ export const newPost = (req: Request, res: Response, next: NextFunction) => {
 export const editPost = (req: Request, res: Response, next: NextFunction) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({ 
+        return res.status(400).json({
             message: errors.array()[0].msg,
-            errors: errors.array() 
+            errors: errors.array()
         });
     }
 
     const postId: string = req.body.postId;
     const newTitle: string = req.body.title;
     const newText: string = req.body.text;
-    
+
     let updatedPost: Post;
     return Post.findById(postId).then(post => {
         updatedPost = post;
         updatedPost.title = newTitle;
         updatedPost.text = newText;
         return updatedPost.update();
-        
+
     }).then(success => {
         if (success) {
             return res.status(200).json({
@@ -121,13 +130,13 @@ export const editPost = (req: Request, res: Response, next: NextFunction) => {
 export const deletePost = (req: Request, res: Response, next: NextFunction) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({ 
+        return res.status(400).json({
             message: errors.array()[0].msg,
-            errors: errors.array() 
+            errors: errors.array()
         });
     }
 
-    const postId: string = req.body.postId;
+    const postId: string = req.params.postId;
 
     let deletedPost: Post;
     return Post.findById(postId).then(post => {
@@ -150,18 +159,25 @@ export const deletePost = (req: Request, res: Response, next: NextFunction) => {
 export const getMessages = (req: Request, res: Response, next: NextFunction) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({ 
+        return res.status(400).json({
             message: errors.array()[0].msg,
-            errors: errors.array() 
+            errors: errors.array()
         });
     }
 
     const postId: string = req.params.postId;
 
     return Message.findByPostId(postId).then(messages => {
+        messages.forEach(message => {
+            if (message.type !== ContentType.Text) {
+                message.content = getUploadURL(message.content)!;
+            }
+        });
+
         return res.status(200).json({
             messages: messages
         });
+
     }).catch(error => {
         console.error(error);
         return next(RequestError.withMessageAndCode('Could not retrieve messages for this post.', 500));
