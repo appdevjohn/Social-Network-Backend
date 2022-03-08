@@ -76,7 +76,7 @@ router.post(
     messagesController.newMessage
 );
 
-router.delete(
+router.post(
     '/delete-message',
     isAuth,
     isActivated,

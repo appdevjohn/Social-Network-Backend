@@ -125,25 +125,29 @@ class Group {
         });
     }
 
-    removeUser(userId: string): Promise<void> {
+    async removeUser(userId: string): Promise<void> {
         if (!this.id) {
             throw new Error('This group must be created in the database before users can be removed.');
         }
 
-        return removeUserFromGroup(userId, this.id).then(result => {
-            if (result.rowCount > 0) {
-                return getUsersInGroup(this.id!).then(usersInGroupResult => {
-                    if (usersInGroupResult.rowCount === 0) {
-                        return this.delete();
-                    } else {
-                        return Promise.resolve();
-                    }
-                });
+        const admins = await this.admins();
+        const memberCount = (await getUsersInGroup(this.id)).rowCount;
+        const isRemovingAdmin = admins.filter(a => a.id === userId).length > 0;
 
+        // An admin cannot remove himself if there is no other admin unless he is the only one in the group.
+        if (isRemovingAdmin && admins.length === 1 && memberCount > 1) {
+            throw new Error('This admin cannot be removed because he or she is the only admin in a group with multiple people.');
+        }
+
+        const removeResult = await removeUserFromGroup(userId, this.id);
+        if (removeResult.rowCount > 0) {
+            const usersInGroupResult = await getUsersInGroup(this.id!);
+            if (usersInGroupResult.rowCount === 0) {
+                return this.delete();
             } else {
-                throw new Error('Something went wrong removing this user from the group.');
+                return Promise.resolve();
             }
-        });
+        }
     }
 
     approveUser(userId: string): Promise<void> {

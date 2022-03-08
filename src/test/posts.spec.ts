@@ -43,10 +43,10 @@ describe('Posts Tests', () => {
         app.get('/:postId', postsController.getPost);
         app.post('/new', postsController.newPost);
         app.put('/edit', postsController.editPost);
-        app.delete('/delete', postsController.deletePost);
+        app.delete('/:postId', postsController.deletePost);
         app.get('/:postId/messages', postsController.getMessages);
         app.post('/add-message', messagesController.newMessage);
-        app.delete('/delete-message', messagesController.deleteMessage);
+        app.post('/delete-message', messagesController.deleteMessage);
 
         app.use((error: RequestError, req: Request, res: Response, next: NextFunction) => {
             console.error(error.message);
@@ -232,8 +232,7 @@ describe('Posts Tests', () => {
 
         }).then(() => {
             return request(app)
-                .delete('/delete')
-                .send({ postId: testPost.id })
+                .delete('/' + testPost.id)
                 .expect(200);
 
         }).then(() => {
@@ -368,7 +367,7 @@ describe('Posts Tests', () => {
 
         }).then(() => {
             return request(app)
-                .delete('/delete-message')
+                .post('/delete-message')
                 .send({ messageId: testComment.id })
                 .expect(200);
 

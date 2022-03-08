@@ -781,7 +781,7 @@ Sends a message from within a post.<br>
 ```
 <br>
 
-**`DELETE /posts/delete-message`**<br>
+**`POST /posts/delete-message`**<br>
 Deletes a message from a post.<br>
 |Field|Location|Required|Description|
 |---|---|---|---|
