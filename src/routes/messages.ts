@@ -1,7 +1,8 @@
-import { Router } from 'express';
+import { Router, Request } from 'express';
 import { body, param } from 'express-validator';
 
 import * as messagesController from '../controllers/messages';
+import User from '../models/user';
 import isAuth from '../middleware/auth';
 import isActivated from '../middleware/activated';
 import upload from '../util/upload';
@@ -54,7 +55,12 @@ router.post(
     isAuth,
     isActivated,
     body('name').isLength({ min: 1 }).withMessage('A name for this conversation is required.'),
-    body('members').isJSON().withMessage('A members array as a JSON string is required, even if it is an empty array.'),
+    body('members').isJSON().withMessage('A members array as a JSON string is required, even if it is an empty array.').customSanitizer(async (value, { req }) => {
+        let members: string[] = JSON.parse(value);
+        members = [...new Set(members)];
+        const user = await User.findById(req.userId);
+        return members.filter(m => m !== user.username);
+    }),
     messagesController.newConversation
 );
 

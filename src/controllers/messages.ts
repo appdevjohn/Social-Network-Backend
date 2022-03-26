@@ -188,7 +188,7 @@ export const newConversation = (req: Request, res: Response, next: NextFunction)
     }
 
     const convoName = req.body.name;
-    const members: string[] = JSON.parse(req.body.members);
+    const members: string[] = req.body.members;
 
     const newConversation = new Conversation({
         name: convoName
