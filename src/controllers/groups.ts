@@ -56,6 +56,7 @@ export const getGroups = async (req: Request, res: Response, next: NextFunction)
 
     try {
         groups = await Group.findByUserId(req.userId!);
+        groups = groups.filter(g => g.approved);
     } catch (error) {
         return next(RequestError.withMessageAndCode('Could not get groups.', 500));
     }
@@ -89,12 +90,15 @@ export const getGroup = async (req: Request, res: Response, next: NextFunction) 
             return next(RequestError.withMessageAndCode('A group id or group name is required to get a group.', 406));
         }
 
-        const members = await group.members();
-        const requests = await group.requests();
-
-        return res.status(200).json({
+        const response: any = {
             group: group,
-            members: members.map(member => {
+        }
+
+        if (req.memberGroupId === groupId) {
+            const members = await group.members();
+            const requests = await group.requests();
+
+            response.members = members.map(member => {
                 return {
                     id: member.id,
                     firstName: member.firstName,
@@ -104,8 +108,9 @@ export const getGroup = async (req: Request, res: Response, next: NextFunction) 
                     admin: member.admin,
                     profilePicURL: getUploadURL(member.profilePicURL)
                 }
-            }),
-            requests: requests.map(user => {
+            });
+
+            response.requests = requests.map(user => {
                 return {
                     id: user.id,
                     firstName: user.firstName,
@@ -114,8 +119,10 @@ export const getGroup = async (req: Request, res: Response, next: NextFunction) 
                     email: user.email,
                     profilePicURL: getUploadURL(user.profilePicURL)
                 }
-            })
-        });
+            });
+        }
+
+        return res.status(200).json(response);
 
     } catch (error) {
         return next(RequestError.withMessageAndCode('Could not get this group.', 500));
@@ -226,7 +233,7 @@ export const deleteGroup = (req: Request, res: Response, next: NextFunction) => 
         });
     }
 
-    const groupId: string = req.body.id;
+    const groupId: string = req.params.groupId;
 
     let deletedGroup: Group;
     return Group.findById(groupId).then(group => {
@@ -254,7 +261,6 @@ export const addUserToGroup = async (req: Request, res: Response, next: NextFunc
 
     const groupId: string = req.params.groupId;
     const userId: string = req.body.userId;
-    // const approved: boolean = req.body.approved;
 
     try {
         const group = await Group.findById(groupId);
@@ -270,7 +276,7 @@ export const addUserToGroup = async (req: Request, res: Response, next: NextFunc
 
     } catch (error) {
         console.error(error);
-        return next(RequestError.withMessageAndCode('Something went wrong adding this user to a group.', 500));
+        return next(RequestError.withMessageAndCode((error as Error).message || 'Something went wrong adding this user to a group.', 400));
     }
 }
 

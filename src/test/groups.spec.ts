@@ -40,7 +40,7 @@ describe('Groups Tests', () => {
         app.get('/:groupId', groupsController.getGroup);
         app.post('/new', groupsController.newGroup);
         app.put('/edit', groupsController.editGroup);
-        app.delete('/delete', groupsController.deleteGroup);
+        app.delete('/delete/:groupId', groupsController.deleteGroup);
         app.post('/:groupId/add-user', groupsController.addUserToGroup);
         app.post('/:groupId/remove-user', groupsController.removeUserFromGroup);
         app.post('/:groupId/requests/:userId/approve', groupsController.approveUserJoinRequest);
@@ -169,8 +169,7 @@ describe('Groups Tests', () => {
 
         return testGroup.create().then(() => {
             return request(app)
-                .delete('/delete')
-                .send({ id: testGroup.id })
+                .delete(`/delete/${testGroup.id}`)
                 .expect(200);
 
         }).then(() => {

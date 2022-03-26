@@ -122,6 +122,12 @@ class Group {
             } else {
                 throw new Error('Something went wrong adding this user to a group.');
             }
+        }).catch(error => {
+            if (error.code == 23505) {
+                throw new Error('User has already joined or requested to join this group.');
+            } else {
+                throw new Error('Something went wrong adding this user to a group.');
+            }
         });
     }
 

@@ -36,6 +36,18 @@ class RequestError extends Error {
         error.code = 401;
         return error;
     }
+
+    static notPostOwner = () => {
+        const error = new RequestError('This account is not the owner of this post.');
+        error.code = 401;
+        return error;
+    }
+
+    static notMessageOwner = () => {
+        const error = new RequestError('This account is not the owner of this message.');
+        error.code = 401;
+        return error;
+    }
 }
 
 export default RequestError;

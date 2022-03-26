@@ -1,9 +1,11 @@
-import { Router } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 import { body, param } from 'express-validator';
 
 import * as groupsController from '../controllers/groups';
 import isAuth from '../middleware/auth';
 import isActivated from '../middleware/activated';
+import isGroupAdmin from '../middleware/groupAdmin';
+import isGroupMember from '../middleware/groupMember';
 
 const router = Router();
 
@@ -34,6 +36,14 @@ router.get(
     '/:groupId',
     isAuth,
     isActivated,
+    async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            await isGroupMember(req.params.groupId, req, res, next);
+            next();
+        } catch {
+            return next();
+        }
+    },
     param('groupId').isLength({ min: 1 }).withMessage('A group ID is required.'),
     groupsController.getGroup
 );
@@ -51,16 +61,32 @@ router.put(
     '/edit',
     isAuth,
     isActivated,
+    async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            await isGroupAdmin(req.body.id, req, res, next);
+            next();
+        } catch (error) {
+            return next(error);
+        }
+    },
     body('id').isLength({ min: 1 }).withMessage('A group ID is required.'),
     body('name').isLength({ min: 1 }).withMessage('A group name is required.'),
     groupsController.editGroup
 );
 
 router.delete(
-    '/delete',
+    '/delete/:groupId',
     isAuth,
     isActivated,
-    body('id').isLength({ min: 1 }).withMessage('A group ID is required.'),
+    async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            await isGroupAdmin(req.params.groupId, req, res, next);
+            next();
+        } catch (error) {
+            return next(error);
+        }
+    },
+    param('groupId').isLength({ min: 1 }).withMessage('A group ID is required.'),
     groupsController.deleteGroup
 );
 
@@ -78,6 +104,16 @@ router.post(
     '/:groupId/remove-user',
     isAuth,
     isActivated,
+    async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            if (req.userId !== req.body.userId) {
+                await isGroupAdmin(req.params.groupId, req, res, next);
+            }
+            next();
+        } catch (error) {
+            return next(error);
+        }
+    },
     param('groupId').isLength({ min: 1 }).withMessage('A group ID is required.'),
     body('userId').isLength({ min: 1 }).withMessage('A user ID is required.'),
     groupsController.removeUserFromGroup
@@ -87,6 +123,14 @@ router.put(
     '/:groupId/requests/:userId/approve',
     isAuth,
     isActivated,
+    async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            await isGroupAdmin(req.params.groupId, req, res, next);
+            next();
+        } catch (error) {
+            return next(error);
+        }
+    },
     param('groupId').isLength({ min: 1 }).withMessage('A group ID is required.'),
     param('userId').isLength({ min: 1 }).withMessage('A user ID is required.'),
     groupsController.approveUserJoinRequest
@@ -96,6 +140,14 @@ router.put(
     '/:groupId/set-admin',
     isAuth,
     isActivated,
+    async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            await isGroupAdmin(req.params.groupId, req, res, next);
+            next();
+        } catch (error) {
+            return next(error);
+        }
+    },
     param('groupId').isLength({ min: 1 }).withMessage('A group ID is required.'),
     body('userId').isLength({ min: 1 }).withMessage('A user ID is required.'),
     body('admin').isBoolean().withMessage('A boolean value for \'admin\' is required.'),
@@ -106,6 +158,14 @@ router.get(
     '/:groupId/requests',
     isAuth,
     isActivated,
+    async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            await isGroupMember(req.params.groupId, req, res, next);
+            next();
+        } catch (error) {
+            return next(error);
+        }
+    },
     param('groupId').isLength({ min: 1 }).withMessage('A group ID is required.'),
     groupsController.getGroupJoinRequests
 );
@@ -114,6 +174,14 @@ router.get(
     '/:groupId/admins',
     isAuth,
     isActivated,
+    async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            await isGroupMember(req.params.groupId, req, res, next);
+            next();
+        } catch (error) {
+            return next(error);
+        }
+    },
     param('groupId').isLength({ min: 1 }).withMessage('A group ID is required.'),
     groupsController.getAdminsInGroup
 );
@@ -122,6 +190,14 @@ router.get(
     '/:groupId/members',
     isAuth,
     isActivated,
+    async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            await isGroupMember(req.params.groupId, req, res, next);
+            next();
+        } catch (error) {
+            return next(error);
+        }
+    },
     param('groupId').isLength({ min: 1 }).withMessage('A group ID is required.'),
     groupsController.getMembersInGroup
 );

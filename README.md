@@ -366,11 +366,11 @@ Edits the details of a group.<br>
 ```
 <br>
 
-**`DELETE /groups/delete`**<br>
+**`DELETE /groups/delete/:groupId`**<br>
 Deletes a group and all of the posts in that group.<br>
 |Field|Location|Required|Description|
 |---|---|---|---|
-|id|body|true|The ID of the group to delete.|
+|groupId|param|true|The ID of the group to delete.|
 ```
 {
     group: {

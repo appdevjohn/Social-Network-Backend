@@ -96,5 +96,5 @@ export const getAdminStatusOfUserForGroup = (groupId: string, userId: string) =>
 }
 
 export const getMemberStatusOfUserForGroup = (groupId: string, userId: string) => {
-    return query('SELECT COUNT(*) FROM users_groups WHERE group_id = $1 AND user_id = $2;', [groupId, userId]);
+    return query('SELECT COUNT(*) FROM users_groups WHERE group_id = $1 AND user_id = $2 AND approved = true;', [groupId, userId]);
 }
