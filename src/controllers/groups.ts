@@ -304,7 +304,7 @@ export const removeUserFromGroup = async (req: Request, res: Response, next: Nex
 
     } catch (error) {
         console.error(error);
-        return next(RequestError.withMessageAndCode('Something went wrong approving this user.', 500));
+        return next(RequestError.withMessageAndCode((error as Error).message || 'Something went wrong approving this user.', 400));
     }
 }
 
