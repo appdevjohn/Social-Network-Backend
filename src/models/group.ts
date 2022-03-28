@@ -47,10 +47,10 @@ class Group {
         this.description = config.description;
         this.id = config.id;
 
-        if (config.approved) {
+        if (config.approved !== undefined && config.approved !== null) {
             this.approved = config.approved;
         }
-        if (config.admin) {
+        if (config.admin !== undefined && config.admin !== null) {
             this.admin = config.admin;
         }
     }
@@ -232,11 +232,11 @@ class Group {
         });
     }
 
-    isUserAdmin = (groupId: string, userId: string): Promise<boolean> => {
+    isUserAdmin(groupId: string, userId: string): Promise<boolean> {
         return Group.isUserAdmin(groupId, userId);
     }
 
-    isUserMember = (groupId: string, userId: string): Promise<boolean> => {
+    isUserMember(groupId: string, userId: string): Promise<boolean> {
         return Group.isUserMember(groupId, userId);
     }
 
@@ -254,30 +254,34 @@ class Group {
         })
     }
 
-    static findById = (groupId: string): Promise<Group> => {
-        return getGroup(groupId).then(result => {
+    static findById = (groupId: string, userId?: string): Promise<Group> => {
+        return getGroup(groupId, userId).then(result => {
             if (result.rowCount > 0) {
                 return new Group({
                     createdAt: result.rows[0]['created_at'],
                     updatedAt: result.rows[0]['updated_at'],
                     name: result.rows[0]['name'],
                     description: result.rows[0]['description'],
+                    approved: result.rows[0]['approved'],
+                    admin: result.rows[0]['admin_status'],
                     id: result.rows[0]['group_id']
                 });
             } else {
-                throw new Error('Could not find this conversation.');
+                throw new Error('Could not find this group.');
             }
         });
     }
 
-    static findByName = (name: string): Promise<Group> => {
-        return getGroupByName(name).then(result => {
+    static findByName = (name: string, userId?: string): Promise<Group> => {
+        return getGroupByName(name, userId).then(result => {
             if (result.rowCount > 0) {
                 return new Group({
                     createdAt: result.rows[0]['created_at'],
                     updatedAt: result.rows[0]['updated_at'],
                     name: result.rows[0]['name'],
                     description: result.rows[0]['description'],
+                    approved: result.rows[0]['approved'],
+                    admin: result.rows[0]['admin_status'],
                     id: result.rows[0]['group_id']
                 });
             } else {
@@ -286,14 +290,16 @@ class Group {
         });
     }
 
-    static findByNameLike = (name: string, limit?: number): Promise<Group[]> => {
-        return getGroupsByNameLike(name, limit).then(result => {
+    static findByNameLike = (name: string, limit?: number, userId?: string): Promise<Group[]> => {
+        return getGroupsByNameLike(name, limit, userId).then(result => {
             return result.rows.map(r => {
                 return new Group({
                     createdAt: r['created_at'],
                     updatedAt: r['updated_at'],
                     name: r['name'],
                     description: r['description'],
+                    approved: r['approved'],
+                    admin: r['admin_status'],
                     id: r['group_id']
                 });
             });

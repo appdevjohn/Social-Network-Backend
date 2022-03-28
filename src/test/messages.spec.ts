@@ -70,7 +70,7 @@ describe('Messages Tests', () => {
     it('should be able to create a new conversation', function () {
         return request(app)
             .post('/conversations/new')
-            .send({ name: 'Test Conversation', members: JSON.stringify(['Lemonayyyd']) })
+            .send({ name: 'Test Conversation', members: ['automated_test_member'] })
             .expect(201)
             .then(res => {
                 const convoId = res.body.conversation.id;

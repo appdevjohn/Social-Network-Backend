@@ -6,21 +6,34 @@ export interface GroupType {
     description?: string;
 }
 
-export const getGroup = (groupId: string): Promise<QueryResult> => {
-    return query('SELECT * FROM groups WHERE group_id = $1;', [groupId]);
+export const getGroup = (groupId: string, userId?: string): Promise<QueryResult> => {
+    if (userId) {
+        return query('SELECT DISTINCT groups.*, users_groups.admin_status, users_groups.approved FROM groups LEFT JOIN users_groups ON users_groups.user_id = $1 WHERE groups.group_id = $2;', [userId, groupId]);
+    } else {
+        return query('SELECT * FROM groups WHERE group_id = $1;', [groupId]);
+    }
 }
 
-export const getGroupByName = (name: string): Promise<QueryResult> => {
-    return query('SELECT * FROM groups WHERE name = $1;', [name]);
+export const getGroupByName = (name: string, userId?: string): Promise<QueryResult> => {
+    if (userId) {
+        return query('SELECT DISTINCT groups.*, users_groups.admin_status, users_groups.approved FROM groups LEFT JOIN users_groups ON users_groups.user_id = $1 WHERE groups.name = $2;', [userId, name]);
+    } else {
+        return query('SELECT * FROM groups WHERE name = $1;', [name]);
+    }
 }
 
 export const getGroupsByUserId = (userId: string): Promise<QueryResult> => {
     return query('SELECT DISTINCT groups.*, users_groups.admin_status, users_groups.approved FROM users FULL JOIN users_groups USING (user_id) FULL JOIN groups USING (group_id) WHERE users.user_id = $1;', [userId]);
 }
 
-export const getGroupsByNameLike = (name: string, limit: number = 20): Promise<QueryResult> => {
+export const getGroupsByNameLike = (name: string, limit: number = 20, userId?: string): Promise<QueryResult> => {
     const nameLike = `%${name.toLowerCase()}%`;
-    return query('SELECT * FROM groups WHERE LOWER(name) LIKE $1 LIMIT $2;', [nameLike, `${limit}`]);
+
+    if (userId) {
+        return query('SELECT DISTINCT groups.*, users_groups.admin_status, users_groups.approved FROM groups LEFT JOIN users_groups ON users_groups.user_id = $1 WHERE LOWER(name) LIKE $2 LIMIT $3;', [userId, nameLike, `${limit}`]);
+    } else {
+        return query('SELECT * FROM groups WHERE LOWER(name) LIKE $1 LIMIT $2;', [nameLike, `${limit}`]);
+    }
 }
 
 export const createGroup = (newGroup: GroupType): Promise<QueryResult> => {

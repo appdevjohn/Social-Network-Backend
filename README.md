@@ -257,6 +257,9 @@ Returns all of the groups the user is currently involved in.<br>
         {
             id: '1234',
             name: 'Nintendo Gamers',
+            description: 'Group for Nintendo and gaming enthusiasts.',
+            approved: true,
+            admin: false,
             createdAt: '2021-06-10T18:16:50.085Z',
             updatedAt: '2021-06-10T18:16:50.085Z'
         }
@@ -276,6 +279,8 @@ Returns details about the group, the members in the group, and the users request
         id: '1234',
         name: 'Nintendo Gamers',
         description: 'Group for Nintendo and gaming enthusiasts.',
+        approved: true,
+        admin: false,
         createdAt: '2021-06-10T18:16:50.085Z',
         updatedAt: '2021-06-10T18:16:50.085Z'
     },

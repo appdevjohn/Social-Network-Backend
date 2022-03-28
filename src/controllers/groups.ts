@@ -16,7 +16,7 @@ export const validateGroupName = (req: Request, res: Response, next: NextFunctio
 
     const groupName = req.params.groupName;
 
-    return Group.findByName(groupName).then(() => {
+    return Group.findByName(groupName, req.userId!).then(() => {
         return res.status(200).json({
             groupName: groupName,
             valid: true
@@ -40,7 +40,7 @@ export const getGroupWithNameLike = (req: Request, res: Response, next: NextFunc
 
     const groupSearch: string = req.params.groupName;
 
-    Group.findByNameLike(groupSearch, 20).then(groups => {
+    Group.findByNameLike(groupSearch, 20, req.userId!).then(groups => {
         return res.status(200).json({
             groups: groups
         });
@@ -81,17 +81,17 @@ export const getGroup = async (req: Request, res: Response, next: NextFunction) 
     try {
         let group: Group;
         if (groupId) {
-            group = await Group.findById(groupId);
+            group = await Group.findById(groupId, req.userId!);
 
         } else if (groupName) {
-            group = await Group.findByName(groupName);
+            group = await Group.findByName(groupName, req.userId!);
 
         } else {
             return next(RequestError.withMessageAndCode('A group id or group name is required to get a group.', 406));
         }
 
         const response: any = {
-            group: group,
+            group: group
         }
 
         if (req.memberGroupId === groupId) {
@@ -125,7 +125,7 @@ export const getGroup = async (req: Request, res: Response, next: NextFunction) 
         return res.status(200).json(response);
 
     } catch (error) {
-        return next(RequestError.withMessageAndCode('Could not get this group.', 500));
+        return next(RequestError.withMessageAndCode((error as Error).message || 'Could not get this group.', 500));
     }
 }
 
@@ -188,7 +188,7 @@ export const editGroup = (req: Request, res: Response, next: NextFunction) => {
     const groupDescription: string | null = req.body.description ? req.body.description.trim() : null;
 
     let updatedGroup: Group;
-    return Group.findById(groupId).then(group => {
+    return Group.findById(groupId, req.userId!).then(group => {
         updatedGroup = group;
         if (groupName && groupName.length > 0) {
             updatedGroup.name = groupName;
@@ -236,7 +236,7 @@ export const deleteGroup = (req: Request, res: Response, next: NextFunction) => 
     const groupId: string = req.params.groupId;
 
     let deletedGroup: Group;
-    return Group.findById(groupId).then(group => {
+    return Group.findById(groupId, req.userId!).then(group => {
         deletedGroup = group;
         return deletedGroup.delete();
 
@@ -263,7 +263,7 @@ export const addUserToGroup = async (req: Request, res: Response, next: NextFunc
     const userId: string = req.body.userId;
 
     try {
-        const group = await Group.findById(groupId);
+        const group = await Group.findById(groupId, req.userId!);
         await group.addUser(userId, false, false);
 
         return res.status(201).json({
@@ -293,7 +293,7 @@ export const removeUserFromGroup = async (req: Request, res: Response, next: Nex
     const userId: string = req.body.userId;
 
     try {
-        const group = await Group.findById(groupId);
+        const group = await Group.findById(groupId, req.userId!);
         await group.removeUser(userId)
 
         return res.status(200).json({
@@ -321,7 +321,7 @@ export const approveUserJoinRequest = async (req: Request, res: Response, next: 
     const userId: string = req.params.userId;
 
     try {
-        const group = await Group.findById(groupId);
+        const group = await Group.findById(groupId, req.userId!);
         await group.approveUser(userId);
 
         return res.status(200).json({
@@ -349,7 +349,7 @@ export const setAdminStatusOfMember = async (req: Request, res: Response, next: 
     const adminStatus: boolean = req.body.admin;
 
     try {
-        const group = await Group.findById(groupId);
+        const group = await Group.findById(groupId, req.userId!);
         await group.setAdmin(userId, adminStatus);
 
         return res.status(200).json({
@@ -375,7 +375,7 @@ export const getGroupJoinRequests = async (req: Request, res: Response, next: Ne
     const groupId: string = req.params.groupId;
 
     try {
-        const group = await Group.findById(groupId);
+        const group = await Group.findById(groupId, req.userId!);
         const usersRequesting = await group.requests();
 
         return res.status(200).json({
@@ -410,7 +410,7 @@ export const getAdminsInGroup = async (req: Request, res: Response, next: NextFu
     const groupId: string = req.params.groupId;
 
     try {
-        const group = await Group.findById(groupId);
+        const group = await Group.findById(groupId, req.userId!);
         const admins = await group.admins();
 
         return res.status(200).json({
@@ -445,7 +445,7 @@ export const getMembersInGroup = async (req: Request, res: Response, next: NextF
     const groupId: string = req.params.groupId;
 
     try {
-        const group = await Group.findById(groupId);
+        const group = await Group.findById(groupId, req.userId!);
         const members = await group.members();
 
         return res.status(200).json({
