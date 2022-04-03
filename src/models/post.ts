@@ -188,8 +188,8 @@ class Post {
         });
     }
 
-    static findByGroupId = (groupId: string): Promise<Post[]> => {
-        return getPostsFromGroup(groupId).then(result => {
+    static findByGroupId = (groupId: string, limit?: number, offset?: number): Promise<Post[]> => {
+        return getPostsFromGroup(groupId, limit, offset).then(result => {
             const posts = result.rows.map(row => {
                 return Post.parseRow(row);
             });

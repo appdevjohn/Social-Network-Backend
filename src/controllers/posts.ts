@@ -17,8 +17,10 @@ export const getPosts = (req: Request, res: Response, next: NextFunction) => {
     }
 
     const groupId: string = req.query.groupId as string;
+    const limit: number | undefined = req.query.limit ? parseInt(req.query.limit as string) : undefined;
+    const offset: number | undefined = req.query.offset ? parseInt(req.query.offset as string) : undefined;
 
-    return Post.findByGroupId(groupId).then(posts => {
+    return Post.findByGroupId(groupId, limit, offset).then(posts => {
         return res.status(200).json({
             posts: posts
         });
@@ -166,8 +168,10 @@ export const getMessages = (req: Request, res: Response, next: NextFunction) => 
     }
 
     const postId: string = req.params.postId;
+    const limit: number | undefined = req.query.limit ? parseInt(req.query.limit as string) : undefined;
+    const offset: number | undefined = req.query.offset ? parseInt(req.query.offset as string) : undefined;
 
-    return Message.findByPostId(postId).then(messages => {
+    return Message.findByPostId(postId, limit, offset).then(messages => {
         messages.forEach(message => {
             if (message.type !== ContentType.Text) {
                 message.content = getUploadURL(message.content)!;

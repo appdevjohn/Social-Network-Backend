@@ -13,8 +13,12 @@ export const getPost = (postId: string): Promise<QueryResult> => {
     return query('SELECT posts.*, users.first_name, users.last_name, users.username, users.email, users.profile_pic_url FROM posts FULL JOIN users USING (user_id) WHERE posts.post_id = $1;', [postId]);
 }
 
-export const getPostsFromGroup = (groupId: string): Promise<QueryResult> => {
-    return query('SELECT posts.*, users.first_name, users.last_name, users.username, users.email, users.profile_pic_url FROM posts FULL JOIN users USING (user_id) WHERE posts.group_id = $1;', [groupId]);
+export const getPostsFromGroup = (groupId: string, limit?: number, offset: number = 0): Promise<QueryResult> => {
+    if (limit) {
+        return query('SELECT posts.*, users.first_name, users.last_name, users.username, users.email, users.profile_pic_url FROM posts FULL JOIN users USING (user_id) WHERE posts.group_id = $1 LIMIT $2 OFFSET $3;', [groupId, `${limit}`, `${offset}`]);
+    } else {
+        return query('SELECT posts.*, users.first_name, users.last_name, users.username, users.email, users.profile_pic_url FROM posts FULL JOIN users USING (user_id) WHERE posts.group_id = $1 OFFSET $2;', [groupId, `${offset}`]);
+    }
 }
 
 export const createPost = (newPost: PostType): Promise<QueryResult> => {
